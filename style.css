@@ -1,0 +1,194 @@
+body {
+    /* background: linear-gradient(180deg, #39FF14, blue, red, red);
+    background-size: 500% 500%;
+    animation: gradient 100s infinite alternate; */
+
+    background-image: url('03.gif');
+    background-size: cover;
+
+    height: 200vh;
+    padding:0;
+    margin:0;
+
+    background-color: rgb(50, 50, 150);
+}
+/*
+@keyframes gradient {
+    0% {
+        background-position: 50% 0%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 50% 0%;
+    }
+} */
+
+.slidecontainer {
+  width: 90%; /* Width of the outside container */
+}
+
+/* The slider itself */
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 25px;
+  border-radius: 30px;
+  background: rgba(255,255,255,0.35);
+  outline: none;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: rgba(0,0,50,0.75);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: rgba(0,0,50,0.75);
+  cursor: pointer;
+}
+
+.attack_knob {
+    color: black;
+}
+
+a.button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+    font-size: 15px;
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.button {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: 2px;
+  color: purple;
+  background-color: rgba(255,255,255,0.10);
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 1px black;
+}
+
+.button:hover {background-color: rgba(255,255,255,0.25)}
+
+.button:active {
+  background-color: rgba(255,255,255,0.25);
+  box-shadow: 0 0px black;
+  transform: translateY(4px);
+}
+
+.navbar-light {
+  border: none;
+}
+
+.tab{
+    color: white;
+    margin-top: 0px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 30px;
+}
+
+.awesome {
+    font-family: times;
+    font-style: italic;
+
+    width:100%;
+
+    margin-top: 0px;
+    margin-bottom: 0px;
+
+    padding-top: 40px;
+    padding-bottom: 0px;
+
+    /* margin: 0 auto; */
+    text-align: center;
+    align: center;
+
+    color:#313131;
+    font-size 70px;
+    font-weight: bold;
+    -webkit-animation: colorchange 2s infinite alternate;
+}
+
+h4,h5,h6,h7,p,label {
+    text-align: center;
+    align: center;
+
+    color: rgba(255, 255, 255, 1.0);
+}
+
+
+@-webkit-keyframes colorchange {
+  0% {
+
+    color: blue;
+  }
+
+  10% {
+
+    color: #8e44ad;
+  }
+
+  20% {
+
+    color: #1abc9c;
+  }
+
+  30% {
+
+    color: #d35400;
+  }
+
+  40% {
+
+    color: blue;
+  }
+
+  50% {
+
+    color: #34495e;
+  }
+
+  60% {
+
+    color: blue;
+  }
+
+  70% {
+
+    color: #2980b9;
+  }
+  80% {
+
+    color: #ff2a00;
+  }
+
+  90% {
+
+    color: #2980b9;
+  }
+
+  100% {
+
+    color: pink;
+  }
+}
