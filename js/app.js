@@ -472,7 +472,7 @@ function ready() {
     conn.on('close', function () {
         status.innerHTML = "Status: Connection reset<br>Awaiting connection...";
         conn = null;
-        start(true);
+        //start(true);
     });
 }
 
@@ -583,60 +583,3 @@ function init() {
     }
     initUI();
 }
-
-
-
-// Play = (function() {
-//   // var ctx = new(AudioContext || webkitAudioContext);
-//   return function(duration, freq_a, freq_b, freq_c, finishedCallback) {
-//     duration = +duration;
-//     if (typeof finishedCallback != "function") {
-//       finishedCallback = function() {};
-//     }
-//
-//     var osc_a = ctx.createOscillator();
-//     osc_a.connect(ctx.destination);
-//     osc_a.frequency.value = freq_a;
-//
-//     var osc_b = ctx.createOscillator();
-//     osc_b.connect(ctx.destination);
-//     osc_b.frequency.value = freq_b;
-//
-//     var osc_c = ctx.createOscillator();
-//     osc_c.connect(ctx.destination);
-//     osc_c.frequency.value = freq_c;
-//
-//     if (osc_a.start) osc_a.start();
-//     else osc_a.noteOn(0);
-//
-//     if (osc_b.start) osc_b.start();
-//     else osc_b.noteOn(0);
-//
-//     if (osc_c.start) osc_c.start();
-//     else osc_c.noteOn(0);
-//
-//     osc_a_gain = ctx.createGain();
-//     osc_a_gain.gain.value = 3000;
-//
-//     // Wiring everything up
-//     osc_a.connect(osc_a_gain);
-//     osc_a_gain.connect(osc_b.frequency);
-//     osc_a_gain.connect(osc_c.frequency);
-//     osc_b.connect(out);
-//
-//     setTimeout(
-//       function() {
-//         if (osc_a.stop) osc_a.stop(0);
-//         else osc_a.noteOff(0);
-//
-//         if (osc_b.stop) osc_b.stop(0);
-//         else osc_b.noteOff(0);
-//
-//         if (osc_c.stop) osc_c.stop(0);
-//         else osc_c.noteOff(0);
-//
-//         finishedCallback();
-//       }, duration
-//     );
-//   };
-// })();

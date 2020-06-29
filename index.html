@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width">
@@ -27,7 +26,17 @@
                 <center>
                     <br><br>
 
-                    <h4> CLIENT </h4>
+                    <h4> Host </h4>
+                    <p id="receiver-id" title=".">Status: Disconnected</p>
+                    <p id="status" class="status"></p>
+                    <br>
+                    <input type="text" id="setChannelNameBox" placeholder="Channel Name" autofocus="off" />
+                    <br><br>
+                    <button type="button" id="startHostButton">Start</button>
+
+                    <br><br><br><hr><br><br>
+
+                    <h4> Client </h4>
                     <p id="statusClient" class="status">Status: Disconnected</p>
                     <br>
                     <!-- <h5> Channel: </h5> -->
@@ -37,17 +46,7 @@
 
                     <br><br><br><hr><br><br>
 
-                    <h4> HOST </h4>
-                    <p id="receiver-id" title=".">Status: Disconnected</p>
-                    <p id="status" class="status"></p>
-                    <br>
-                    <input type="text" id="setChannelNameBox" placeholder="Channel Name" autofocus="off" />
-                    <br><br>
-                    <button type="button" id="startHostButton">Connect</button>
-
-                    <br><br><br><hr><br><br>
-
-                    <h4> SERVER (Optional) </h4>
+                    <h4> Custom Sserver </h4>
                     <input type="text" id="setServerBox" placeholder="" autofocus="off" />
                     <br><br>
                     <button type="button" id="startHostButton">Connect</button>
@@ -68,6 +67,7 @@
                         <!-- <li><a class="tab" data-toggle="tab" href="#menu2">Settings</a></li> -->
                     </ul>
                 </div>
+
                 <div class="tab-content ml-auto">
 
                     <div id="synth" class="tab-pane fade">
@@ -274,7 +274,7 @@
 
         <footer>
             <!-- <center>
-                
+
             </center> -->
         </footer>
 

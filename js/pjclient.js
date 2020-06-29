@@ -78,7 +78,7 @@ function initializeClient() {
     peerClient.on('error', function (err) {
         console.log(err);
         initializeClient();
-        alert('' + err);
+        //alert('' + err);
     });
 };
 
@@ -199,7 +199,6 @@ function clearMessages() {
     addMessageClient("Msgs cleared");
 };
 
-// Listen for enter in message box
 sendMessageBoxClient.onkeypress = function (e) {
     var event = e || window.event;
     var char = event.which || event.keyCode;
@@ -207,7 +206,6 @@ sendMessageBoxClient.onkeypress = function (e) {
         sendButtonClient.click();
 };
 
-// Send message
 sendButtonClient.onclick = function () {
     if (connClient && connClient.open) {
         var msg = sendMessageBoxClient.value;
@@ -220,20 +218,10 @@ sendButtonClient.onclick = function () {
     }
 };
 
-
-// Clear messages box
-// clearMsgsButtonClient.onclick = function () {
-//     clearMessages();
-// };
-
-// Start peerClient connClientection on click
 connectButtonClient.addEventListener('click', joinClient);
-
-
 
 function init() {
     console.log("Client: OK");
 }
-// Since all our callbacks are setup, start the process of obtaining an ID
 
 initializeClient();
