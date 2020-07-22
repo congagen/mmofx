@@ -76,8 +76,8 @@ function initializeClient() {
     });
 
     peerClient.on('error', function (err) {
-        console.log(err);
-        initializeClient();
+        //console.log(err);
+        //initializeClient();
         //alert('' + err);
     });
 };
