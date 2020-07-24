@@ -110,25 +110,28 @@
                 <div class="tab-content ml-auto">
 
                     <div id="control_tab" class="tab-pane fade">
-                        <center>
+                        <div class="container">
+                            <center>
                             <br><br>
-                            <div class="container">
+                            <h4>PlotSeq</h4>
+                            <button type="button" name="button">Play</button>
+                            <button type="button" name="button">Pause</button>
+                            <br><br><br>
 
-                                <h4>PlotSeq</h4>
-                                <button type="button" name="button">Play</button>
-                                <button type="button" name="button">Pause</button>
-                                <br><br><br>
+                            <h4> Keymap </h4>
+                            <br>
 
-                                <h4> Keymap </h4>
-                                <br>
-                                <table id = "keyTable" border="0" cellpadding="5" cellspacing="5"></table>
+                            <br>
+                            <div class="row" id="contentPanel"> </div>
 
-                                <br><br>
-                                <!-- <button onclick="addSamplesBtnClicked()">Add Samples</button> -->
+                            <!-- <form class="form-inline">
+                                <input class="form-control col-1" type="text" id="numPanels" value="90" maxlength="3" />
+                                <button type="button" class="btn btn-info" id="btnGen">Generate</button>
+                            </form> -->
 
-                            </div>
-
-                        </center>
+                            <!-- <button onclick="addSamplesBtnClicked()">Add Samples</button> -->
+                            </center>
+                        </div>
                     </div>
 
                     <div id="composer_tab" class="tab-pane fade">
@@ -330,6 +333,8 @@
             </div>
         </div>
 
+        "type="button" name="button">Play</button>
+
         <footer>
             <!-- <center>
 
@@ -342,6 +347,48 @@
         <script type="text/javascript" src="js/network.js"></script>
         <script type="text/javascript" src="js/audio.js"></script>
         <script type="text/javascript" src="js/ui.js"></script>
+
+        <script>
+            var addCols = function (num){
+                for (var i=1; i<=num; i++) {
+                    let cId = i.toString();
+                    let ltr = String.fromCharCode(60+i);
+
+                    var myCol = $('<div class="col-sm-3 col-md-3 pb-2"></div>');
+
+                    let card_a = '<div type="button" class="card card-outline-info" id="' + cId + 'Panel">';
+                    let card_b = '<div class="card-block"><div class="card-title"><span>Card #' + cId + '</span></div>';
+                    let card_c = '<p>' + ltr + '</p>';
+                    let card_d = '';//'<input id="freq_' + cId + '" placeholder="100"/>';
+                    let card_e = '';//'<button type="button" name="button">Play</button>';
+                    let card_f = '';
+                    let card_g = '</div></div>';
+
+                    var myPanel = $(card_a + card_b + card_c + card_d + card_e + card_f + card_g);
+                    myPanel.appendTo(myCol);
+                    myCol.appendTo('#contentPanel');
+                }
+
+                $('.close').on('click', function(e){
+                    e.stopPropagation();
+                    var $target = $(this).parents('.col-sm-3');
+                    $target.hide('slow', function(){
+                        $target.remove();
+                    });
+                });
+
+            };
+
+            $(document).ready(function(){
+                addCols('100');
+                return false;
+            });
+
+            // $( "#btnGen" ).click(function() {
+            //     addCols('1');
+            //     return false;
+            // });
+        </script>
 
         <script>
             $('.nav-tabs a[href="#studio_tab"]').tab('show');

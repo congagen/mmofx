@@ -33,6 +33,13 @@ body {
     color: lime;
 }
 
+.card-block{
+    background-color: rgba(100, 0, 255, 0);
+}
+.card{
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
 .slidecontainer {
   width: 90%; /* Width of the outside container */
 }

@@ -85,8 +85,7 @@ function AddSampleListRow(sampleId) {
 }
 
 
-function updateKeyMap(keyId) {
-    console.log(keyId);
+function updateKeyMap_(keyId) {
     let keyItem = currentKeyboard[keyId];
 
     var keyConfTableContainer = $("#keyTable");
@@ -148,13 +147,17 @@ function updateKeyMap(keyId) {
 }
 
 
+function updateKeyMap(keyId) {
+    let keyItem = currentKeyboard[keyId];
+    var keyConfTableContainer = $("#playbackPads");
+}
+
+
 function initKeyMap(){
-    currentKeyboard["ui"] = ["N", "SA", "SY", "b"]
-    updateKeyMap("ui");
 
     for (var i = 66; i < 96; i++) {
         var l = String.fromCharCode(i).toLowerCase();
-        console.log(l);
+
         currentKeyboard[l] = [l, l, "a", "b"]
         updateKeyMap(l);
     }
@@ -195,8 +198,6 @@ function initUI() {
     window.onbeforeunload = function () {
       window.scrollTo(0, 0);
     }
-
-    initKeyMap();
 
     if (!isInitUI) {
         initAudio();
