@@ -98,15 +98,49 @@
                 <div style="background-color: rgb(0, 0, 0, 0.35)">
                     <ul class="nav nav-tabs justify-content-center navbar-light">
                         <!-- <li class="active button"><a data-toggle="tab" href="#network_tab">Network</a></li> -->
+                        <li><a class="tab" data-toggle="tab" href="#control_tab">Controls</a></li>
+                        <li><a class="tab" data-toggle="tab" href="#composer_tab">Comp</a></li>
                         <li><a class="tab" data-toggle="tab" href="#mixer">Mixer</a></li>
                         <li><a class="tab" data-toggle="tab" href="#synth">Synth</a></li>
                         <li><a class="tab" data-toggle="tab" href="#sampler">Sampler</a></li>
-                        <li><a class="tab" data-toggle="tab" href="#keys_tab">Keys</a></li>
                         <!-- <li><a class="tab" data-toggle="tab" href="#settings_tab">Settings</a></li> -->
                     </ul>
                 </div>
 
                 <div class="tab-content ml-auto">
+
+                    <div id="control_tab" class="tab-pane fade">
+                        <center>
+                            <br><br>
+                            <div class="container">
+
+                                <h4>PlotSeq</h4>
+                                <button type="button" name="button">Play</button>
+                                <button type="button" name="button">Pause</button>
+                                <br><br><br>
+
+                                <h4> Keymap </h4>
+                                <br>
+                                <table id = "keyTable" border="0" cellpadding="5" cellspacing="5"></table>
+
+                                <br><br>
+                                <!-- <button onclick="addSamplesBtnClicked()">Add Samples</button> -->
+
+                            </div>
+
+                        </center>
+                    </div>
+
+                    <div id="composer_tab" class="tab-pane fade">
+                        <center>
+                            <br><br>
+                            <div class="container">
+
+
+                            </div>
+
+                        </center>
+                    </div>
 
                     <div id="synth" class="tab-pane fade">
                         <center>
@@ -146,7 +180,6 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm">
-                                        <center><h5> Keymap <h5></center><br>
                                     </div>
                                 </div>
                             </div>
@@ -162,7 +195,6 @@
                             <br><br>
                         </center>
                     </div>
-
 
                     <div id="mixer" class="tab-pane fade">
                         <center>
@@ -253,24 +285,6 @@
                             </center>
                         </div>
 
-                        <div id="keys_tab" class="tab-pane fade">
-                            <center>
-                                <br><br>
-                                <div class="container">
-
-                                    <h4> Keys </h4>
-                                    <br><br><br>
-
-                                    <table id = "keyTable" border="0" cellpadding="5" cellspacing="5"></table>
-
-                                    <br><br>
-                                    <!-- <button onclick="addSamplesBtnClicked()">Add Samples</button> -->
-
-                                </div>
-
-                            </center>
-                        </div>
-
                     </div>
                 </div>
 
@@ -323,7 +337,6 @@
         </footer>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.4/Pizzicato.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.7.2/simplepeer.min.js" integrity="sha512-RZlErEuUwWv3EhGNhvni9vinu0QPwNU0OyWAlhTeezEToTZu/C+/Mn7ItRFmpcf8MTK0J2kRalSfzrpQqF7wJQ==" crossorigin="anonymous"></script>
 
         <script type="text/javascript" src="js/session.js"></script>
         <script type="text/javascript" src="js/network.js"></script>
@@ -332,7 +345,7 @@
 
         <script>
             $('.nav-tabs a[href="#studio_tab"]').tab('show');
-            $('.nav-tabs a[href="#mixer"]').tab('show');
+            $('.nav-tabs a[href="#control_tab"]').tab('show');
             window.scrollTo(0,0);
         </script>
 

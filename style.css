@@ -29,6 +29,10 @@ body {
     color: lime;
 }
 
+#sampleTableContainer{
+    color: lime;
+}
+
 .slidecontainer {
   width: 90%; /* Width of the outside container */
 }

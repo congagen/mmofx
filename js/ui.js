@@ -104,29 +104,60 @@ function updateKeyMap(keyId) {
         currentKeyboard[sId][2] = a.value;
     });
 
-    var btnPreview = $("<input id=" + keyId + " type = 'button' value = 'Preview'/>");
+    var btnPreview = $("<input id=" + keyId + " type = 'button' value = 'Play'/>");
     btnPreview.click(function () {
         var row = btnPreview.closest("TR");
         var sId = btnPreview.attr('id');
         //playSample(sId);
     });
 
-    var btnRemove = $("<input id=" + keyId + " type = 'button' value = 'Remove'/>");
-    btnRemove.click(function () {
-        var row = btnRemove.closest("TR");
-        var sId = btnPreview.attr('id');
-
-        delete currentKeyboard[sId];
-        row.remove();
+    // <input checked type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
+    let synCheckboxId = keyId + "_" + "synActiveForKey";
+    var synthCheckbox = $("<input checked type=\"checkbox\" id=\"" + synCheckboxId + "\" type = 'button' />");
+    synthCheckbox.click(function () {
+        console.log(synCheckboxId);
     });
+
+    let samplerCheckboxId = keyId + "_" + "synActiveForKey";
+    var samplerCheckbox = $("<input checked type=\"checkbox\" id=\"" + samplerCheckboxId + "\" type = 'button' />");
+    samplerCheckbox.click(function () {
+        console.log(samplerCheckboxId);
+    });
+
+    // var btnRemove = $("<input id=" + keyId + " type = 'button' value = 'Remove'/>");
+    // btnRemove.click(function () {
+    //     var row = btnRemove.closest("TR");
+    //     var sId = btnPreview.attr('id');
+    //
+    //     delete currentKeyboard[sId];
+    //     row.remove();
+    // });
 
     $(cell).append(" ");
     $(cell).append("Key: ");
-    $(cell).append(trgKeysInput);
     $(cell).append(" ");
     $(cell).append(nameField);
+    $(cell).append(" ");
+    $(cell).append(synthCheckbox);
+    $(cell).append(" ");
+    $(cell).append(samplerCheckbox);
+    $(cell).append(" ");
     $(cell).append(btnPreview);
-    $(cell).append(btnRemove);
+    // $(cell).append(btnRemove);
+
+}
+
+
+function initKeyMap(){
+    currentKeyboard["ui"] = ["N", "SA", "SY", "b"]
+    updateKeyMap("ui");
+
+    for (var i = 66; i < 96; i++) {
+        var l = String.fromCharCode(i).toLowerCase();
+        console.log(l);
+        currentKeyboard[l] = [l, l, "a", "b"]
+        updateKeyMap(l);
+    }
 
 }
 
@@ -155,22 +186,6 @@ function handleFileSelect(e) {
         var f = files[i];
     }
 
-}
-
-function initKeyMap(){
-    let kbKeys = [
-        "1","2","3","4","5","6","7","8","9","0",
-        "1","2","3","4","5","6","7","8","9","0",
-        "1","2","3","4","5","6","7","8","9","0",
-        "1","2","3","4","5","6","7","8","9","0"
-    ]
-
-    for (var i = 60; i < 96; i++) {
-        var l = String.fromCharCode(i).toLowerCase();
-        console.log(l);
-        // currentKeyboard[l] = [l,"a"]
-        // updateKeyMap(l);
-    }
 }
 
 

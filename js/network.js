@@ -76,4 +76,4 @@ networkHostChannelStartButton.onclick = function () {
 };
 
 
-init();
+//init();
