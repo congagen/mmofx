@@ -3,14 +3,14 @@ body {
     background-size: 500% 500%;
     animation: gradient 100s infinite alternate; */
 
-    background-image: url('03.gif');
+    /* background-image: url('03.gif'); */
     background-size: cover;
 
     height: 200vh;
     padding:0;
     margin:0;
 
-    background-color: rgb(50, 50, 150);
+    background-color: rgb(40, 40, 50);
 }
 /*
 @keyframes gradient {
@@ -24,6 +24,10 @@ body {
         background-position: 50% 0%;
     }
 } */
+
+#keyTable{
+    color: lime;
+}
 
 .slidecontainer {
   width: 90%; /* Width of the outside container */

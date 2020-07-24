@@ -1,0 +1,22 @@
+{
+  "name": "mmosfx",
+  "version": "1.0.0",
+  "description": "XUSIONE.COM^P2P^SFX lab (PeerJS + Pizzicato) Demo -> https://yphnaweb.s3.amazonaws.com/MMOSFXYS/index.html",
+  "main": "js/networking.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/congagen/mmosfx.git"
+  },
+  "dependencies": {
+    "simple-peer": "*"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/congagen/mmosfx/issues"
+  },
+  "homepage": "https://github.com/congagen/mmosfx#readme"
+}

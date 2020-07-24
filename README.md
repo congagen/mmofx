@@ -8,4 +8,4 @@ Demo -> https://yphnaweb.s3.amazonaws.com/MMOSFXYS/index.html
 ### Local testing:
 
 ```sh
-$ python -m SimpleHTTPServer 8000
+$ python3 -m http.server -d .
