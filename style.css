@@ -32,6 +32,18 @@ body {
 #sampleTableContainer{
     color: lime;
 }
+/*
+.input{
+    box-sizing : border-box;
+} */
+
+.keyPadInput {
+    background-color: clear !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
 
 .card-block{
     background-color: rgba(100, 0, 255, 0);

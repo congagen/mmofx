@@ -38,6 +38,7 @@ var previewBtn = document.getElementById("previewBtnHost");
 var cueString = "<span class=\"cueMsg\">Cue: </span>";
 var currentKeyboard = {"a": ["a1","b1","c1"]};
 var isTouchDevice = 'ontouchstart' in document.documentElement;
+var padCount = 0;
 
 
 function AddSampleListRow(sampleId) {
@@ -85,24 +86,25 @@ function AddSampleListRow(sampleId) {
 
 }
 
-
 function updateKeyMap_(keyId) {
     let keyItem = currentKeyboard[keyId];
+    padCount += 1;
+    let cId = keyId.toString();
+    let inputId = keyId + "_input";
 
-    let cId = keyId.toString() + "_panel";
-
-    var myCol = $('<div class="col-sm-2 col-md-2 pb-2"></div>');
+    // <div class="col-xs-2">
+    var padCol = $('<div class="col-3 col-md-2 pb-2"></div>');
     let card_a = '<div type="button" class="card card-outline-info" id="' + "playBtn" + '">';
-    let card_b = '<div class="card-block"><div class="card-title"><span>Card #' + cId + '</span></div>';
-    let card_c = '<p>' + keyId + '</p>';
-    let card_d = ''; //'<input id="freq_' + cId + '" placeholder="100"/>';
-    let card_e = ''; //'<button type="button" name="button">Play</button>';
+    let card_b = '<div class="card-block"><div class="card-title"></div>';
+    let card_c = '<div class="col-xs-2 keyPad">';
+    let card_d = '<input id="pInput_'+ padCount.toString() +'" class="form-control text-center keyPadInput" placeholder="'
+    let card_e = keyId + '"> </input></div>';
     let card_f = '';
     let card_g = '</div></div>';
 
     var keyPanel = $(card_a + card_b + card_c + card_d + card_e + card_f + card_g);
-    keyPanel.appendTo(myCol);
-    myCol.appendTo('#contentPanel');
+    keyPanel.appendTo(padCol);
+    padCol.appendTo('#contentPanel');
 
     var nameField = $("<input id=keyNameField" + keyId + " size='4' type = 'text' value = " + keyItem[0] + " readonly>");
 
@@ -157,17 +159,20 @@ function updateKeyMap_(keyId) {
         console.log(samplerCheckboxId);
     });
 
-
 }
 
 
-function updateKeyMap(keyId) {
-    let keyItem = currentKeyboard[keyId];
-    var keyConfTableContainer = $("#sampleTableContainer");
+function toggleEditMode(isEnabled) {
+    var all = document.getElementsByClassName("keyPadInput");
+    for (var i=0, max=all.length; i < max; i++) {
+        console.log(i);
+        all[i].readOnly = !isEnabled;
+    }
 }
 
 
 function initKeyMap(){
+    padCount = 0;
 
     for (var i = 33; i < 96; i++) {
         var l = String.fromCharCode(i).toLowerCase();
@@ -175,6 +180,8 @@ function initKeyMap(){
         currentKeyboard[l] = [l, l, "a", "b"]
         updateKeyMap_(l);
     }
+
+    toggleEditMode(false);
 
 }
 
