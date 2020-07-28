@@ -37,6 +37,7 @@ var previewBtn = document.getElementById("previewBtnHost");
 
 var cueString = "<span class=\"cueMsg\">Cue: </span>";
 var currentKeyboard = {"a": ["a1","b1","c1"]};
+var isTouchDevice = 'ontouchstart' in document.documentElement;
 
 
 function AddSampleListRow(sampleId) {
@@ -88,9 +89,24 @@ function AddSampleListRow(sampleId) {
 function updateKeyMap_(keyId) {
     let keyItem = currentKeyboard[keyId];
 
-    var keyConfTableContainer = $("#keyTable");
-    var row = keyConfTableContainer[0].insertRow(-1);
-    var cell = row.insertCell(-1);
+    // var keyConfTableContainer = $("#sampleTableContainer");
+    // var row = keyConfTableContainer[0].insertRow(-1);
+    // var cell = row.insertCell(-1);
+
+    let cId = keyId.toString() + "_panel";
+
+    var myCol = $('<div class="col-sm-2 col-md-2 pb-2"></div>');
+    let card_a = '<div type="button" class="card card-outline-info" id="' + "playBtn" + '">';
+    let card_b = '<div class="card-block"><div class="card-title"><span>Card #' + cId + '</span></div>';
+    let card_c = '<p>' + keyId + '</p>';
+    let card_d = '';//'<input id="freq_' + cId + '" placeholder="100"/>';
+    let card_e = '';//'<button type="button" name="button">Play</button>';
+    let card_f = '';
+    let card_g = '</div></div>';
+
+    var keyPanel = $(card_a + card_b + card_c + card_d + card_e + card_f + card_g);
+    keyPanel.appendTo(myCol);
+    myCol.appendTo('#contentPanel');
 
     var nameField = $("<input id=keyNameField" + keyId + " size='4' type = 'text' value = " + keyItem[0] + " readonly>");
 
@@ -104,11 +120,35 @@ function updateKeyMap_(keyId) {
     });
 
     var btnPreview = $("<input id=" + keyId + " type = 'button' value = 'Play'/>");
-    btnPreview.click(function () {
-        var row = btnPreview.closest("TR");
-        var sId = btnPreview.attr('id');
-        //playSample(sId);
+    keyPanel.mousedown(function () {
+        console.log("Mouse Down");
+
+        console.log(keyId);
+        if (enablePreviewCheckbox.checked == true){
+            playKey(keyId, false);
+        }
     });
+
+    keyPanel.mouseup(function () {
+        console.log("Mouse Up");
+        oscillators.stop();
+    });
+
+    if (isTouchDevice){
+        // keyPanel.touchstart(function () {
+        //     console.log("Touch Start");
+        //
+        //     console.log(keyId);
+        //     if (enablePreviewCheckbox.checked == true){
+        //         playKey(keyId, false);
+        //     }
+        // });
+        //
+        // keyPanel.touchend(function () {
+        //     console.log("Touch Stop");
+        //     oscillators.stop();
+        // });
+    }
 
     // <input checked type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
     let synCheckboxId = keyId + "_" + "synActiveForKey";
@@ -123,43 +163,23 @@ function updateKeyMap_(keyId) {
         console.log(samplerCheckboxId);
     });
 
-    // var btnRemove = $("<input id=" + keyId + " type = 'button' value = 'Remove'/>");
-    // btnRemove.click(function () {
-    //     var row = btnRemove.closest("TR");
-    //     var sId = btnPreview.attr('id');
-    //
-    //     delete currentKeyboard[sId];
-    //     row.remove();
-    // });
-
-    $(cell).append(" ");
-    $(cell).append("Key: ");
-    $(cell).append(" ");
-    $(cell).append(nameField);
-    $(cell).append(" ");
-    $(cell).append(synthCheckbox);
-    $(cell).append(" ");
-    $(cell).append(samplerCheckbox);
-    $(cell).append(" ");
-    $(cell).append(btnPreview);
-    // $(cell).append(btnRemove);
 
 }
 
 
 function updateKeyMap(keyId) {
     let keyItem = currentKeyboard[keyId];
-    var keyConfTableContainer = $("#playbackPads");
+    var keyConfTableContainer = $("#sampleTableContainer");
 }
 
 
 function initKeyMap(){
 
-    for (var i = 66; i < 96; i++) {
+    for (var i = 33; i < 96; i++) {
         var l = String.fromCharCode(i).toLowerCase();
 
         currentKeyboard[l] = [l, l, "a", "b"]
-        updateKeyMap(l);
+        updateKeyMap_(l);
     }
 
 }
@@ -203,6 +223,8 @@ function initUI() {
         initAudio();
     }
 
+    initKeyMap();
+
     masterAmp_slider.value= 30;
     attack_knob.value = 5;
     duration_knob.value = 30;
@@ -222,30 +244,12 @@ previewBtn.onclick = function () {
     playKey(previewBox.value, true);
 };
 
-window.addEventListener('keydown', function(evt) {
-  if(!(evt.key in keysdown)) {
-    keysdown[evt.key] = true;
-
-    if (enablePreviewCheckbox.checked == true){
-        playKey(evt.key.toString(), false);
-    }
-
-    if (enableTransmissionCheckbox.checked == true){
-        console.log("Send");
-    }
-
-  }
-});
-
-window.addEventListener('keyup', function(evt) {
-  delete keysdown[evt.key];
-  oscillators.stop();
-});
 
 document.body.addEventListener('click', function() {
     if (!isInitAudio) {
         initAudio();
     }
 });
+
 
 document.addEventListener("DOMContentLoaded", initUI, false);

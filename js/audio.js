@@ -256,7 +256,6 @@ function playKey(client_seed, isRemote) {
     // }
 }
 
-
 document.body.addEventListener('click', function() {
     if (!isInitAudio) {
         initAudio();
@@ -278,7 +277,7 @@ window.addEventListener('keydown', function(evt) {
         }
     }
 
-    let rvl = context.currentTime + (release_knob.value / 100);
+    let rvl = context.currentTime + (release_knob.value / 1000);
     console.log("Release: " + rvl.toString());
 
     // oscillators.stop(rvl);
@@ -290,7 +289,7 @@ window.addEventListener('keydown', function(evt) {
 
 window.addEventListener('keyup', function(evt) {
     delete keysdown[evt.key];
-    //oscA.stop();
+    oscillators.stop();
 });
 
 
