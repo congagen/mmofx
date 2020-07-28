@@ -93,8 +93,8 @@ function updateKeyMap_(keyId) {
     let inputId = keyId + "_input";
 
     // <div class="col-xs-2">
-    var padCol = $('<div class="col-3 col-md-2 pb-2"></div>');
-    let card_a = '<div type="button" class="card card-outline-info" id="' + "playBtn" + '">';
+    var padCol = $('<div class="col-2 col-xs-1 py-2 px-2"></div>');
+    let card_a = '<div type="button" class="card" id="' + "playBtn" + '">';
     let card_b = '<div class="card-block"><div class="card-title"></div>';
     let card_c = '<div class="col-xs-2 keyPad">';
     let card_d = '<input id="pInput_'+ padCount.toString() +'" class="form-control text-center keyPadInput" placeholder="'
