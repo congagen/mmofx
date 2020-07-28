@@ -89,18 +89,14 @@ function AddSampleListRow(sampleId) {
 function updateKeyMap_(keyId) {
     let keyItem = currentKeyboard[keyId];
 
-    // var keyConfTableContainer = $("#sampleTableContainer");
-    // var row = keyConfTableContainer[0].insertRow(-1);
-    // var cell = row.insertCell(-1);
-
     let cId = keyId.toString() + "_panel";
 
     var myCol = $('<div class="col-sm-2 col-md-2 pb-2"></div>');
     let card_a = '<div type="button" class="card card-outline-info" id="' + "playBtn" + '">';
     let card_b = '<div class="card-block"><div class="card-title"><span>Card #' + cId + '</span></div>';
     let card_c = '<p>' + keyId + '</p>';
-    let card_d = '';//'<input id="freq_' + cId + '" placeholder="100"/>';
-    let card_e = '';//'<button type="button" name="button">Play</button>';
+    let card_d = ''; //'<input id="freq_' + cId + '" placeholder="100"/>';
+    let card_e = ''; //'<button type="button" name="button">Play</button>';
     let card_f = '';
     let card_g = '</div></div>';
 
@@ -124,9 +120,7 @@ function updateKeyMap_(keyId) {
         console.log("Mouse Down");
 
         console.log(keyId);
-        if (enablePreviewCheckbox.checked == true){
-            playKey(keyId, false);
-        }
+        playKey(keyId, false);
     });
 
     keyPanel.mouseup(function () {
