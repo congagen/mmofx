@@ -1,5 +1,5 @@
 {
-  "name": "dev_srv",
+  "name": "sigserv",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,9 +8,8 @@
   },
   "dependencies": {
     "express": "*",
-    "ws": "*",
-    "http": "*",
-    "uuidv4": "*"
+    "uuid": "*",
+    "ws": "*"
   },
   "author": "",
   "license": "ISC"

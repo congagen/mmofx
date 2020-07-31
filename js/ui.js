@@ -37,7 +37,7 @@ var previewBtn = document.getElementById("previewBtnHost");
 
 var cueString = "<span class=\"cueMsg\">Cue: </span>";
 var currentKeyboard = {"a": ["a1","b1","c1"]};
-var isTouchDevice = 'ontouchstart' in document.documentElement;
+var isTouchDevice = "ontouchstart" in document.documentElement;
 var padCount = 0;
 
 
@@ -54,8 +54,6 @@ function AddSampleListRow(sampleId) {
     var trgKeysInput = $("<input id=" + sampleId.toString() + " size='4' type = 'text' value = "+sItem[2].toLowerCase()+"></input>");
     trgKeysInput.change(function () {
         var sId = trgKeysInput.attr('id');
-        console.log(currentSamples[sId]);
-
         let a = document.getElementById(sId.toString());
         currentSamples[sId][2] = a.value;
     });
@@ -111,7 +109,6 @@ function updateKeyMap_(keyId) {
     var trgKeysInput = $("<input id=" + keyId.toString() + " size='4' type = 'text' value = " + keyItem[2].toLowerCase() + "></input>");
     trgKeysInput.change(function () {
         var sId = trgKeysInput.attr('id');
-        console.log(currentKeyboard[sId]);
 
         let a = document.getElementById(sId.toString());
         currentKeyboard[sId][2] = a.value;
@@ -165,7 +162,6 @@ function updateKeyMap_(keyId) {
 function toggleEditMode(isEnabled) {
     var all = document.getElementsByClassName("keyPadInput");
     for (var i=0, max=all.length; i < max; i++) {
-        console.log(i);
         all[i].readOnly = !isEnabled;
     }
 }
@@ -192,7 +188,6 @@ function strToNum(inputString) {
     for (var i = 0; i < inputString.length; i++) {
         composite += inputString.charCodeAt(i).toString();
     }
-    console.log(composite);
     return parseInt(composite);
 }
 

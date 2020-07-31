@@ -1,7 +1,8 @@
 const express = require("express");
 const WebSocket = require("ws");
 const http = require("http");
-// const uuidv4 = require("uuid/v4");
+const uuidv4 = require("uuid/v4");
+
 const app = express();
 
 const port = process.env.PORT || 9000;
@@ -34,15 +35,14 @@ const sendToAll = (clients, type, { id, name: userName }) => {
 wss.on("connection", ws => {
   ws.on("message", msg => {
     let data;
-    //accepting only JSON messages
+    //accept only JSON messages
     try {
       data = JSON.parse(msg);
     } catch (e) {
       console.log("Invalid JSON");
       data = {};
     }
-    const { type, name } = data;
-    //Handle message by type
+    const { type, name, offer, answer, candidate } = data;
     switch (type) {
       //when a user tries to login
       case "login":
@@ -69,6 +69,49 @@ wss.on("connection", ws => {
           sendToAll(users, "updateUsers", ws);
         }
         break;
+      case "offer":
+        //Check if user to send offer to exists
+        const offerRecipient = users[name];
+        if (!!offerRecipient) {
+          sendTo(offerRecipient, {
+            type: "offer",
+            offer,
+            name: ws.name
+          });
+        } else {
+          sendTo(ws, {
+            type: "error",
+            message: `User ${name} does not exist!`
+          });
+        }
+        break;
+      case "answer":
+        //Check if user to send answer to exists
+        const answerRecipient = users[name];
+        if (!!answerRecipient) {
+          sendTo(answerRecipient, {
+            type: "answer",
+            answer,
+          });
+        } else {
+          sendTo(ws, {
+            type: "error",
+            message: `User ${name} does not exist!`
+          });
+        }
+        break;
+      case "candidate":
+        const candidateRecipient = users[name];
+        if (!!candidateRecipient) {
+          sendTo(candidateRecipient, {
+            type: "candidate",
+            candidate
+          });
+        }
+        break;
+      case "leave":
+        sendToAll(users, "leave", ws);
+        break;
       default:
         sendTo(ws, {
           type: "error",
@@ -76,9 +119,14 @@ wss.on("connection", ws => {
         });
         break;
     }
-
   });
-  //send immediate a feedback to the incoming connection
+
+  ws.on("close", function() {
+    delete users[ws.name];
+    sendToAll(users, "leave", ws);
+  });
+  
+  //send immediatly a feedback to the incoming connection
   ws.send(
     JSON.stringify({
       type: "connect",
@@ -86,8 +134,6 @@ wss.on("connection", ws => {
     })
   );
 });
-
-
 
 //start our server
 server.listen(port, () => {

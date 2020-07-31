@@ -13,67 +13,44 @@ const sendBtn = document.querySelector('#send');
 const messages = document.querySelector('#messages');
 const messageBox = document.querySelector('#messageBox');
 
-let ws;
+let firebaseConfig = {
 
-function showMessage(message) {
-  messages.textContent += `\n\n${message}`;
-  messages.scrollTop = messages.scrollHeight;
-  messageBox.value = '';
-}
-
-function init() {
-  if (ws) {
-    ws.onerror = ws.onopen = ws.onclose = null;
-    ws.close();
-  }
-
-  ws = new WebSocket('ws://localhost:6969');
-  ws.onopen = () => {
-    console.log('Connection opened!');
-  }
-  ws.onmessage = ({ data }) => showMessage(data);
-  ws.onclose = function() {
-    ws = null;
-  }
-}
-
-sendBtn.onclick = function() {
-  if (!ws) {
-    showMessage("No WebSocket connection :(");
-    return ;
-  }
-
-  ws.send(messageBox.value);
-  showMessage(messageBox.value);
-}
-
-
-function getUrlParam(name) {
-    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-    var regexS = "[\\?&]" + name + "=([^&#]*)";
-    var regex = new RegExp(regexS);
-    var results = regex.exec(window.location.href);
-    if (results == null)
-        return null;
-    else
-        return results[1];
 };
 
+function initFb() {
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
 
-function makeid(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
+    firebase.auth().signInAnonymously().catch(function(error) {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+
+        if (errorCode === 'auth/operation-not-allowed') {
+            alert('You must enable Anonymous auth in the Firebase Console.');
+        } else {
+            console.error(error);
+        }
+    });
+
+    const messaging = firebase.messaging();
+
+    messaging.onMessage((payload) => {
+      console.log('Message received. ', payload);
+    });
+
+    // messaging.setBackgroundMessageHandler(function(payload) {
+    //   console.log('[firebase-messaging-sw.js] Received background message ', payload);
+    //   // Customize notification here
+    //   const notificationTitle = 'Background Message Title';
+    //   const notificationOptions = {
+    //     body: 'Background Message body.',
+    //     icon: '/firebase-logo.png'
+    //   };
+    //
+    //   return self.registration.showNotification(notificationTitle,
+    //     notificationOptions);
+    // });
 }
 
 
-networkHostChannelStartButton.onclick = function () {
-    WebSocketTest();
-};
-
-
-//init();
+initFb();
