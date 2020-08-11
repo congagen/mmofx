@@ -70,6 +70,8 @@ let oscList = [oscA, oscB, oscC];
 var currentSamples = {};
 let testSampleBtn = document.getElementById("debugSample");
 
+var lastPlayedKey = "";
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // SAMPLER  ////////////////////////////////////////////////////////////////////
@@ -173,9 +175,7 @@ function selectFile (contentType, multiple){
 
 // -------------------------------------------------------------
 // -------------------------------------------------------------
-// MAIN: ---------------------------------------------------
-
-
+// MAIN: -------------------------------------------------------
 function strToNum(inputString) {
     var composite = "1";
 
@@ -193,12 +193,10 @@ function getRandomArbitrary(min, max) {
 
 
 function playKey(client_seed, isRemote) {
+
     Pizzicato.volume = (masterAmp_slider.value / 110);
-    var dur = 100 * ((duration_knob.value + 1) / 100);
-
-    clearTimeout(noteTimer);
-
-    // oscillators.stop();
+    var dur = (duration_knob.value + 1);
+    //clearTimeout(noteTimer);
 
     oscA.volume = ((osc_a_vol_knob.value + 1.0) / 1001.0);
     oscA.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
@@ -208,12 +206,6 @@ function playKey(client_seed, isRemote) {
 
     oscC.volume = ((osc_c_vol_knob.value + 1.0) / 1001.0);
     oscC.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
-
-    for(var i=0; i < oscList.length; i++) {
-        // oscList[i].stop();
-        oscList[i].attack  = (attack_knob.value / 100);
-        oscList[i].release = (release_knob.value / 100);
-    }
 
     reverb.time = (reverb_speed_knob.value / 100);
     reverb.decay = (reverb_feedback_knob.value / 100);
@@ -229,12 +221,29 @@ function playKey(client_seed, isRemote) {
     dubDelayB.cutoff = parseInt(5000 * (delayB_cutoff_knob.value / 100));
     dubDelayB.mix = (delayB_drywet_knob.value / 100.0);
 
-    // pingPongDelay.time = (delayB_speed_knob.value / 100);
-    // pingPongDelay.feedback = (delayB_feedback_knob.value / 120);
-    // pingPongDelay.mix = (delayB_drywet_knob.value / 100);
+    oscillators.volume = ((synthMasterAmp.value + 0.01) / 1000.0);
+
+    var now = parseFloat(context.currentTime);
+    let releaseKnobVal = parseFloat(release_knob.value * 0.1);
+    let stopTime = (now + 0.5);
+
+//    for(var i=0; i < oscList.length; i++) {
+//        if (client_seed == lastPlayedKey) {
+//            console.log("client_seed == lastPlayedKey");
+//            oscList[i].stop();
+//        }
+//
+//        oscList[i].attack  = parseFloat(attack_knob.value / 100);
+//        oscList[i].release = parseFloat(release_knob.value / 1000);
+//    }
+
+    // oscillators.attack  = parseFloat(attack_knob.value / 100);
+    // oscillators.release = parseFloat(release_knob.value / 1000);
+
+    //oscillators.play();
+    //oscillators.stop();
 
     let sUrls = getSamplesFromTxt(client_seed);
-
     for(var i=0; i < sUrls.length; i++) {
         sU = sUrls[i];
 
@@ -246,14 +255,7 @@ function playKey(client_seed, isRemote) {
         });
     }
 
-    oscillators.volume = ((synthMasterAmp.value + 0.01) / 1000.0);
-    oscillators.play();
-
-    // if (isRemote) {
-    //     noteTimer = setTimeout(function () {
-    //       oscillators.stop();
-    //     }, dur);
-    // }
+    lastPlayedKey = client_seed.toString();
 }
 
 document.body.addEventListener('click', function() {
@@ -265,31 +267,34 @@ document.body.addEventListener('click', function() {
 
 window.addEventListener('keydown', function(evt) {
 
-    if(!(evt.key in keysdown)) {
+    if (!(evt.key in keysdown)) {
         keysdown[evt.key] = true;
 
-        if (enablePreviewCheckbox.checked == true){
+        if (enablePreviewCheckbox.checked == true) {
             playKey(evt.key.toString(), false);
+            console.log("playKbd");
         }
 
-        if (enableTransmissionCheckbox.checked == true){
+        if (enableTransmissionCheckbox.checked == true) {
             console.log("Send");
+            let data = {};
+
+            let dbData = {
+                "session_id": currentSessionId,
+                "playedKey": evt.key.toString()
+            };
+
+            let rsp = writeToDB(currentChannelName, dbData);
+            console.log(rsp);
         }
     }
 
-    let rvl = context.currentTime + (release_knob.value / 1000);
-    console.log("Release: " + rvl.toString());
-
-    // oscillators.stop(rvl);
-    // oscA.stop(rvl);
-    // oscA.stop(rvl);
-    // oscA.stop(rvl);
 });
 
 
 window.addEventListener('keyup', function(evt) {
-    delete keysdown[evt.key];
-    oscillators.stop();
+    //delete keysdown[evt.key];
+    //oscillators.stop();
 });
 
 

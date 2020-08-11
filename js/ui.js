@@ -2,6 +2,7 @@ var masterAmp_slider = document.getElementById("masterAmp");
 
 var enablePreviewCheckbox = document.getElementById("enablePreviewCheckbox");
 var enableTransmissionCheckbox = document.getElementById("enableTransmissionCheckbox");
+var receiveCommandsCheckbox = document.getElementById("receiveCommandsCheckbox");
 
 var synthMasterAmp   = document.getElementById("synthMasterAmp");
 var samplerMasterAmp = document.getElementById("samplerMasterAmp");
@@ -31,9 +32,10 @@ var reverb_drywet_knob = document.getElementById("reverb_drywet_knob");
 // var setChannelButton = document.getElementById("setChannelNameButton");
 var noteTimer;
 
-var setServerBox = document.getElementById("setServerBox");
-var previewBox = document.getElementById("previewBoxHost");
-var previewBtn = document.getElementById("previewBtnHost");
+var username_input_box = document.getElementById("username_input_box");
+
+var channelNameInputBox = document.getElementById("channelNameInputBox");
+var setChannelNameButton = document.getElementById("setChannelNameButton");
 
 var cueString = "<span class=\"cueMsg\">Cue: </span>";
 var currentKeyboard = {"a": ["a1","b1","c1"]};
@@ -81,8 +83,8 @@ function AddSampleListRow(sampleId) {
 
     $(cell).append(btnPreview);
     $(cell).append(btnRemove);
-
 }
+
 
 function updateKeyMap_(keyId) {
     let keyItem = currentKeyboard[keyId];
@@ -115,16 +117,28 @@ function updateKeyMap_(keyId) {
     });
 
     var btnPreview = $("<input id=" + keyId + " type = 'button' value = 'Play'/>");
+
     keyPanel.mousedown(function () {
         console.log("Mouse Down");
-
         console.log(keyId);
-        playKey(keyId, false);
+
+        if (enableTransmissionCheckbox.checked == true) {
+            let dbData = {
+                "session_id": currentSessionId,
+                "playedKey": keyId.toString()
+            };
+
+            let rsp = writeToDB(currentChannelName, dbData);
+            console.log(rsp);
+        } else {
+            playKey(keyId, false);
+        }
+
     });
 
     keyPanel.mouseup(function () {
-        console.log("Mouse Up");
-        oscillators.stop();
+        //console.log("Mouse Up");
+        //oscillators.stop();
     });
 
     if (isTouchDevice){
@@ -235,10 +249,10 @@ duration_knob.oninput = function () {
     console.log(duration_knob.value);
 };
 
-previewBtn.onclick = function () {
-    console.log("previewBtn");
-    playKey(previewBox.value, true);
-};
+//previewBtn.onclick = function () {
+//    console.log("previewBtn");
+//    playKey(previewBox.value, true);
+//};
 
 
 document.body.addEventListener('click', function() {
@@ -249,3 +263,11 @@ document.body.addEventListener('click', function() {
 
 
 document.addEventListener("DOMContentLoaded", initUI, false);
+
+
+function updateChannel(){
+    console.log("TODO: Update DB Channel Name");
+    console.log("New Channel: " + channelName.value());
+}
+
+setChannelNameButton.addEventListener("click", updateChannel);

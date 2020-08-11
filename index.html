@@ -12,6 +12,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.js" integrity="sha512-F63QPFxQ27mn9COmkZhSirC1pBNeVJ7MJJs4wtK6XfiAaH3WM1SfX6Sv2Pme/499+hafP0dALVZOADw4W2r6eQ==" crossorigin="anonymous"></script>
 
         <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.17.2/firebase-database.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-auth.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-analytics.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-messaging.js"></script>
@@ -35,10 +36,7 @@
         </div>
 
         <div class="tab-content ml-auto">
-
-
             <div id="network_tab" class="tab-pane fade in active">
-
                 <div style="background-color: rgb(0, 0, 0, 0.35)">
                     <ul class="nav nav-tabs justify-content-center navbar-light">
                         <!-- <li class="active button"><a data-toggle="tab" href="#network_tab">Network</a></li> -->
@@ -54,33 +52,18 @@
                         <center>
                             <br><br><br>
 
-                            <h4> Host </h4>
-                            <p id="receiver-id" title=".">Status: Disconnected</p>
-                            <p id="status" class="status"></p>
                             <br>
-                            <input type="text" id="networkHostChannelNameBox" placeholder="Channel Name" autofocus="off" />
+                            <h4> Username </h4>
+                            <input type="text" id="username_input_box" placeholder="Channel Name" title="Host channel name">
+
+                            <br><br><br>
+
+                            <h4> Channel </h4>
+                            <input type="text" id="channelNameInputBox" placeholder="Channel Name" autofocus="off" />
                             <br><br>
-                            <button type="button" id="networkHostChannelStartButton">Start</button>
 
-                            <br><br><br><hr><br><br>
+                            <button type="button" id="setChannelNameButton">Connect</button>
 
-                            <h4> Client </h4>
-                            <p id="statusClient" class="status">Status: Disconnected</p>
-                            <br>
-                            <!-- <h5> Channel: </h5> -->
-                            <input type="text" id="networkClientChannelNameBox" placeholder="Channel Name" title="Host channel name">
-                            <br><br>
-                            <button type="button" id="networkClientChannelConnectButton">Connect</button>
-
-                            <br><br><br><hr><br><br>
-
-                            <h4> Custom Server </h4>
-                            <input type="text" id="networkServerBox" placeholder="" autofocus="off" />
-                            <br><br>
-                            <button type="button" id="networkServerConnectButton">Connect</button>
-
-                            <br><br><br><br>
-                            <p class="message" id="messageClient"></p>
                         </center>
                     </div>
 
@@ -104,7 +87,7 @@
                         <li><a class="tab" data-toggle="tab" href="#composer_tab">Comp</a></li>
                         <li><a class="tab" data-toggle="tab" href="#mixer">Mixer</a></li>
                         <li><a class="tab" data-toggle="tab" href="#control_tab">Pads</a></li>
-                        <li><a class="tab" data-toggle="tab" href="#synth">Synth</a></li>
+<!--                        <li><a class="tab" data-toggle="tab" href="#synth">Synth</a></li>-->
                         <li><a class="tab" data-toggle="tab" href="#sampler">Sampler</a></li>
                     </ul>
                 </div>
@@ -114,15 +97,20 @@
                     <div id="control_tab" class="tab-pane fade">
                         <center>
                         <br>
+
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="receiveCommandsCheckbox">
+                            <label class="form-check-label" for="receiveCommandsCheckbox">Receive Commands</label>
+                        </div>
+
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
-                            <!-- <input checked type="checkbox" class="form-check-input" id="enablePreviewCheckbox"> -->
-                            <label class="form-check-label" for="exampleCheck1">Preview Keyboard</label>
+                            <label class="form-check-label" for="enablePreviewCheckbox">Preview Keyboard</label>
                         </div>
 
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="enableTransmissionCheckbox">
-                            <label class="form-check-label" for="exampleCheck1">Transmit Keyboard</label>
+                            <label class="form-check-label" for="enableTransmissionCheckbox">Client Mode</label>
                         </div>
                         </center>
 
@@ -165,33 +153,33 @@
                             <div class="container">
                                 <div class="row">
                                     <div class="col-sm">
-                                        <center><h5> Oscs <h5></center><br>
+                                        <center> <h5> Oscs </h5> </center><br>
 
                                         <div class="slidecontainer">
-                                            <input id="osc_a_vol_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p>Sine</p>
+                                            <input id="osc_a_vol_knob" type="range" min="1" max="100" value="50" class="slider"><p>Sine</p>
                                         </div><br>
 
                                         <div class="slidecontainer">
-                                            <input id="osc_b_vol_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p>Square</p>
+                                            <input id="osc_b_vol_knob" type="range" min="1" max="100" value="50" class="slider" ><p>Square</p>
                                         </div><br>
 
                                         <div class="slidecontainer">
-                                            <input id="osc_c_vol_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p>Sawtooth</p>
+                                            <input id="osc_c_vol_knob" type="range" min="1" max="100" value="50" class="slider"><p>Sawtooth</p>
                                         </div><br>
                                     </div>
                                     <div class="col-sm">
-                                        <center><h5> Envelope <h5></center><br>
+                                        <center><h5> Envelope </h5></center><br>
 
                                         <div class="slidecontainer">
-                                            <input id="attack_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p>Attack</p>
+                                            <input id="attack_knob" type="range" min="1" max="100" value="50" class="slider"><p>Attack</p>
                                         </div><br>
 
                                         <div class="slidecontainer">
-                                            <input id="duration_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p>Decay</p>
+                                            <input id="duration_knob" type="range" min="1" max="100" value="50" class="slider"><p>Decay</p>
                                         </div><br>
 
                                         <div class="slidecontainer">
-                                            <input id="release_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p>Release</p>
+                                            <input id="release_knob" type="range" min="1" max="100" value="50" class="slider"><p>Release</p>
                                         </div><br>
                                     </div>
                                 </div>
@@ -219,18 +207,19 @@
                             <div class="container">
                                     <div class="row">
                                         <div class="col-sm">
-                                            <center><h5> Mix <h5></center><br>
+                                            <center> <h5> Mix </h5> </center>
+                                            <br>
 
                                             <div class="slidecontainer">
-                                                <input id="masterAmp" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Master </p>
+                                                <input id="masterAmp" type="range" min="1" max="100" value="50" class="slider"><p> Master </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="synthMasterAmp" type="range" min="0" max="100" value="50" class="slider" id="myRange"><p> Synth </p>
+                                                <input id="synthMasterAmp" type="range" min="0" max="100" value="50" class="slider"><p> Synth </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="samplerMasterAmp" type="range" min="0" max="100" value="50" class="slider" id="myRange"><p> Sampler </p>
+                                                <input id="samplerMasterAmp" type="range" min="0" max="100" value="50" class="slider"><p> Sampler </p>
                                             </div><br>
 
                                         </div>
@@ -239,60 +228,60 @@
 
                                     <div class="row">
                                         <div class="col-sm">
-                                            <center><h5> Delay A<h5></center><br>
+                                            <center><h5> Delay A</h5></center><br>
 
                                             <div class="slidecontainer">
-                                                <input id="delay_speed_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Time </p>
+                                                <input id="delay_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Time </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="delay_feedback_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Feedback </p>
+                                                <input id="delay_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="delay_cutoff_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Cutoff </p>
+                                                <input id="delay_cutoff_knob" type="range" min="1" max="100" value="50" class="slider"><p> Cutoff </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="delay_drywet_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Dry/Wet </p>
+                                                <input id="delay_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
                                             </div><br>
                                         </div>
 
                                         <div class="col-sm">
-                                            <center><h5> Delay B<h5></center><br>
+                                            <center><h5> Delay B</h5></center><br>
 
                                             <div class="slidecontainer">
-                                                <input id="delayB_speed_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Time </p>
+                                                <input id="delayB_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Time </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="delayB_feedback_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Feedback </p>
+                                                <input id="delayB_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="delayB_cutoff_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Cutoff </p>
+                                                <input id="delayB_cutoff_knob" type="range" min="1" max="100" value="50" class="slider"><p> Cutoff </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="delayB_drywet_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Dry/Wet </p>
+                                                <input id="delayB_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
                                             </div><br>
                                         </div>
                                     </div>
 
                                     <div class="row">
                                         <div class="col-sm">
-                                            <center><h5> Reverb <h5></center><br>
+                                            <center><h5> Reverb </h5></center><br>
 
                                             <div class="slidecontainer">
-                                                <input id="reverb_speed_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Room Size </p>
+                                                <input id="reverb_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Room Size </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="reverb_feedback_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Feedback </p>
+                                                <input id="reverb_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
                                             </div><br>
 
                                             <div class="slidecontainer">
-                                                <input id="reverb_drywet_knob" type="range" min="1" max="100" value="50" class="slider" id="myRange"><p> Dry/Wet </p>
+                                                <input id="reverb_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
                                             </div><br>
 
                                         </div>
@@ -308,20 +297,13 @@
                 <div id="settings_tab" class="tab-pane fade">
                     <center>
                         <br><br>
-
-                        <h4> Input </h4>
-                        <br>
-
-                        <br><br><hr><br><br>
                         <h4> Test </h4>
                         <br>
 
-                        <input type="text" id="previewBoxHost" placeholder="FX Code (a-Z)" autofocus="off" />
-                        <br><br>
-                        <button type="button" id="sendButtonClient">Send</button>
-                        <button type="button" id="previewBtnHost">Preview</button>
-
-                        <br><br><br><br><br><br><br><br>
+<!--                        <input type="text" id="previewBoxHost" placeholder="FX Code (a-Z)" autofocus="off" />-->
+<!--                        <br><br>-->
+<!--                        <button type="button" id="sendButtonClient">Send</button>-->
+<!--                        <button type="button" id="previewBtnHost">Preview</button>-->
 
                         <!-- <p for="volume">Volume</p>
                         <input type="range" id="volume" class="control-volume" min="0" max="2" value="1" list="gain-vals" step="0.01" data-action="volume" /> -->
@@ -343,37 +325,11 @@
             </center> -->
         </footer>
 
-        <!-- <script>
-            var firebaseConfig = {
-                apiKey: "AIzaSyDx3-4RSc8fpkQcL2O_DsDSZ29qJ_JoRx8",
-                authDomain: "xtation-2.firebaseapp.com",
-                databaseURL: "https://xtation-2.firebaseio.com",
-                projectId: "xtation-2",
-                storageBucket: "xtation-2.appspot.com",
-                messagingSenderId: "450882156281",
-                appId: "1:450882156281:web:fbf4488538e97fb7181428",
-                measurementId: "G-2Y4RXY6X3N"
-            };
-
-            firebase.initializeApp(firebaseConfig);
-            firebase.analytics();
-
-            firebase.auth().signInAnonymously().catch(function(error) {
-                var errorCode = error.code;
-                var errorMessage = error.message;
-
-                if (errorCode === 'auth/operation-not-allowed') {
-                    alert('You must enable Anonymous auth in the Firebase Console.');
-                } else {
-                    console.error(error);
-                }
-            });
-        </script> -->
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.4/Pizzicato.js"></script>
         <script type="text/javascript" src="js/session.js"></script>
-        <script type="text/javascript" src="js/network.js"></script>
         <script type="text/javascript" src="js/audio.js"></script>
+        <script type="text/javascript" src="js/network.js"></script>
         <script type="text/javascript" src="js/ui.js"></script>
 
         <script>
