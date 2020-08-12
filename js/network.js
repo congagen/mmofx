@@ -1,18 +1,26 @@
-
-
 const sendBtn = document.querySelector('#send');
 const messages = document.querySelector('#messages');
 const messageBox = document.querySelector('#messageBox');
 
-let firebaseConfig = {
+var prevChannelName = "";
 
+let firebaseConfig = {
+    apiKey: "AIzaSyDx3-4RSc8fpkQcL2O_DsDSZ29qJ_JoRx8",
+    authDomain: "xtation-2.firebaseapp.com",
+    databaseURL: "https://xtation-2.firebaseio.com",
+    projectId: "xtation-2",
+    storageBucket: "xtation-2.appspot.com",
+    messagingSenderId: "450882156281",
+    appId: "1:450882156281:web:fbf4488538e97fb7181428",
+    measurementId: "G-2Y4RXY6X3N"
 };
 
 firebase.initializeApp(firebaseConfig);
 
-firebase.analytics();
+//firebase.analytics();
+//const messaging = firebase.messaging();
+
 var database = firebase.database();
-const messaging = firebase.messaging();
 
 
 function uuidv4() {
@@ -45,15 +53,16 @@ firebase.auth().signInAnonymously().catch(function(error) {
     }
 });
 
+
 function writeToDB(db_name, data_dct) {
     console.log("Writing");
     return firebase.database().ref(db_name).set(data_dct);
 }
 
+// TODO:
 function itemInDb(db_name, item_name, item_value) {
     firebase.database().ref(db_name).orderByChild(item_name).equalTo(item_value).once("value", snapshot => {
         if (snapshot.exists()){
-//            const userData = snapshot.val();
             return true;
         } else {
             return false;
@@ -73,13 +82,29 @@ function sendTokenToServer(currentToken) {
     }
 }
 
-var db_refChannelNoteData = firebase.database().ref(currentChannelName);
 
-db_refChannelNoteData.on('child_changed', function (data) {
-    console.log("Data change");
-    console.log(data.val());
-
-    if (receiveCommandsCheckbox.checked == true) {
-        playKey(data.val(), true);
+function subscribeToDb(dbChannelName) {
+    if (prevChannelName != "") {
+        console.log("Unsubscribing: " + prevChannelName);
+        var prevDb = firebase.database().ref(prevChannelName);
+        prevDb.off();
     }
-});
+
+    console.log("Connecting to DB: " + dbChannelName);
+    var newDbChannel = firebase.database().ref(dbChannelName);
+
+    newDbChannel.on('child_changed', function (data) {
+        console.log("Data change");
+        console.log(data.val());
+
+        if (receiveCommandsCheckbox.checked == true) {
+            playKey(data.val(), true);
+        }
+    });
+
+    prevChannelName = dbChannelName;
+}
+
+
+subscribeToDb(currentChannelName);
+prevChannelName = currentChannelName;

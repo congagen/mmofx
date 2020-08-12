@@ -70,7 +70,7 @@ let oscList = [oscA, oscB, oscC];
 var currentSamples = {};
 let testSampleBtn = document.getElementById("debugSample");
 
-var lastPlayedKey = "";
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,96 +195,19 @@ function getRandomArbitrary(min, max) {
 function playKey(client_seed, isRemote) {
 
     Pizzicato.volume = (masterAmp_slider.value / 110);
-    var dur = (duration_knob.value + 1);
-    //clearTimeout(noteTimer);
-
-    oscA.volume = ((osc_a_vol_knob.value + 1.0) / 1001.0);
-    oscA.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
-
-    oscB.volume = ((osc_b_vol_knob.value + 1.0) / 1001.0);
-    oscB.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
-
-    oscC.volume = ((osc_c_vol_knob.value + 1.0) / 1001.0);
-    oscC.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
-
-    reverb.time = (reverb_speed_knob.value / 100);
-    reverb.decay = (reverb_feedback_knob.value / 100);
-    reverb.mix = (reverb_drywet_knob.value / 100);
-
-    dubDelayA.time = (delay_speed_knob.value / 100);
-    dubDelayA.feedback = (delay_feedback_knob.value / 110);
-    dubDelayA.cutoff = parseInt(5000 * (delay_cutoff_knob.value / 100));
-    dubDelayA.mix = (delay_drywet_knob.value / 100.0);
-
-    dubDelayB.time = (delayB_speed_knob.value / 100);
-    dubDelayB.feedback = (delayB_feedback_knob.value / 110);
-    dubDelayB.cutoff = parseInt(5000 * (delayB_cutoff_knob.value / 100));
-    dubDelayB.mix = (delayB_drywet_knob.value / 100.0);
-
-    oscillators.volume = ((synthMasterAmp.value + 0.01) / 1000.0);
-
     var now = parseFloat(context.currentTime);
     let releaseKnobVal = parseFloat(release_knob.value * 0.1);
     let stopTime = (now + 0.5);
 
-//    for(var i=0; i < oscList.length; i++) {
-//        if (client_seed == lastPlayedKey) {
-//            console.log("client_seed == lastPlayedKey");
-//            oscList[i].stop();
-//        }
-//
-//        oscList[i].attack  = parseFloat(attack_knob.value / 100);
-//        oscList[i].release = parseFloat(release_knob.value / 1000);
-//    }
-
-    // oscillators.attack  = parseFloat(attack_knob.value / 100);
-    // oscillators.release = parseFloat(release_knob.value / 1000);
-
-    //oscillators.play();
-    //oscillators.stop();
-
-    let sUrls = getSamplesFromTxt(client_seed);
-    for(var i=0; i < sUrls.length; i++) {
-        sU = sUrls[i];
-
-//        var dubDelayAA = new Pizzicato.Effects.DubDelay({
-//            feedback: 0.6,
-//            time: 0.25,
-//            mix: 0.5,
-//            cutoff: 3000
-//        });
-//
-//        var dubDelayBB = new Pizzicato.Effects.DubDelay({
-//            feedback: 0.6,
-//            time: 0.25,
-//            mix: 0.5,
-//            cutoff: 1500
-//        });
-//
-//
-//        var reverbS = new Pizzicato.Effects.Reverb({
-//            time: 1,
-//            decay: 0.8,
-//            reverse: false,
-//            mix: 0.5
-//        });
-
-        var sampler = new Pizzicato.Sound(sU, () => {
-            //oscillators.addSound(sampler); samplerMasterAmp
-            //sampler.play();
+    let sampleUrls = getSamplesFromTxt(client_seed);
+    for(var i=0; i < sampleUrls.length; i++) {
+        var sampler = new Pizzicato.Sound(sampleUrls[i], () => {
             sampler.volume = ((samplerMasterAmp.value + 0.01) / 1000);
-//            sampler.addEffect(dubDelayAA);
-//            sampler.addEffect(dubDelayBB);
-//            sampler.addEffect(reverbS);
             sampler.play();
         });
-
-
     }
 
-    lastPlayedKey = client_seed.toString();
 }
-
 
 
 function initAudio() {
@@ -303,3 +226,113 @@ function initAudio() {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//function playKey(client_seed, isRemote) {
+//
+//    Pizzicato.volume = (masterAmp_slider.value / 110);
+//    var dur = (duration_knob.value + 1);
+//    //clearTimeout(noteTimer);
+//
+//    oscA.volume = ((osc_a_vol_knob.value + 1.0) / 1001.0);
+//    oscA.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
+//
+//    oscB.volume = ((osc_b_vol_knob.value + 1.0) / 1001.0);
+//    oscB.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
+//
+//    oscC.volume = ((osc_c_vol_knob.value + 1.0) / 1001.0);
+//    oscC.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
+//
+//    reverb.time = (reverb_speed_knob.value / 100);
+//    reverb.decay = (reverb_feedback_knob.value / 100);
+//    reverb.mix = (reverb_drywet_knob.value / 100);
+//
+//    dubDelayA.time = (delay_speed_knob.value / 100);
+//    dubDelayA.feedback = (delay_feedback_knob.value / 110);
+//    dubDelayA.cutoff = parseInt(5000 * (delay_cutoff_knob.value / 100));
+//    dubDelayA.mix = (delay_drywet_knob.value / 100.0);
+//
+//    dubDelayB.time = (delayB_speed_knob.value / 100);
+//    dubDelayB.feedback = (delayB_feedback_knob.value / 110);
+//    dubDelayB.cutoff = parseInt(5000 * (delayB_cutoff_knob.value / 100));
+//    dubDelayB.mix = (delayB_drywet_knob.value / 100.0);
+//
+//    oscillators.volume = ((synthMasterAmp.value + 0.01) / 1000.0);
+//
+//    var now = parseFloat(context.currentTime);
+//    let releaseKnobVal = parseFloat(release_knob.value * 0.1);
+//    let stopTime = (now + 0.5);
+//
+////    for(var i=0; i < oscList.length; i++) {
+////        if (client_seed == lastPlayedKey) {
+////            console.log("client_seed == lastPlayedKey");
+////            oscList[i].stop();
+////        }
+////
+////        oscList[i].attack  = parseFloat(attack_knob.value / 100);
+////        oscList[i].release = parseFloat(release_knob.value / 1000);
+////    }
+//
+//    // oscillators.attack  = parseFloat(attack_knob.value / 100);
+//    // oscillators.release = parseFloat(release_knob.value / 1000);
+//
+//    //oscillators.play();
+//    //oscillators.stop();
+//
+//    let sUrls = getSamplesFromTxt(client_seed);
+//    for(var i=0; i < sUrls.length; i++) {
+//        sU = sUrls[i];
+//
+////        var dubDelayAA = new Pizzicato.Effects.DubDelay({
+////            feedback: 0.6,
+////            time: 0.25,
+////            mix: 0.5,
+////            cutoff: 3000
+////        });
+////
+////        var dubDelayBB = new Pizzicato.Effects.DubDelay({
+////            feedback: 0.6,
+////            time: 0.25,
+////            mix: 0.5,
+////            cutoff: 1500
+////        });
+////
+////
+////        var reverbS = new Pizzicato.Effects.Reverb({
+////            time: 1,
+////            decay: 0.8,
+////            reverse: false,
+////            mix: 0.5
+////        });
+//
+//        var sampler = new Pizzicato.Sound(sU, () => {
+//            //oscillators.addSound(sampler); samplerMasterAmp
+//            //sampler.play();
+//            sampler.volume = ((samplerMasterAmp.value + 0.01) / 1000);
+////            sampler.addEffect(dubDelayAA);
+////            sampler.addEffect(dubDelayBB);
+////            sampler.addEffect(reverbS);
+//            sampler.play();
+//        });
+//
+//
+//    }
+//
+//    lastPlayedKey = client_seed.toString();
+//}

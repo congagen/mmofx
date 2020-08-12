@@ -140,7 +140,7 @@ function updateKeyMap_(keyId) {
         console.log(keyId);
 
         if (enableTransmissionCheckbox.checked == true) {
-            console.log("SENDING");
+            console.log("Sending: " + keyId.toString());
             playNetworkCmd(keyId);
         } else {
             playKey(keyId, false);
@@ -183,46 +183,6 @@ function updateKeyMap_(keyId) {
     });
 
 }
-
-
-document.body.addEventListener('click', function() {
-    if (!isInitAudio) {
-        initAudio();
-    }
-});
-
-
-window.addEventListener('keydown', function(evt) {
-
-    if (!(evt.key in keysdown)) {
-        keysdown[evt.key] = true;
-
-        if (enablePreviewCheckbox.checked == true) {
-            playKey(evt.key.toString(), false);
-            console.log("playKbd");
-        }
-
-        if (enableTransmissionCheckbox.checked == true) {
-            console.log("Send");
-            let data = {};
-
-            let dbData = {
-                "session_id": currentSessionId,
-                "playedKey": evt.key.toString()
-            };
-
-            let rsp = writeToDB(currentChannelName, dbData);
-            console.log(rsp);
-        }
-    }
-
-});
-
-
-window.addEventListener('keyup', function(evt) {
-    //delete keysdown[evt.key];
-    //oscillators.stop();
-});
 
 
 function toggleEditMode(isEnabled) {
@@ -301,10 +261,52 @@ duration_knob.oninput = function () {
     console.log(duration_knob.value);
 };
 
-//previewBtn.onclick = function () {
-//    console.log("previewBtn");
-//    playKey(previewBox.value, true);
-//};
+
+// TODO:
+function updateChannel(){
+    console.log("TODO: Update DB Channel Name");
+    console.log("New Channel: " + currentChannelName);
+
+    if (channelNameInputBox.value != "") {
+        currentChannelName = channelNameInputBox.value;
+        subscribeToDb(currentChannelName);
+        console.log("Switching to channel: " + currentChannelName);
+    }
+
+}
+
+setChannelNameButton.addEventListener("click", updateChannel);
+
+document.addEventListener("DOMContentLoaded", initUI, false);
+
+window.addEventListener('keydown', function(evt) {
+
+    if (!(evt.key in keysdown)) {
+        keysdown[evt.key] = true;
+
+        if (enablePreviewCheckbox.checked == true) {
+            playKey(evt.key.toString(), false);
+            console.log("playKbd");
+        }
+
+        if (enableTransmissionCheckbox.checked == true) {
+            console.log("Send");
+            let data = {};
+
+            let dbData = {
+                "session_id": currentSessionId,
+                "playedKey": evt.key.toString()
+            };
+
+            let rsp = writeToDB(currentChannelName, dbData);
+            console.log(rsp);
+        }
+    }
+
+});
+
+
+window.addEventListener('keyup', function(evt) {});
 
 
 document.body.addEventListener('click', function() {
@@ -312,14 +314,3 @@ document.body.addEventListener('click', function() {
         initAudio();
     }
 });
-
-
-document.addEventListener("DOMContentLoaded", initUI, false);
-
-
-function updateChannel(){
-    console.log("TODO: Update DB Channel Name");
-    console.log("New Channel: " + channelName.value());
-}
-
-setChannelNameButton.addEventListener("click", updateChannel);
