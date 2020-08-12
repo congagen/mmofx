@@ -86,6 +86,23 @@ function AddSampleListRow(sampleId) {
 }
 
 
+function playNetworkCmd(cmdText) {
+    let dbData = {
+        "session_id": currentSessionId,
+        "playedKey": cmdText.toString()
+    };
+
+    let clearData = {
+        "session_id": currentSessionId,
+        "playedKey": ""
+    };
+
+    let rsp = writeToDB(currentChannelName, dbData);
+    //let rsp2 = writeToDB(currentChannelName, clearData);
+    console.log(rsp);
+}
+
+
 function updateKeyMap_(keyId) {
     let keyItem = currentKeyboard[keyId];
     padCount += 1;
@@ -123,13 +140,8 @@ function updateKeyMap_(keyId) {
         console.log(keyId);
 
         if (enableTransmissionCheckbox.checked == true) {
-            let dbData = {
-                "session_id": currentSessionId,
-                "playedKey": keyId.toString()
-            };
-
-            let rsp = writeToDB(currentChannelName, dbData);
-            console.log(rsp);
+            console.log("SENDING");
+            playNetworkCmd(keyId);
         } else {
             playKey(keyId, false);
         }
@@ -171,6 +183,46 @@ function updateKeyMap_(keyId) {
     });
 
 }
+
+
+document.body.addEventListener('click', function() {
+    if (!isInitAudio) {
+        initAudio();
+    }
+});
+
+
+window.addEventListener('keydown', function(evt) {
+
+    if (!(evt.key in keysdown)) {
+        keysdown[evt.key] = true;
+
+        if (enablePreviewCheckbox.checked == true) {
+            playKey(evt.key.toString(), false);
+            console.log("playKbd");
+        }
+
+        if (enableTransmissionCheckbox.checked == true) {
+            console.log("Send");
+            let data = {};
+
+            let dbData = {
+                "session_id": currentSessionId,
+                "playedKey": evt.key.toString()
+            };
+
+            let rsp = writeToDB(currentChannelName, dbData);
+            console.log(rsp);
+        }
+    }
+
+});
+
+
+window.addEventListener('keyup', function(evt) {
+    //delete keysdown[evt.key];
+    //oscillators.stop();
+});
 
 
 function toggleEditMode(isEnabled) {

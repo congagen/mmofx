@@ -45,8 +45,6 @@ firebase.auth().signInAnonymously().catch(function(error) {
     }
 });
 
-// messaging.usePublicVapidKey("BPpoyqjt8hWh34uokRVtRkZIqIP0r6sOrMZiwD35jiIWqNre09k2XHdIxLReZZVM2m9H4DVH8EwM5sWvX0eb9hM");
-
 function writeToDB(db_name, data_dct) {
     console.log("Writing");
     return firebase.database().ref(db_name).set(data_dct);
@@ -69,7 +67,6 @@ function sendTokenToServer(currentToken) {
     if (!isTokenSentToServer()) {
         console.log('Sending token to server...');
         // TODO(developer): Send the current token to your server.
-
         setTokenSentToServer(true);
     } else {
         console.log('Token already sent to server so won\'t send it again ' + 'unless it changes');
@@ -82,9 +79,7 @@ db_refChannelNoteData.on('child_changed', function (data) {
     console.log("Data change");
     console.log(data.val());
 
-    if (receiveCommandsCheckbox.checked == true)  {
+    if (receiveCommandsCheckbox.checked == true) {
         playKey(data.val(), true);
     }
-
 });
-

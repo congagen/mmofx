@@ -247,55 +247,44 @@ function playKey(client_seed, isRemote) {
     for(var i=0; i < sUrls.length; i++) {
         sU = sUrls[i];
 
-        const sampler = new Pizzicato.Sound(sU, () => {
+//        var dubDelayAA = new Pizzicato.Effects.DubDelay({
+//            feedback: 0.6,
+//            time: 0.25,
+//            mix: 0.5,
+//            cutoff: 3000
+//        });
+//
+//        var dubDelayBB = new Pizzicato.Effects.DubDelay({
+//            feedback: 0.6,
+//            time: 0.25,
+//            mix: 0.5,
+//            cutoff: 1500
+//        });
+//
+//
+//        var reverbS = new Pizzicato.Effects.Reverb({
+//            time: 1,
+//            decay: 0.8,
+//            reverse: false,
+//            mix: 0.5
+//        });
+
+        var sampler = new Pizzicato.Sound(sU, () => {
             //oscillators.addSound(sampler); samplerMasterAmp
             //sampler.play();
             sampler.volume = ((samplerMasterAmp.value + 0.01) / 1000);
+//            sampler.addEffect(dubDelayAA);
+//            sampler.addEffect(dubDelayBB);
+//            sampler.addEffect(reverbS);
             sampler.play();
         });
+
+
     }
 
     lastPlayedKey = client_seed.toString();
 }
 
-document.body.addEventListener('click', function() {
-    if (!isInitAudio) {
-        initAudio();
-    }
-});
-
-
-window.addEventListener('keydown', function(evt) {
-
-    if (!(evt.key in keysdown)) {
-        keysdown[evt.key] = true;
-
-        if (enablePreviewCheckbox.checked == true) {
-            playKey(evt.key.toString(), false);
-            console.log("playKbd");
-        }
-
-        if (enableTransmissionCheckbox.checked == true) {
-            console.log("Send");
-            let data = {};
-
-            let dbData = {
-                "session_id": currentSessionId,
-                "playedKey": evt.key.toString()
-            };
-
-            let rsp = writeToDB(currentChannelName, dbData);
-            console.log(rsp);
-        }
-    }
-
-});
-
-
-window.addEventListener('keyup', function(evt) {
-    //delete keysdown[evt.key];
-    //oscillators.stop();
-});
 
 
 function initAudio() {
