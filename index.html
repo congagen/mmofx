@@ -28,9 +28,9 @@
             <br>
             <ul class="nav nav-tabs justify-content-center navbar-light">
                 <!-- <li class="active button"><a data-toggle="tab" href="#network_tab">Network</a></li> -->
-                <li><a class="tab btn" data-toggle="tab" href="#network_tab">Network</a></li>
+                <li><a class="tab btn" data-toggle="tab" href="#network_tab">Connection</a></li>
                 <li><a class="tab btn" data-toggle="tab" href="#studio_tab">Studio</a></li>
-                <li><a class="tab btn" data-toggle="tab" href="#settings_tab">Settings</a></li>
+                <li><a class="tab btn" data-toggle="tab" href="#help_tab">Help</a></li>
             </ul>
         </div>
 
@@ -94,25 +94,25 @@
                 </div>
 
                 <div class="tab-content ml-auto">
-
                     <div id="control_tab" class="tab-pane fade">
                         <center>
                         <br>
 
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="receiveCommandsCheckbox">
-                            <label class="form-check-label" for="receiveCommandsCheckbox">Receive</label>
-                        </div>
+                            <div class="form-check">
+                                <input type="checkbox" checked class="form-check-input" id="receiveCommandsCheckbox">
+                                <label class="form-check-label" for="receiveCommandsCheckbox">Receive</label>
+                            </div>
 
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
-                            <label class="form-check-label" for="enablePreviewCheckbox">Preview Keyboard</label>
-                        </div>
+                              <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="enableTransmissionCheckbox">
+                                <label class="form-check-label" for="enableTransmissionCheckbox">Send</label>
+                            </div>
 
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="enableTransmissionCheckbox">
-                            <label class="form-check-label" for="enableTransmissionCheckbox">Send</label>
-                        </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
+                                <label class="form-check-label" for="enablePreviewCheckbox">Keyboard</label>
+                            </div>
+
                         </center>
 
                         <div class="container form">
@@ -131,6 +131,7 @@
                     </div>
 
                     <div id="composer_tab" class="tab-pane fade">
+
                         <div class="container">
                             <center>
                                 <br><br>
@@ -193,8 +194,11 @@
                     </div>
 
                     <div id="sampler" class="tab-pane fade">
+
+
+
                         <center>
-                            <br><br><br>
+                            <br>
                             <table id = "sampleTableContainer" border="0" cellpadding="5" cellspacing="5"></table>
                             <br><br>
                             <button onclick="addSamplesBtnClicked()">Add Samples</button>
@@ -212,8 +216,8 @@
                                             <br>
 
                                             <div class="slidecontainer">
-                                                <input id="masterAmp" type="range" min="1" max="100" value="50" class="slider"><p> Master </p>
-                                            </div><br>
+                                                <input id="masterAmp" type="range" min="1" max="100" value="50" class="slider"><p> Volume </p>
+                                            </div>
 
                                             <div class="slidecontainer">
                                                 <input id="synthMasterAmp" type="range" min="0" max="100" value="50" class="slider"><p> Synth </p>
@@ -295,11 +299,22 @@
                     </div>
                 </div>
 
-                <div id="settings_tab" class="tab-pane fade">
+                <div id="help_tab" class="tab-pane fade">
                     <center>
-                        <br><br>
+                        <br><br><br>
+
+                        <h4> Reciever </h4>
+                        <p> 1. Load samples and configure keys</p>
+                        <p> 2. Uncheck Send & Check Receive in Studio/Controls </p>
+                        <br><br><br>
+
+                        <h4> Sender </h4>
+                        <p> 1. Uncheck Receive & Check Send in Studio/Controls </p>
+                        <p> 2. Click/Tap buttons in Studio/Controls </p>
+
+                        <br><br><br>
 <!--                        <h4> Test </h4>-->
-                        <br>
+
 
 <!--                        <input type="text" id="previewBoxHost" placeholder="FX Code (a-Z)" autofocus="off" />-->
 <!--                        <br><br>-->

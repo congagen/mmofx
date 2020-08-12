@@ -147,6 +147,7 @@ async function addSamplesBtnClicked(){
         let sUrl = URL.createObjectURL(files[i]);
         let trgKeys = fName[0].toLowerCase();
 
+        // TODO: TrgKey from
         currentSamples[sKey] = [fName, sUrl, fName[0].toLowerCase()];
         AddSampleListRow(sKey);
     }

@@ -50,10 +50,10 @@ function AddSampleListRow(sampleId) {
     var row = sampleTableContainer[0].insertRow(-1);
     var cell = row.insertCell(-1);
 
-    var nameField = $("<input id=sNameField" + sampleId + " size='4' type = 'text' value = "+sItem[0]+" readonly>");
+    var nameField = $("<input id=sNameField" + sampleId + " size='4' type = 'text' value = " + sItem[0] + " readonly>");
     $(cell).append(nameField);
 
-    var trgKeysInput = $("<input id=" + sampleId.toString() + " size='4' type = 'text' value = "+sItem[2].toLowerCase()+"></input>");
+    var trgKeysInput = $("<input id=" + sampleId.toString() + " size='4' type = 'text' value = " + sItem[2].toLowerCase() + "></input>");
     trgKeysInput.change(function () {
         var sId = trgKeysInput.attr('id');
         let a = document.getElementById(sId.toString());
@@ -98,19 +98,20 @@ function playNetworkCmd(cmdText) {
     };
 
     let rsp = writeToDB(currentChannelName, dbData);
-    //let rsp2 = writeToDB(currentChannelName, clearData);
     console.log(rsp);
+
 }
 
 
 function updateKeyMap_(keyId) {
     let keyItem = currentKeyboard[keyId];
     padCount += 1;
+
     let cId = keyId.toString();
     let inputId = keyId + "_input";
 
     // <div class="col-xs-2">
-    var padCol = $('<div class="col-2 col-xs-1 py-2 px-2"></div>');
+    var padCol = $('<div class="col-sm-1 py-1 px-1"></div>');
     let card_a = '<div type="button" class="card" id="' + "playBtn" + '">';
     let card_b = '<div class="card-block"><div class="card-title"></div>';
     let card_c = '<div class="col-xs-2 keyPad">';
@@ -196,7 +197,7 @@ function toggleEditMode(isEnabled) {
 function initKeyMap(){
     padCount = 0;
 
-    for (var i = 33; i < 96; i++) {
+    for (var i = 33; i < 256; i++) {
         var l = String.fromCharCode(i).toLowerCase();
 
         currentKeyboard[l] = [l, l, "a", "b"]
@@ -281,26 +282,22 @@ document.addEventListener("DOMContentLoaded", initUI, false);
 
 window.addEventListener('keydown', function(evt) {
 
-    if (!(evt.key in keysdown)) {
-        keysdown[evt.key] = true;
+    if (enablePreviewCheckbox.checked == true) {
+        playKey(evt.key.toString(), false);
+        console.log("playKbd");
+    }
 
-        if (enablePreviewCheckbox.checked == true) {
-            playKey(evt.key.toString(), false);
-            console.log("playKbd");
-        }
+    if (enableTransmissionCheckbox.checked == true) {
+        console.log("Send");
+        let data = {};
 
-        if (enableTransmissionCheckbox.checked == true) {
-            console.log("Send");
-            let data = {};
+        let dbData = {
+            "session_id": currentSessionId,
+            "playedKey": evt.key.toString()
+        };
 
-            let dbData = {
-                "session_id": currentSessionId,
-                "playedKey": evt.key.toString()
-            };
-
-            let rsp = writeToDB(currentChannelName, dbData);
-            console.log(rsp);
-        }
+        let rsp = writeToDB(currentChannelName, dbData);
+        console.log(rsp);
     }
 
 });

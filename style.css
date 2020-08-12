@@ -39,6 +39,7 @@ body {
 
 /* .tomato a:link, */
 
+
 .keyPadInput, .keyPadInput:focus, .keyPadInput:active {
     background-color: clear !important;
     background: transparent !important;
@@ -48,6 +49,7 @@ body {
 }
 
 .card-block {
+    border-radius: 5px;
     background-color: rgba(100, 0, 255, 0);
     outline: 0;
     border: none !important;
@@ -55,11 +57,20 @@ body {
 }
 
 .card {
-    background-color: rgba(255, 255, 255, 0.5);
+    font-size: 25px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .card:active, .card:focus {
+    border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.75);
+}
+
+.card-block {
+    border-radius: 5px;
+    color: rgba(255, 255, 255, 0.01);
+    background-color: rgba(255, 255, 255, 0.01);
 }
 
 .slidecontainer {
@@ -106,7 +117,7 @@ a.button {
     appearance: button;
     font-size: 15px;
     text-decoration: none;
-    color: rgba(0, 0, 0, 0.7);
+    color: rgba(0, 0, 0, 1);
 }
 
 .button {
@@ -118,7 +129,7 @@ a.button {
   text-decoration: none;
   outline: 2px;
   color: purple;
-  background-color: rgba(255,255,255,0.10);
+  background-color: rgba(255,255,255, 0.40);
   border: none;
   border-radius: 5px;
   box-shadow: 0 1px black;
