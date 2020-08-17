@@ -110,13 +110,23 @@ function ehh(sample_path) {
 }
 
 
-function playKey(sampleKey, isRemote) {
+function playKey(sampleKey, isRemote, randomize) {
     let sampleUrls = getSamplesFromTxt(sampleKey);
 
-    for (var i=0; i < sampleUrls.length; i++) {
-        var sample_path = sampleUrls[i];
-        ehh(sample_path);
+    if (randomizePlaybackCheckbox.checked == true) {
+        var curKeys = Object.keys(currentSamples);
+
+        let sKey = curKeys[parseInt(Math.random() * (curKeys.length - 1) + 0)];
+        let sam = currentSamples[sKey];
+        let sUrl = sam[1];
+        ehh(sUrl);
+
+    } else {
+        for (var i=0; i < sampleUrls.length; i++) {
+            ehh(sampleUrls[i]);
+        }
     }
+
 }
 
 
@@ -166,19 +176,18 @@ function getSamplesFromTxt(samKey) {
     var sToPlay = [];
     var curKeys = Object.keys(currentSamples);
 
-    if (curKeys.length > 0) {
-        for(var i = 0; i < curKeys.length; i++) {
-            let k = curKeys[i];
-            let sam = currentSamples[k];
-            let sKeys = sam[2].toString();
+    for (var i = 0; i < curKeys.length; i++) {
+        let k = curKeys[i];
+        let sam = currentSamples[k];
+        let sKeys = sam[2].toString();
 
-            if (sKeys.includes(samKey)) {
-                let sUrl = sam[1];
-                console.log(sUrl);
-                sToPlay.push(sUrl);
-            }
+        if (sKeys.includes(samKey)) {
+            let sUrl = sam[1];
+            console.log(sUrl);
+            sToPlay.push(sUrl);
         }
     }
+
     return sToPlay;
 }
 
@@ -256,9 +265,7 @@ function highlightCard(cardID) {
     sCard.style.color = "blue";
     sCard.parentNode.style.color = "red";
     sCard.parentNode.parentNode.style.color = "red";
-
 }
-
 
 
 function playKey_(keyChars, isRemote) {

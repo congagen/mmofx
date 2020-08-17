@@ -3,6 +3,7 @@ var masterAmp_slider = document.getElementById("masterAmp");
 var enablePreviewCheckbox = document.getElementById("enablePreviewCheckbox");
 var enableTransmissionCheckbox = document.getElementById("enableTransmissionCheckbox");
 var receiveCommandsCheckbox = document.getElementById("receiveCommandsCheckbox");
+var randomizePlaybackCheckbox = document.getElementById("randomizePlaybackCheckbox");
 
 var currentChannelDisplay = document.getElementById("currentChannelDisplay");
 var synthMasterAmp   = document.getElementById("synthMasterAmp");
@@ -61,7 +62,7 @@ function AddSampleListRow(sampleId) {
         currentSamples[sId][2] = a.value;
     });
 
-    var btnPreview = $("<input id=" + sampleId + " type = 'button' value = 'Preview'/>");
+    var btnPreview = $("<input id=" + sampleId + " type = 'button' value = '>'/>");
     btnPreview.click(function () {
         var row = btnPreview.closest("TR");
         var sId = btnPreview.attr('id');
@@ -101,26 +102,23 @@ function playNetworkCmd(cmdText) {
 
     let rsp = writeToDB(currentChannelName, dbData);
     console.log(rsp);
-
 }
 
 
-function updateKeyMap_(keyId) {
+function updateKeyPad(keyId) {
     let keyItem = currentKeyboard[keyId];
     padCount += 1;
 
     // <div class="col-xs-2">
-    var padCol = $('<div class="col-sm-1 py-1 px-1"></div>');
-    let card_a = '<div type="button" class="card" id="' + "playBtn" + keyId + '">';
-    let card_b = '<div class="card-block"><div id="' + 'pInput_' + keyId.toString() + '" class="card-title"></div>';
-    let card_c = '<div class="col-xs-2 keyPad">';
+    var padCol = $('<div class="col-sm-1 px-1 py-1"></div>');
+    let card_a = '<div class="card" style="width:100%; height:100%;" id="' + "playBtn" + keyId + '">';
+    let card_b = '<div class="card-block"> <div id="' + 'pInput_' + keyId.toString() + '" class="card-title"></div>';
+    let card_c = '<div class="keyPad" style="width:100%; height:100%;">';
 
-    //let card_d = '<input id="pInput_'+ padCount.toString() +'" class="form-control text-center keyPadInput" placeholder="'
-    let card_d = '<input class="form-control text-center keyPadInput" placeholder="'
-
-    let card_e = keyId + '"> </input></div>';
-    let card_f = '';
-    let card_g = '</div></div>';
+    let card_d = '<input type="text" class="form-control text-center keyPadInput" placeholder="' + keyId + '"> </input>'
+    let card_e = '</div>';
+    let card_f = '</div>';
+    let card_g = '';
 
     // console.log("playBtn" + keyId);
 
@@ -148,7 +146,7 @@ function updateKeyMap_(keyId) {
             console.log("Sending: " + keyId.toString());
             playNetworkCmd(keyId);
         } else {
-            playKey(keyId, false);
+            playKey(keyId, false, false);
         }
 
     });
@@ -230,7 +228,7 @@ function initKeyMap(){
         var l = String.fromCharCode(i).toLowerCase();
 
         currentKeyboard[l] = [l, l, "a", "b"]
-        updateKeyMap_(l);
+        updateKeyPad(l);
     }
 
     toggleEditMode(false);
@@ -312,7 +310,7 @@ document.addEventListener("DOMContentLoaded", initUI, false);
 window.addEventListener('keydown', function(evt) {
 
     if (enablePreviewCheckbox.checked == true) {
-        playKey(evt.key.toString(), false);
+        playKey(evt.key.toString(), false, false);
         console.log("playKbd");
     }
 

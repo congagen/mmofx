@@ -100,7 +100,7 @@ function subscribeToDb(dbChannelName) {
         console.log(data.val());
 
         if (receiveCommandsCheckbox.checked == true) {
-            playKey(data.val(), true);
+            playKey(data.val(), true, false);
         }
     });
 
