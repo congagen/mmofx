@@ -4,7 +4,6 @@ var enablePreviewCheckbox = document.getElementById("enablePreviewCheckbox");
 var enableTransmissionCheckbox = document.getElementById("enableTransmissionCheckbox");
 var receiveCommandsCheckbox = document.getElementById("receiveCommandsCheckbox");
 
-//currentChannel
 var currentChannelDisplay = document.getElementById("currentChannelDisplay");
 var synthMasterAmp   = document.getElementById("synthMasterAmp");
 var samplerMasterAmp = document.getElementById("samplerMasterAmp");
@@ -66,10 +65,11 @@ function AddSampleListRow(sampleId) {
     btnPreview.click(function () {
         var row = btnPreview.closest("TR");
         var sId = btnPreview.attr('id');
-        playSample(sId);
+        console.log("Umm: " + sId);
+        previewSample(sId);
     });
 
-    var btnRemove = $("<input id=" + sampleId + " type = 'button' value = 'Remove'/>");
+    var btnRemove = $("<input id=" + sampleId + " type = 'button' value = 'X'/>");
     btnRemove.click(function () {
         var row = btnRemove.closest("TR");
         var sId = btnPreview.attr('id');
@@ -79,7 +79,7 @@ function AddSampleListRow(sampleId) {
     });
 
     $(cell).append(" ");
-    $(cell).append("Trg Keys: ");
+    $(cell).append("Keys: ");
     $(cell).append(trgKeysInput);
     $(cell).append(" ");
 
@@ -112,11 +112,11 @@ function updateKeyMap_(keyId) {
     // <div class="col-xs-2">
     var padCol = $('<div class="col-sm-1 py-1 px-1"></div>');
     let card_a = '<div type="button" class="card" id="' + "playBtn" + keyId + '">';
-    let card_b = '<div class="card-block"><div class="card-title"></div>';
+    let card_b = '<div class="card-block"><div id="' + 'pInput_' + keyId.toString() + '" class="card-title"></div>';
     let card_c = '<div class="col-xs-2 keyPad">';
 
     //let card_d = '<input id="pInput_'+ padCount.toString() +'" class="form-control text-center keyPadInput" placeholder="'
-    let card_d = '<input id="pInput_'+ keyId.toString() +'" class="form-control text-center keyPadInput" placeholder="'
+    let card_d = '<input class="form-control text-center keyPadInput" placeholder="'
 
     let card_e = keyId + '"> </input></div>';
     let card_f = '';
@@ -187,6 +187,31 @@ function updateKeyMap_(keyId) {
         console.log(samplerCheckboxId);
     });
 
+}
+
+
+async function addSamplesBtnClicked(){
+//    let files = await selectFile("audio/*", true);
+    let files = await selectFile("", true);
+    //console.log(files);
+    //console.log(URL.createObjectURL(files[0]));
+
+    for (var i=0; i < files.length; i++) {
+        //console.log(files[i]);
+        var fileName = files[i].name.toString();
+        var ext = fileName.substr(fileName.lastIndexOf('.') + 1);
+
+        if (ext == "wav" || ext == "mp3") {
+            let fName = files[i].name.toString();
+            var sKey = URL.createObjectURL(files[i]).toString();
+            let sUrl = URL.createObjectURL(files[i]);
+            let trgKeys = fName[0].toLowerCase();
+
+            // TODO: TrgKey from
+            currentSamples[sKey] = [fName, sUrl, fName[0].toLowerCase()];
+            AddSampleListRow(sKey);
+        }
+    }
 }
 
 
@@ -311,6 +336,12 @@ window.addEventListener('keyup', function(evt) {});
 
 
 document.body.addEventListener('click', function() {
+    if (!isInitAudio) {
+        initAudio();
+    }
+});
+
+document.body.addEventListener('touchend', function() {
     if (!isInitAudio) {
         initAudio();
     }

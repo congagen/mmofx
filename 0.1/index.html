@@ -30,7 +30,7 @@
         </div>
 
         <div class="tab-content ml-auto">
-            <div id="settings_tab" class="tab-pane fade">
+            <div id="settings_tab" class="tab-pane">
                 <center>
                     <br><br>
                     <h6 id="currentChannelDisplay"> Disconnected </h6>
@@ -43,14 +43,10 @@
                     <div class="slidecontainer">
                         <input id="masterAmp" type="range" min="1" max="100" value="80" class="slider"><p> Volume </p>
                     </div><br>
-
-                    <div class="slidecontainer">
-                        <input id="samplerMasterAmp" type="range" min="0" max="100" value="80" class="slider"><p> Sampler </p>
-                    </div>
                 </center>
             </div>
 
-            <div id="help_tab" class="tab-pane fade">
+            <div id="help_tab" class="tab-pane">
                 <center>
                     <br><br><br>
 
@@ -67,28 +63,48 @@
                 </center>
             </div>
 
-            <div id="studio_tab" class="tab-pane fade">
+            <div id="studio_tab" class="tab-pane">
                 <div style="background-color: rgb(0, 0, 0, 0.35)">
                     <ul class="nav nav-tabs justify-content-center navbar-light">
     <!--                        <li><a class="tab" data-toggle="tab" href="#composer_tab">Comp</a></li>-->
     <!--                        <li><a class="tab" data-toggle="tab" href="#mixer">Mixer</a></li>-->
     <!--                        <li><a class="tab" data-toggle="tab" href="#synth">Synth</a></li>-->
-                        <li><a class="tab" data-toggle="tab" href="#control_tab">Controls</a></li>
+                        <li><a class="tab" data-toggle="tab" href="#control_tab">Pads</a></li>
                         <li><a class="tab" data-toggle="tab" href="#sampler_tab">Samples</a></li>
                     </ul>
                 </div>
 
                 <div class="tab-content ml-auto">
-                    <div id="control_tab" class="tab-pane fade">
+                    <div id="control_tab" class="tab-pane">
                         <br>
 
                         <div class="row">
                             <div class="col-sm">
-                                <center><div class="form-check">
-                                    <input type="checkbox" checked class="form-check-input" id="receiveCommandsCheckbox">
-                                    <label class="form-check-label" for="receiveCommandsCheckbox">Receive</label>
-                            </div></center>
+                                <center>
+                                    <div class="form-check">
+                                        <input type="checkbox" checked class="form-check-input" id="receiveCommandsCheckbox">
+                                        <label class="form-check-label" for="receiveCommandsCheckbox">Receive</label>
+                                    </div>
+                                </center>
                             </div>
+
+<!--                            <div class="col-sm">-->
+<!--                                <center>-->
+<!--                                    <div class="form-check">-->
+<!--                                        <input type="checkbox" class="form-check-input" id="randomizePlaybackCheckbox">-->
+<!--                                        <label class="form-check-label" for="randomizePlaybackCheckbox">Random Sample</label>-->
+<!--                                    </div>-->
+<!--                                </center>-->
+<!--                            </div>-->
+
+<!--                           <div class="col-sm">-->
+<!--                                <center>-->
+<!--                                    <div class="form-check">-->
+<!--                                        <input type="checkbox" class="form-check-input" id="loopLastPlayed">-->
+<!--                                        <label class="form-check-label" for="loopLastPlayed">Loop</label>-->
+<!--                                    </div>-->
+<!--                                </center>-->
+<!--                            </div>-->
 
                             <div class="col-sm">
                                 <center><div class="form-check">
@@ -111,21 +127,23 @@
                             </center>
                         </div>
                     </div>
-                    <div id="sampler_tab" class="tab-pane fade">
+
+                    <div id="sampler_tab" class="tab-pane">
                         <center>
                             <br>
-                            <button id="add_samples_btn" class="" onclick="addSamplesBtnClicked()">Add Samples</button>
+                            <button id="add_samples_btn" class="" onclick="addSamplesBtnClicked()">+ Import</button>
                             <br><br>
                             <table id = "sampleTableContainer" border="0" cellpadding="5" cellspacing="5"></table>
                             <br><br>
                             <br><br>
                         </center>
                     </div>
+
                 </div>
             </div>
 
 
-            <div id="composer_tab" class="tab-pane fade">
+            <div id="composer_tab" class="tab-pane">
                 <div class="container">
                     <center>
                         <br><br>
@@ -142,7 +160,7 @@
                 </div>
             </div>
 
-            <div id="synth" class="tab-pane fade">
+            <div id="synth" class="tab-pane">
                 <center>
                     <br><br><br>
                     <div class="container">
@@ -183,7 +201,7 @@
                 </center>
             </div>
 
-            <div id="mixer" class="tab-pane fade">
+            <div id="mixer" class="tab-pane">
                 <center>
                     <br><br>
                     <div class="container">
@@ -191,6 +209,9 @@
                             <div class="col-sm">
                                 <center> <h5> Mix </h5> </center>
                                 <br>
+                                <div class="slidecontainer">
+                                    <input id="samplerMasterAmp" type="range" min="0" max="100" value="80" class="slider"><p> Sampler </p>
+                                </div>
 
                             </div>
                             <br><br>
@@ -263,8 +284,8 @@
 
         </div>
 
-
         <script type="text/javascript" src="js/libs/Pizzicato.min.js"></script>
+        <script type="text/javascript" src="js/buffer-loader.js"></script>
         <script type="text/javascript" src="js/session.js"></script>
         <script type="text/javascript" src="js/audio.js"></script>
         <script type="text/javascript" src="js/network.js"></script>
