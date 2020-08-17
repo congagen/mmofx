@@ -215,9 +215,6 @@ function clearSamplesList() {
 }
 
 
-
-
-
 function selectFile (contentType, multiple){
     return new Promise(resolve => {
         let input = document.createElement('input');

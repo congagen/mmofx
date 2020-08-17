@@ -105,7 +105,7 @@ function playNetworkCmd(cmdText) {
 }
 
 
-function updateKeyPad(keyId) {
+function addKeyPad(keyId) {
     let keyItem = currentKeyboard[keyId];
     padCount += 1;
 
@@ -114,7 +114,6 @@ function updateKeyPad(keyId) {
     let card_a = '<div class="card" style="width:100%; height:100%;" id="' + "playBtn" + keyId + '">';
     let card_b = '<div class="card-block"> <div id="' + 'pInput_' + keyId.toString() + '" class="card-title"></div>';
     let card_c = '<div class="keyPad" style="width:100%; height:100%;">';
-
     let card_d = '<input type="text" class="form-control text-center keyPadInput" placeholder="' + keyId + '"> </input>'
     let card_e = '</div>';
     let card_f = '</div>';
@@ -228,7 +227,7 @@ function initKeyMap(){
         var l = String.fromCharCode(i).toLowerCase();
 
         currentKeyboard[l] = [l, l, "a", "b"]
-        updateKeyPad(l);
+        addKeyPad(l);
     }
 
     toggleEditMode(false);
