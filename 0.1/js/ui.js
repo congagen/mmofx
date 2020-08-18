@@ -110,7 +110,7 @@ function addKeyPad(keyId) {
     padCount += 1;
 
     // <div class="col-xs-2">
-    var padCol = $('<div class="col-sm-1 px-1 py-1"></div>');
+    var padCol = $('<div class="col-sm-1 px-1 py-1" style="width:20%;"></div>');
     let card_a = '<div class="card" style="width:100%; height:100%;" id="' + "playBtn" + keyId + '">';
     let card_b = '<div class="card-block"> <div id="' + 'pInput_' + keyId.toString() + '" class="card-title"></div>';
     let card_c = '<div class="keyPad" style="width:100%; height:100%;">';
@@ -222,9 +222,16 @@ function toggleEditMode(isEnabled) {
 
 function initKeyMap(){
     padCount = 0;
+    let charlist = ["0","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
+    "c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
+    "∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
+    "÷","≈","ç","‹","›","‘","◊","…","–","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
+    "c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
+    "∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
+    "÷","≈","ç","‹","›","‘","◊","…","–"]
 
-    for (var i = 33; i < 256; i++) {
-        var l = String.fromCharCode(i).toLowerCase();
+    for (var i = 0; i < charlist.length; i++) {
+        var l = charlist[i].toLowerCase();
 
         currentKeyboard[l] = [l, l, "a", "b"]
         addKeyPad(l);
