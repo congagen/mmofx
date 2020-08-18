@@ -74,8 +74,16 @@ let oscList = [oscA, oscB, oscC];
 var currentSamples = {};
 let testSampleBtn = document.getElementById("debugSample");
 
+let midiOutput = null;
 
 
+function connectMidi(){
+    navigator.requestMIDIAccess()
+    .then(function(midiAccess) {
+      const outputs = Array.from(midiAccess.outputs.values());
+      console.log(outputs);
+    });
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // SAMPLER  ////////////////////////////////////////////////////////////////////
@@ -323,7 +331,7 @@ function initAudio() {
 }
 
 
-
+//connectMidi();
 
 
 
