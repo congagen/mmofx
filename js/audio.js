@@ -1,5 +1,9 @@
 // WebAudio
 let ctx;
+let audioCtx;
+let source;
+let songLength;
+
 var out;
 var oscA_gain;
 var oscA;
@@ -70,15 +74,100 @@ let oscList = [oscA, oscB, oscC];
 var currentSamples = {};
 let testSampleBtn = document.getElementById("debugSample");
 
+let midiOutput = null;
 
 
+function connectMidi(){
+    navigator.requestMIDIAccess()
+    .then(function(midiAccess) {
+      const outputs = Array.from(midiAccess.outputs.values());
+      console.log(outputs);
+    });
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // SAMPLER  ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+function ehh(sample_path) {
+    var curSource = audioCtx.createBufferSource();
+    var curRequest = new XMLHttpRequest();
+    console.log(sample_path);
 
-function playSample(sampleId) {
+    curRequest.open('GET', sample_path, true);
+    curRequest.responseType = 'arraybuffer';
+
+    curRequest.onload = function() {
+        let audioData = curRequest.response;
+
+        audioCtx.decodeAudioData(audioData, function(buffer) {
+            myBuffer = buffer;
+            songLength = buffer.duration;
+            curSource.buffer = myBuffer;
+            curSource.playbackRate.value = 1;
+            curSource.connect(audioCtx.destination);
+            curSource.loop = false;
+        },
+
+        function(e){"Error with decoding audio data" + e.error});
+    }
+
+    curRequest.send();
+    curSource.start(0);
+
+}
+
+
+function playKey(sampleKey, isRemote, randomize) {
+    let sampleUrls = getSamplesFromTxt(sampleKey);
+
+    if (randomizePlaybackCheckbox.checked == true) {
+        var curKeys = Object.keys(currentSamples);
+
+        let sKey = curKeys[parseInt(Math.random() * (curKeys.length - 1) + 0)];
+        let sam = currentSamples[sKey];
+        let sUrl = sam[1];
+        ehh(sUrl);
+
+    } else {
+        for (var i=0; i < sampleUrls.length; i++) {
+            ehh(sampleUrls[i]);
+        }
+    }
+
+}
+
+
+function previewSample_(sampleId) {
+    let sUrl = currentSamples[sampleId][1];
+    var curSource = audioCtx.createBufferSource();
+    var curRequest = new XMLHttpRequest();
+
+    curRequest.open('GET', sUrl, true);
+    curRequest.responseType = 'arraybuffer';
+
+    curRequest.onload = function() {
+        let audioData = curRequest.response;
+
+        audioCtx.decodeAudioData(audioData, function(buffer) {
+            myBuffer = buffer;
+            songLength = buffer.duration;
+            curSource.buffer = myBuffer;
+            curSource.playbackRate.value = 1;
+            curSource.connect(audioCtx.destination);
+            curSource.loop = false;
+        },
+
+        function(e){"Error with decoding audio data" + e.error});
+
+        curRequest.send();
+        curSource.start(0);
+    }
+
+}
+
+
+function previewSample(sampleId) {
     let sUrl = currentSamples[sampleId][1];
     console.log("Playing: " + currentSamples[sampleId][0]);
     console.log("TrgKeys: " + currentSamples[sampleId][2]);
@@ -95,17 +184,15 @@ function getSamplesFromTxt(samKey) {
     var sToPlay = [];
     var curKeys = Object.keys(currentSamples);
 
-    if (curKeys.length > 0) {
+    for (var i = 0; i < curKeys.length; i++) {
+        let k = curKeys[i];
+        let sam = currentSamples[k];
+        let sKeys = sam[2].toString();
 
-        for(var i = 0; i < curKeys.length; i++) {
-            let k = curKeys[i];
-            let sam = currentSamples[k];
-            let sKeys = sam[2].toString();
-
-            if (sKeys.includes(samKey)) {
-                let sUrl = sam[1];
-                sToPlay.push(sUrl);
-            }
+        if (sKeys.includes(samKey)) {
+            let sUrl = sam[1];
+            console.log(sUrl);
+            sToPlay.push(sUrl);
         }
     }
 
@@ -119,7 +206,7 @@ function initDefSamples(){
     var f = new File([""], "xus.wav");
     var files = [f];
 
-    for(var i=0; i < files.length; i++) {
+    for (var i=0; i < files.length; i++) {
         let fName = files[i].name.toString();
         var sKey = URL.createObjectURL(files[i]).toString();
         let sUrl = URL.createObjectURL(files[i]);
@@ -133,24 +220,6 @@ function initDefSamples(){
 
 function clearSamplesList() {
     $("#sampleTableContainer tr").remove();
-}
-
-
-async function addSamplesBtnClicked(){
-    let files = await selectFile("audio/*", true);
-    console.log(files);
-    console.log(URL.createObjectURL(files[0]));
-
-    for(var i=0; i < files.length; i++) {
-        let fName = files[i].name.toString();
-        var sKey = URL.createObjectURL(files[i]).toString();
-        let sUrl = URL.createObjectURL(files[i]);
-        let trgKeys = fName[0].toLowerCase();
-
-        // TODO: TrgKey from
-        currentSamples[sKey] = [fName, sUrl, fName[0].toLowerCase()];
-        AddSampleListRow(sKey);
-    }
 }
 
 
@@ -193,18 +262,32 @@ function getRandomArbitrary(min, max) {
 }
 
 
-function playKey(client_seed, isRemote) {
+function highlightCard(cardID) {
+    console.log("HL: " + cardID);
+    var sCard = document.getElementById(cardID);
+    console.log(sCard);
+    sCard.classList.add("active");
+    sCard.style.color = "blue";
+    sCard.parentNode.style.color = "red";
+    sCard.parentNode.parentNode.style.color = "red";
+}
+
+
+function playKey_(keyChars, isRemote) {
+    highlightCard("pInput_" + keyChars);
 
     Pizzicato.volume = (masterAmp_slider.value / 110);
     var now = parseFloat(context.currentTime);
     let releaseKnobVal = parseFloat(release_knob.value * 0.1);
     let stopTime = (now + 0.5);
 
-    let sampleUrls = getSamplesFromTxt(client_seed);
-    for(var i=0; i < sampleUrls.length; i++) {
-        var sampler = new Pizzicato.Sound(sampleUrls[i], () => {
-            sampler.volume = ((samplerMasterAmp.value + 0.01) / 1000);
-            sampler.play();
+    let sampleUrls = getSamplesFromTxt(keyChars);
+    for (var i=0; i < sampleUrls.length; i++) {
+        console.log("Playing: " + sampleUrls[i]);
+
+        var curSampler = new Pizzicato.Sound(sampleUrls[i], () => {
+            curSampler.volume = ((curSampler.value + 0.01) / 1000);
+            curSampler.play();
         });
     }
 
@@ -216,6 +299,25 @@ function initAudio() {
 
         try {
             if (!isInitAudio){
+                var AudioContext = window.AudioContext // Default
+                    || window.webkitAudioContext // Safari and old versions of Chrome
+                    || false;
+
+                if (AudioContext) {
+                    var ctx = new AudioContext;
+
+                    if(window.webkitAudioContext) {
+                        audioCtx = new window.webkitAudioContext();
+                    } else {
+                        audioCtx = new window.AudioContext();
+                    }
+
+                    console.log("AudioContext OK");
+                } else {
+                    console.log("AudioContext ERR");
+                    alert("Sorry, but the Web Audio API is not supported by your browser. Please, consider upgrading to the latest version or downloading Google Chrome or Mozilla Firefox");
+                }
+
                 context = Pizzicato.context;
                 isInitAudio = true;
             }
@@ -229,7 +331,7 @@ function initAudio() {
 }
 
 
-
+//connectMidi();
 
 
 

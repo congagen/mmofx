@@ -93,12 +93,14 @@ function subscribeToDb(dbChannelName) {
     console.log("Connecting to DB: " + dbChannelName);
     var newDbChannel = firebase.database().ref(dbChannelName);
 
+    currentChannelDisplay.innerHTML = "Current Channel: " + dbChannelName;
+
     newDbChannel.on('child_changed', function (data) {
         console.log("Data change");
         console.log(data.val());
 
         if (receiveCommandsCheckbox.checked == true) {
-            playKey(data.val(), true);
+            playKey(data.val(), true, false);
         }
     });
 

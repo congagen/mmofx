@@ -2,10 +2,16 @@
 # MMOSFX
 
 
+#### TODO:
+1. Highlight Remote
+2. Midi Out
+3. Effects
+4. Mic Input?
+5. Default Sample Pack
+
+----------
 
 #### Testing:
-
-
 * HTTPS (MAC):
 ```sh
 brew install nss
@@ -35,12 +41,6 @@ Client:
 2. Tap/Click Pads
 
 
-<br>
-
-## TODO:
-1. Polyphony Modes
-2. Mic Input?
-3. Mixer Routing?
 
 
 

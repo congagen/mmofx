@@ -3,7 +3,9 @@ var masterAmp_slider = document.getElementById("masterAmp");
 var enablePreviewCheckbox = document.getElementById("enablePreviewCheckbox");
 var enableTransmissionCheckbox = document.getElementById("enableTransmissionCheckbox");
 var receiveCommandsCheckbox = document.getElementById("receiveCommandsCheckbox");
+var randomizePlaybackCheckbox = document.getElementById("randomizePlaybackCheckbox");
 
+var currentChannelDisplay = document.getElementById("currentChannelDisplay");
 var synthMasterAmp   = document.getElementById("synthMasterAmp");
 var samplerMasterAmp = document.getElementById("samplerMasterAmp");
 
@@ -47,42 +49,55 @@ function AddSampleListRow(sampleId) {
     let sItem = currentSamples[sampleId];
 
     var sampleTableContainer = $("#sampleTableContainer");
-    var row = sampleTableContainer[0].insertRow(-1);
-    var cell = row.insertCell(-1);
+    var sampleRow = $('<div class="row py-2"> </div>');
 
-    var nameField = $("<input id=sNameField" + sampleId + " size='4' type = 'text' value = " + sItem[0] + " readonly>");
-    $(cell).append(nameField);
+    // -----------------------------------------------------------------------------------------------------------------
 
-    var trgKeysInput = $("<input id=" + sampleId.toString() + " size='4' type = 'text' value = " + sItem[2].toLowerCase() + "></input>");
-    trgKeysInput.change(function () {
-        var sId = trgKeysInput.attr('id');
-        let a = document.getElementById(sId.toString());
-        currentSamples[sId][2] = a.value;
+    var nameField = $("<div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div>");
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    let itmB = "<div class='col'> <input class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div>"
+
+    var trgKeysInput = $(itmB);
+    var trigInp = trgKeysInput.find( "input" );
+
+    trigInp.change(function () {
+        var sId = $(trigInp).attr('id');
+        let trgKeyInputField = document.getElementById(sId.toString());
+        currentSamples[sId][2] = trgKeyInputField.value.toString();
     });
 
-    var btnPreview = $("<input id=" + sampleId + " type = 'button' value = 'Preview'/>");
-    btnPreview.click(function () {
-        var row = btnPreview.closest("TR");
-        var sId = btnPreview.attr('id');
-        playSample(sId);
+    // -----------------------------------------------------------------------------------------------------------------
+
+    let itmC = "<div class='col'> <input class='btn btn-dark' type='button' value = 'P'> </div>";
+
+    var btnPreview = $(itmC);
+    var prevBtn = btnPreview.find( "input" );
+    prevBtn.click(function () {
+        previewSample(sampleId.toString());
     });
 
-    var btnRemove = $("<input id=" + sampleId + " type = 'button' value = 'Remove'/>");
-    btnRemove.click(function () {
-        var row = btnRemove.closest("TR");
-        var sId = btnPreview.attr('id');
+    // -----------------------------------------------------------------------------------------------------------------
 
-        delete currentSamples[sId];
-        row.remove();
+    let itmD  = "<div class='col'> <input class='btn btn-dark' type='button' value='X'> </div>";
+
+    var btnRemove = $(itmD);
+    var remoBtn = btnRemove.find( "input" );
+    remoBtn.click(function () {
+        delete currentSamples[sampleId.toString()];
+        sampleRow.remove();
     });
 
-    $(cell).append(" ");
-    $(cell).append("Trg Keys: ");
-    $(cell).append(trgKeysInput);
-    $(cell).append(" ");
+    // -----------------------------------------------------------------------------------------------------------------
 
-    $(cell).append(btnPreview);
-    $(cell).append(btnRemove);
+    $(sampleRow).append(nameField);
+    // $(sampleRow).append(itmA);
+    $(sampleRow).append(trgKeysInput);
+    $(sampleRow).append(btnPreview);
+    $(sampleRow).append(btnRemove);
+
+    $(sampleTableContainer).append(sampleRow);
 }
 
 
@@ -99,43 +114,40 @@ function playNetworkCmd(cmdText) {
 
     let rsp = writeToDB(currentChannelName, dbData);
     console.log(rsp);
-
 }
 
 
-function updateKeyMap_(keyId) {
+function addKeyPad(keyId) {
     let keyItem = currentKeyboard[keyId];
     padCount += 1;
 
-    let cId = keyId.toString();
-    let inputId = keyId + "_input";
-
     // <div class="col-xs-2">
-    var padCol = $('<div class="col-sm-1 py-1 px-1"></div>');
-    let card_a = '<div type="button" class="card" id="' + "playBtn" + '">';
-    let card_b = '<div class="card-block"><div class="card-title"></div>';
-    let card_c = '<div class="col-xs-2 keyPad">';
-    let card_d = '<input id="pInput_'+ padCount.toString() +'" class="form-control text-center keyPadInput" placeholder="'
-    let card_e = keyId + '"> </input></div>';
-    let card_f = '';
-    let card_g = '</div></div>';
+    var padCol = $('<div class="col-sm-1 px-1 py-1" style="width:20%;"></div>');
+    let card_a = '<div class="card" style="width:100%; height:100%;" id="' + "playBtn" + keyId + '">';
+    let card_b = '<div class="card-block"> <div id="' + 'pInput_' + keyId.toString() + '" class="card-title"></div>';
+    let card_c = '<div class="keyPad" style="width:100%; height:100%;">';
+    let card_d = '<input type="text" class="form-control text-center keyPadInput" placeholder="' + keyId + '"> </input>'
+    let card_e = '</div>';
+    let card_f = '</div>';
+    let card_g = '';
+
+    // console.log("playBtn" + keyId);
 
     var keyPanel = $(card_a + card_b + card_c + card_d + card_e + card_f + card_g);
     keyPanel.appendTo(padCol);
     padCol.appendTo('#contentPanel');
 
-    var nameField = $("<input id=keyNameField" + keyId + " size='4' type = 'text' value = " + keyItem[0] + " readonly>");
+    //var nameField = $("<input id=keyNameField" + keyId + " size='4' type = 'text' value = " + keyItem[0] + " readonly>");
 
-    var trgKeysInput = $("<input id=" + keyId.toString() + " size='4' type = 'text' value = " + keyItem[2].toLowerCase() + "></input>");
-    trgKeysInput.change(function () {
-        var sId = trgKeysInput.attr('id');
+//    var trgKeysInput = $("<input id=" + keyId.toString() + " size='4' type = 'text' value = " + keyItem[2].toLowerCase() + "></input>");
+//    trgKeysInput.change(function () {
+//        var sId = trgKeysInput.attr('id');
+//
+//        let a = document.getElementById(sId.toString());
+//        currentKeyboard[sId][2] = a.value;
+//    });
 
-        let a = document.getElementById(sId.toString());
-        currentKeyboard[sId][2] = a.value;
-    });
-
-    var btnPreview = $("<input id=" + keyId + " type = 'button' value = 'Play'/>");
-
+    //var btnPreview = $("<input id=" + keyId + " type = 'button' value = 'Play'/>");
     keyPanel.mousedown(function () {
         console.log("Mouse Down");
         console.log(keyId);
@@ -144,31 +156,10 @@ function updateKeyMap_(keyId) {
             console.log("Sending: " + keyId.toString());
             playNetworkCmd(keyId);
         } else {
-            playKey(keyId, false);
+            playKey(keyId, false, false);
         }
 
     });
-
-    keyPanel.mouseup(function () {
-        //console.log("Mouse Up");
-        //oscillators.stop();
-    });
-
-    if (isTouchDevice){
-        // keyPanel.touchstart(function () {
-        //     console.log("Touch Start");
-        //
-        //     console.log(keyId);
-        //     if (enablePreviewCheckbox.checked == true){
-        //         playKey(keyId, false);
-        //     }
-        // });
-        //
-        // keyPanel.touchend(function () {
-        //     console.log("Touch Stop");
-        //     oscillators.stop();
-        // });
-    }
 
     // <input checked type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
     let synCheckboxId = keyId + "_" + "synActiveForKey";
@@ -186,6 +177,31 @@ function updateKeyMap_(keyId) {
 }
 
 
+async function addSamplesBtnClicked(){
+//    let files = await selectFile("audio/*", true);
+    let files = await selectFile("", true);
+    //console.log(files);
+    //console.log(URL.createObjectURL(files[0]));
+
+    for (var i=0; i < files.length; i++) {
+        //console.log(files[i]);
+        var fileName = files[i].name.toString();
+        var ext = fileName.substr(fileName.lastIndexOf('.') + 1);
+
+        if (ext == "wav" || ext == "mp3") {
+            let fName = files[i].name.toString();
+            var sKey = URL.createObjectURL(files[i]).toString();
+            let sUrl = URL.createObjectURL(files[i]);
+            let trgKeys = fName[0].toLowerCase();
+
+            // TODO: TrgKey from
+            currentSamples[sKey] = [fName, sUrl, fName[0].toLowerCase()];
+            AddSampleListRow(sKey);
+        }
+    }
+}
+
+
 function toggleEditMode(isEnabled) {
     var all = document.getElementsByClassName("keyPadInput");
     for (var i=0, max=all.length; i < max; i++) {
@@ -196,12 +212,19 @@ function toggleEditMode(isEnabled) {
 
 function initKeyMap(){
     padCount = 0;
+    let charlist = ["0","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
+    "c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
+    "∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
+    "÷","≈","ç","‹","›","‘","◊","…","–","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
+    "c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
+    "∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
+    "÷","≈","ç","‹","›","‘","◊","…","–"]
 
-    for (var i = 33; i < 256; i++) {
-        var l = String.fromCharCode(i).toLowerCase();
+    for (var i = 0; i < charlist.length; i++) {
+        var l = charlist[i].toLowerCase();
 
         currentKeyboard[l] = [l, l, "a", "b"]
-        updateKeyMap_(l);
+        addKeyPad(l);
     }
 
     toggleEditMode(false);
@@ -248,7 +271,7 @@ function initUI() {
 
     initKeyMap();
 
-    masterAmp_slider.value= 30;
+    masterAmp_slider.value= 90;
     attack_knob.value = 5;
     duration_knob.value = 30;
     release_knob.value = 15;
@@ -283,7 +306,7 @@ document.addEventListener("DOMContentLoaded", initUI, false);
 window.addEventListener('keydown', function(evt) {
 
     if (enablePreviewCheckbox.checked == true) {
-        playKey(evt.key.toString(), false);
+        playKey(evt.key.toString(), false, false);
         console.log("playKbd");
     }
 
@@ -307,6 +330,12 @@ window.addEventListener('keyup', function(evt) {});
 
 
 document.body.addEventListener('click', function() {
+    if (!isInitAudio) {
+        initAudio();
+    }
+});
+
+document.body.addEventListener('touchend', function() {
     if (!isInitAudio) {
         initAudio();
     }

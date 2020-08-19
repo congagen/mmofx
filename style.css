@@ -1,44 +1,43 @@
 body {
-    /* background: linear-gradient(180deg, #39FF14, blue, red, red);
-    background-size: 500% 500%;
-    animation: gradient 100s infinite alternate; */
-
-    /* background-image: url('03.gif'); */
-    background-size: cover;
-
-    height: 200vh;
-    padding:0;
-    margin:0;
-
     background-color: rgb(40, 40, 50);
 }
-/*
-@keyframes gradient {
-    0% {
-        background-position: 50% 0%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 50% 0%;
-    }
-} */
 
 #keyTable{
     color: lime;
 }
 
 #sampleTableContainer{
-    color: lime;
+    color: rgba(180, 180, 180, 1);
 }
-/*
-.input{
-    box-sizing : border-box;
-} */
 
-/* .tomato a:link, */
+.qr-code {
+  max-width: 200px;
+  margin: 10px;
+}
 
+.btn{
+    color: purple;
+}
+
+.row {
+    background-color: rgba(180, 180, 180, .1);
+}
+
+.form-control {
+    background-color: clear !important;
+    background: transparent !important;
+    color: purple;
+}
+
+.input {
+    background-color: clear !important;
+    background: transparent !important;
+    color: clear !important;
+}
+
+.scroll-container {
+  scroll-padding: 0 0 0 0;
+}
 
 .keyPadInput, .keyPadInput:focus, .keyPadInput:active {
     background-color: clear !important;
@@ -74,7 +73,7 @@ body {
 }
 
 .slidecontainer {
-  width: 90%; /* Width of the outside container */
+  width: 70%; /* Width of the outside container */
 }
 
 /* The slider itself */
@@ -117,7 +116,7 @@ a.button {
     appearance: button;
     font-size: 15px;
     text-decoration: none;
-    color: rgba(0, 0, 0, 1);
+    color: rgba(0, 0, 0, 0);
 }
 
 .button {
@@ -155,6 +154,7 @@ a.button {
     margin-bottom: 30px;
 }
 
+
 .awesome {
     font-family: times;
     font-style: italic;
@@ -177,7 +177,7 @@ a.button {
     -webkit-animation: colorchange 2s infinite alternate;
 }
 
-h4,h5,h6,h7,p,label {
+h4, h5, h6, h7, p, label {
     text-align: center;
     align: center;
 

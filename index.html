@@ -5,7 +5,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width">
-        <title>MMOSXFYS</title>
+        <title>MMOSXFYS v0.1</title>
 
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
@@ -13,8 +13,6 @@
         <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.17.2/firebase-database.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-auth.js"></script>
-<!--        <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-analytics.js"></script>-->
-<!--        <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-messaging.js"></script>-->
 
         <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="style.css">
@@ -23,327 +21,293 @@
     <body>
 
         <div style="background-color: rgb(0, 0, 0, 0.5)">
-            <!-- <br><br> -->
-            <center><h1 class="awesome"> MMOSFX! </h1></center>
-            <br>
+            <center><h1 class="awesome"> MMOSFX! </h1></center><br>
             <ul class="nav nav-tabs justify-content-center navbar-light">
-                <!-- <li class="active button"><a data-toggle="tab" href="#network_tab">Network</a></li> -->
-                <li><a class="tab btn" data-toggle="tab" href="#network_tab">Connection</a></li>
+                <li><a class="tab btn" data-toggle="tab" href="#settings_tab">Settings</a></li>
                 <li><a class="tab btn" data-toggle="tab" href="#studio_tab">Studio</a></li>
                 <li><a class="tab btn" data-toggle="tab" href="#help_tab">Help</a></li>
             </ul>
         </div>
 
         <div class="tab-content ml-auto">
-            <div id="network_tab" class="tab-pane fade in active">
-<!--                <div style="background-color: rgb(0, 0, 0, 0.35)">-->
-<!--                    <ul class="nav nav-tabs justify-content-center navbar-light">-->
-<!--                        &lt;!&ndash; <li class="active button"><a data-toggle="tab" href="#network_tab">Network</a></li> &ndash;&gt;-->
-<!--                        <li><a class="tab" data-toggle="tab" href="#connection">Connection</a></li>-->
-<!--                        <li><a class="tab" data-toggle="tab" href="#chat">Chat</a></li>-->
-<!--                        <li><a class="tab" data-toggle="tab" href="#users">Users</a></li>-->
-<!--                        &lt;!&ndash; <li><a class="tab" data-toggle="tab" href="#settings_tab">Settings</a></li> &ndash;&gt;-->
-<!--                    </ul>-->
-<!--                </div>-->
+            <div id="settings_tab" class="tab-pane">
+                <center>
+                    <br><br>
+                    <h6 id="currentChannelDisplay"> Disconnected </h6>
+                    <br>
+                    <input type="text" id="channelNameInputBox" placeholder="Channel Name" autofocus="off" />
+                    <br><br>
+                    <button type="button" id="setChannelNameButton">Connect</button>
+                    <br><br><br><br>
 
+                    <div class="slidecontainer">
+                        <input id="masterAmp" type="range" min="1" max="100" value="80" class="slider"><p> Volume </p>
+                    </div><br>
+
+<!--                    <div class="container-fluid">-->
+<!--                      <div class="text-center">-->
+<!--                        <img src="https://chart.googleapis.com/chart?cht=qr&chl=XUSIONE.COM&chs=160x160&chld=L|0"-->
+<!--                             class="qr-code img-thumbnail img-responsive">-->
+<!--                      </div>-->
+
+<!--                      <div class="form-horizontal">-->
+<!--                        <div class="form-group">-->
+<!--                          <div class="col-sm-10">-->
+<!--                            <input type="text" class="form-control" id="qr_gen_content" placeholder="">-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                          <div class="col-sm-offset-2 col-sm-10">-->
+<!--                            <button type="button" class="btn btn-default" id="generate">Generate</button>-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </div>-->
+
+                </center>
+            </div>
+
+            <div id="help_tab" class="tab-pane">
                 <center>
                     <br><br><br>
 
-                    <br>
-                    <p> Username: </p>
-                    <input type="text" id="username_input_box" placeholder="Channel Name" title="Host channel name">
-
+                    <h4> Host (Desktop Only) </h4>
+                    <p> 1. Load samples and configure keys</p>
+                    <p> 2. Uncheck Client & check Host in Studio/Pads </p>
                     <br><br><br>
 
-                    <p> Channel: </p>
-                    <input type="text" id="channelNameInputBox" placeholder="Channel Name" autofocus="off" />
+                    <h4> Client </h4>
+                    <p> 1. Uncheck Host & check Slient in Studio/Pads </p>
+                    <p> 2. Click/Tap buttons in Studio/Controls </p>
+
                     <br><br>
-
-                    <button type="button" id="setChannelNameButton">Connect</button>
-
                 </center>
-
-<!--                <div class="tab-content ml-auto">-->
-<!--                    <div id="connection" class="tab-pane fade">-->
-<!--                        -->
-<!--                    </div>-->
-
-<!--                    <div id="chat" class="tab-pane fade">-->
-<!--                        <h1>Real Time Messaging</h1>-->
-<!--                        <pre id="messages" style="height: 400px; overflow: scroll"></pre>-->
-<!--                        <input type="text" id="messageBox" placeholder="Type your message here" style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />-->
-<!--                        <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button>-->
-<!--                    </div>-->
-
-<!--                    <div id="users" class="tab-pane fade">-->
-
-<!--                    </div>-->
-<!--                </div>-->
             </div>
 
-            <div id="studio_tab" class="tab-pane fade">
-
+            <div id="studio_tab" class="tab-pane">
                 <div style="background-color: rgb(0, 0, 0, 0.35)">
                     <ul class="nav nav-tabs justify-content-center navbar-light">
-<!--                        <li><a class="tab" data-toggle="tab" href="#composer_tab">Comp</a></li>-->
-<!--                        <li><a class="tab" data-toggle="tab" href="#mixer">Mixer</a></li>-->
-                        <li><a class="tab" data-toggle="tab" href="#control_tab">Controls</a></li>
-<!--                        <li><a class="tab" data-toggle="tab" href="#synth">Synth</a></li>-->
-                        <li><a class="tab" data-toggle="tab" href="#sampler">Samples</a></li>
+    <!--                        <li><a class="tab" data-toggle="tab" href="#composer_tab">Comp</a></li>-->
+    <!--                        <li><a class="tab" data-toggle="tab" href="#mixer">Mixer</a></li>-->
+    <!--                        <li><a class="tab" data-toggle="tab" href="#synth">Synth</a></li>-->
+                        <li><a class="tab" data-toggle="tab" href="#control_tab">Pads</a></li>
+                        <li><a class="tab" data-toggle="tab" href="#sampler_tab">Samples</a></li>
                     </ul>
                 </div>
 
                 <div class="tab-content ml-auto">
-                    <div id="control_tab" class="tab-pane fade">
-                        <center>
+                    <div id="control_tab" class="tab-pane">
                         <br>
 
-                            <div class="form-check">
-                                <input type="checkbox" checked class="form-check-input" id="receiveCommandsCheckbox">
-                                <label class="form-check-label" for="receiveCommandsCheckbox">Receive</label>
+                        <div class="row">
+                            <div class="col-sm">
+                                <center>
+                                    <div class="form-check">
+                                        <input type="checkbox" checked class="form-check-input" id="receiveCommandsCheckbox">
+                                        <label class="form-check-label" for="receiveCommandsCheckbox">Host</label>
+                                    </div>
+                                </center>
                             </div>
 
-                              <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="enableTransmissionCheckbox">
-                                <label class="form-check-label" for="enableTransmissionCheckbox">Send</label>
+                            <div class="col-sm">
+                                <center><div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="enableTransmissionCheckbox">
+                                    <label class="form-check-label" for="enableTransmissionCheckbox">Client</label>
+                                </div></center>
                             </div>
 
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
-                                <label class="form-check-label" for="enablePreviewCheckbox">Keyboard</label>
+                            <div class="col-sm">
+                                <center>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="randomizePlaybackCheckbox">
+                                        <label class="form-check-label" for="randomizePlaybackCheckbox">Rnd</label>
+                                    </div>
+                                </center>
                             </div>
 
-                        </center>
-
-                        <div class="container form">
-                            <center>
-                            <br>
-                            <div class="form-group row" id="contentPanel"> </div>
-
-                            <!-- <form class="form-inline">
-                                <input class="form-control col-1" type="text" id="numPanels" value="90" maxlength="3" />
-                                <button type="button" class="btn btn-info" id="btnGen">Generate</button>
-                            </form> -->
-
-                            <!-- <button onclick="addSamplesBtnClicked()">Add Samples</button> -->
-                            </center>
-                        </div>
-                    </div>
-
-                    <div id="composer_tab" class="tab-pane fade">
-
-                        <div class="container">
-                            <center>
-                                <br><br>
-                                <button type="button" name="button">Play</button>
-                                <button type="button" name="button">Pause</button>
-                                <br><br>
-                                <div id="compPlot" class=""></div>
-                                <br><br>
-                                <button type="button" name="button">Load</button>
-                                <button type="button" name="button">Save</button>
-                                <button type="button" name="button">Clear</button>
-                                <br><br>
-                            </center>
+                            <div class="col-sm">
+                                <center><div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
+                                    <label class="form-check-label" for="enablePreviewCheckbox">Keyboard</label>
+                                </div></center>
+                            </div>
                         </div>
 
-                    </div>
-
-                    <div id="synth" class="tab-pane fade">
                         <center>
-                            <br><br><br>
                             <div class="container">
-                                <div class="row">
-                                    <div class="col-sm">
-                                        <center> <h5> Oscs </h5> </center><br>
+                                <br><div class="row" id="contentPanel">
 
-                                        <div class="slidecontainer">
-                                            <input id="osc_a_vol_knob" type="range" min="1" max="100" value="50" class="slider"><p>Sine</p>
-                                        </div><br>
-
-                                        <div class="slidecontainer">
-                                            <input id="osc_b_vol_knob" type="range" min="1" max="100" value="50" class="slider" ><p>Square</p>
-                                        </div><br>
-
-                                        <div class="slidecontainer">
-                                            <input id="osc_c_vol_knob" type="range" min="1" max="100" value="50" class="slider"><p>Sawtooth</p>
-                                        </div><br>
-                                    </div>
-                                    <div class="col-sm">
-                                        <center><h5> Envelope </h5></center><br>
-
-                                        <div class="slidecontainer">
-                                            <input id="attack_knob" type="range" min="1" max="100" value="50" class="slider"><p>Attack</p>
-                                        </div><br>
-
-                                        <div class="slidecontainer">
-                                            <input id="duration_knob" type="range" min="1" max="100" value="50" class="slider"><p>Decay</p>
-                                        </div><br>
-
-                                        <div class="slidecontainer">
-                                            <input id="release_knob" type="range" min="1" max="100" value="50" class="slider"><p>Release</p>
-                                        </div><br>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm">
-                                    </div>
                                 </div>
                             </div>
                         </center>
+
                     </div>
 
-                    <div id="sampler" class="tab-pane fade">
-
-
-
+                    <div id="sampler_tab" class="tab-pane">
                         <center>
                             <br>
-                            <table id = "sampleTableContainer" border="0" cellpadding="5" cellspacing="5"></table>
+                            <button id="add_samples_btn" class="btn btn-dark" onclick="addSamplesBtnClicked()">+ Add</button>
                             <br><br>
-                            <button onclick="addSamplesBtnClicked()">Add Samples</button>
+
+                            <div class="container" id="sampleTableContainer">
+                                <div class="row">
+                                    <div class="col-sm">
+
+                                    </div>
+                                </div>
+                            </div>
+
                             <br><br>
                         </center>
                     </div>
 
-                    <div id="mixer" class="tab-pane fade">
-                        <center>
-                            <br><br>
-                            <div class="container">
-                                    <div class="row">
-                                        <div class="col-sm">
-                                            <center> <h5> Mix </h5> </center>
-                                            <br>
-
-                                            <div class="slidecontainer">
-                                                <input id="masterAmp" type="range" min="1" max="100" value="50" class="slider"><p> Volume </p>
-                                            </div>
-
-                                            <div class="slidecontainer">
-                                                <input id="synthMasterAmp" type="range" min="0" max="100" value="50" class="slider"><p> Synth </p>
-                                            </div><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="samplerMasterAmp" type="range" min="0" max="100" value="50" class="slider"><p> Sampler </p>
-                                            </div><br>
-
-                                        </div>
-                                        <br><br>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm">
-                                            <center><h5> Delay A</h5></center><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="delay_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Time </p>
-                                            </div><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="delay_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
-                                            </div><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="delay_cutoff_knob" type="range" min="1" max="100" value="50" class="slider"><p> Cutoff </p>
-                                            </div><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="delay_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
-                                            </div><br>
-                                        </div>
-
-                                        <div class="col-sm">
-                                            <center><h5> Delay B</h5></center><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="delayB_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Time </p>
-                                            </div><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="delayB_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
-                                            </div><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="delayB_cutoff_knob" type="range" min="1" max="100" value="50" class="slider"><p> Cutoff </p>
-                                            </div><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="delayB_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
-                                            </div><br>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm">
-                                            <center><h5> Reverb </h5></center><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="reverb_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Room Size </p>
-                                            </div><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="reverb_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
-                                            </div><br>
-
-                                            <div class="slidecontainer">
-                                                <input id="reverb_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
-                                            </div><br>
-
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </center>
-                        </div>
-
-                    </div>
                 </div>
+            </div>
 
-                <div id="help_tab" class="tab-pane fade">
+
+            <div id="composer_tab" class="tab-pane">
+                <div class="container">
                     <center>
-                        <br><br><br>
+                        <br><br>
+                        <button type="button" name="button">Play</button>
+                        <button type="button" name="button">Pause</button>
+                        <br><br>
+                        <div id="compPlot" class=""></div>
+                        <br><br>
+                        <button type="button" name="button">Load</button>
+                        <button type="button" name="button">Save</button>
+                        <button type="button" name="button">Clear</button>
+                        <br><br>
+                    </center>
+                </div>
+            </div>
 
-                        <h4> Reciever </h4>
-                        <p> 1. Load samples and configure keys</p>
-                        <p> 2. Uncheck Send & Check Receive in Studio/Controls </p>
-                        <br><br><br>
+            <div id="synth" class="tab-pane">
+                <center>
+                    <br><br><br>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm">
+                                <center> <h5> Oscs </h5> </center><br>
 
-                        <h4> Sender </h4>
-                        <p> 1. Uncheck Receive & Check Send in Studio/Controls </p>
-                        <p> 2. Click/Tap buttons in Studio/Controls </p>
+                                <div class="slidecontainer">
+                                    <input id="osc_a_vol_knob" type="range" min="1" max="100" value="50" class="slider"><p>Sine</p>
+                                </div><br>
 
-                        <br><br><br>
-<!--                        <h4> Test </h4>-->
+                                <div class="slidecontainer">
+                                    <input id="osc_b_vol_knob" type="range" min="1" max="100" value="50" class="slider" ><p>Square</p>
+                                </div><br>
 
+                                <div class="slidecontainer">
+                                    <input id="osc_c_vol_knob" type="range" min="1" max="100" value="50" class="slider"><p>Sawtooth</p>
+                                </div><br>
+                            </div>
 
-<!--                        <input type="text" id="previewBoxHost" placeholder="FX Code (a-Z)" autofocus="off" />-->
-<!--                        <br><br>-->
-<!--                        <button type="button" id="sendButtonClient">Send</button>-->
-<!--                        <button type="button" id="previewBtnHost">Preview</button>-->
+                            <div class="col-sm">
+                                <center><h5> Envelope </h5></center><br>
 
-                        <!-- <p for="volume">Volume</p>
-                        <input type="range" id="volume" class="control-volume" min="0" max="2" value="1" list="gain-vals" step="0.01" data-action="volume" /> -->
+                                <div class="slidecontainer">
+                                    <input id="attack_knob" type="range" min="1" max="100" value="50" class="slider"><p>Attack</p>
+                                </div><br>
 
+                                <div class="slidecontainer">
+                                    <input id="duration_knob" type="range" min="1" max="100" value="50" class="slider"><p>Decay</p>
+                                </div><br>
+
+                                <div class="slidecontainer">
+                                    <input id="release_knob" type="range" min="1" max="100" value="50" class="slider"><p>Release</p>
+                                </div><br>
+                            </div>
+                        </div>
+                    </div>
+                </center>
+            </div>
+
+            <div id="mixer" class="tab-pane">
+                <center>
+                    <br><br>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm">
+                                <center> <h5> Mix </h5> </center>
+                                <br>
+                                <div class="slidecontainer">
+                                    <input id="samplerMasterAmp" type="range" min="0" max="100" value="80" class="slider"><p> Sampler </p>
+                                </div>
+
+                            </div>
+                            <br><br>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm">
+                                <center><h5> Delay A</h5></center><br>
+
+                                <div class="slidecontainer">
+                                    <input id="delay_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Time </p>
+                                </div><br>
+
+                                <div class="slidecontainer">
+                                    <input id="delay_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
+                                </div><br>
+
+                                <div class="slidecontainer">
+                                    <input id="delay_cutoff_knob" type="range" min="1" max="100" value="50" class="slider"><p> Cutoff </p>
+                                </div><br>
+
+                                <div class="slidecontainer">
+                                    <input id="delay_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
+                                </div><br>
+                            </div>
+
+                            <div class="col-sm">
+                                <center><h5> Delay B</h5></center><br>
+
+                                <div class="slidecontainer">
+                                    <input id="delayB_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Time </p>
+                                </div><br>
+
+                                <div class="slidecontainer">
+                                    <input id="delayB_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
+                                </div><br>
+
+                                <div class="slidecontainer">
+                                    <input id="delayB_cutoff_knob" type="range" min="1" max="100" value="50" class="slider"><p> Cutoff </p>
+                                </div><br>
+
+                                <div class="slidecontainer">
+                                    <input id="delayB_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
+                                </div><br>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm">
+                                <center><h5> Reverb </h5></center><br>
+
+                                <div class="slidecontainer">
+                                    <input id="reverb_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Room Size </p>
+                                </div><br>
+
+                                <div class="slidecontainer">
+                                    <input id="reverb_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
+                                </div><br>
+
+                                <div class="slidecontainer">
+                                    <input id="reverb_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
+                                </div><br>
+
+                            </div>
+                        </div>
+
+                        </div>
                     </center>
                 </div>
 
-            </div>
-
-            <div id="menu3" class="tab-pane fade">
-                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-            </div>
         </div>
 
-        <footer>
-            <!-- <center>
-
-            </center> -->
-        </footer>
-
-
-<!--        <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.4/Pizzicato.min.js"></script>-->
         <script type="text/javascript" src="js/libs/Pizzicato.min.js"></script>
+        <script type="text/javascript" src="js/buffer-loader.js"></script>
         <script type="text/javascript" src="js/session.js"></script>
         <script type="text/javascript" src="js/audio.js"></script>
         <script type="text/javascript" src="js/network.js"></script>
@@ -353,6 +317,23 @@
             $('.nav-tabs a[href="#studio_tab"]').tab('show');
             $('.nav-tabs a[href="#control_tab"]').tab('show');
             window.scrollTo(0,0);
+        </script>
+
+        <script>
+            function htmlEncode (value){
+                return $('<div/>').text(value).html();
+            }
+
+            // TODO: https://yphnaweb.s3.amazonaws.com/xusione.com/xunet/mmosfx/index.html?channel=CHANNEL_NAME
+
+            let chUrl = "https://yphnaweb.s3.amazonaws.com/xusione.com/xunet/mmosfx/index.html?channel=" + currentChannelName.value;
+            let uhmm = "https://chart.googleapis.com/chart?cht=qr&chl=" + htmlEncode(chUrl) + "&chs=160x160&chld=L|0";
+
+            $(function() {
+                $("#generate").click(function() {
+                    $(".qr-code").attr("src", "https://chart.googleapis.com/chart?cht=qr&chl=" + htmlEncode($("#qr_gen_content").val()) + "&chs=160x160&chld=L|0");
+                });
+            });
         </script>
 
 
