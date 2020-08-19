@@ -28,8 +28,6 @@ sudo pacman -S nss
 -> https://localhost
 ```
 
-<br>
-
 #### Usage:
 
 Host Mode
