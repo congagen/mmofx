@@ -2,6 +2,39 @@ body {
     background-color: rgb(40, 40, 50);
 }
 
+html {
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+
+
+h4, h5, h6, h7, p, label {
+    text-align: center;
+    align: center;
+
+    color: rgba(255, 255, 255, 1.0);
+}
+
+.top-sample-row {
+    margin-top:20px;
+    margin-left:10px;
+    margin-right:10px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+}
+
+.mid-sample-row {
+    margin-left:10px;
+    margin-right:10px;
+}
+
+.btm-sample-row {
+    margin-left:10px;
+    margin-right:10px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
 #keyTable{
     color: lime;
 }
@@ -15,17 +48,25 @@ body {
   margin: 10px;
 }
 
-.btn{
-    color: purple;
+.keys-btn{
+    background-color: rgba(180, 180, 180, 0);
+    background: rgba(180, 180, 180, 0);
+    border: none !important;
+    outline: none !important;
+
 }
 
+/*.btn {
+    color: purple;
+}*/
+
 .row {
-    background-color: rgba(180, 180, 180, .1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .form-control {
-    background-color: clear !important;
-    background: transparent !important;
+    background-color: rgba(180, 180, 180, 0.1);
+    background: rgba(180, 180, 180, 0.1);
     color: purple;
 }
 
@@ -110,6 +151,7 @@ body {
     color: black;
 }
 
+
 a.button {
     -webkit-appearance: button;
     -moz-appearance: button;
@@ -176,14 +218,6 @@ a.button {
     font-weight: bold;
     -webkit-animation: colorchange 2s infinite alternate;
 }
-
-h4, h5, h6, h7, p, label {
-    text-align: center;
-    align: center;
-
-    color: rgba(255, 255, 255, 1.0);
-}
-
 
 @-webkit-keyframes colorchange {
   0% {

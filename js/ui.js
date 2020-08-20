@@ -45,15 +45,78 @@ var isTouchDevice = "ontouchstart" in document.documentElement;
 var padCount = 0;
 
 
-function AddSampleListRow(sampleId) {
-    let sItem = currentSamples[sampleId];
+function addApiListRow(apiUrl) {
+    var apiListContainer = $("#sampleTableContainer");
 
-    var sampleTableContainer = $("#sampleTableContainer");
+    var urlRow  = $("<div class='row py-2 top-buffer'> <div class='col'> <input class='form-control' id='sNameField" + apiUrl + "' type='text' value='" + sItem[0] + "' readonly> </div> </div>");
     var sampleRow = $('<div class="row py-2"> </div>');
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    var nameField = $("<div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div>");
+    let trgKeysInputLabel = $("<div class='col'> <input class='btn btn-dark keys-btn pull-right' type='button' value = 'Keys: '> </div>");
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    let itmB = "<div class='col'> <input class='form-control' id='" + apiUrl.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div>"
+
+    var trgKeysInput = $(itmB);
+    var trigInp = trgKeysInput.find( "input" );
+
+    trigInp.change(function () {
+        var sId = $(trigInp).attr('id');
+        let trgKeyInputField = document.getElementById(sId.toString());
+        currentSamples[sId][2] = trgKeyInputField.value.toString();
+    });
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    let itmC = "<div class='col'> <input class='btn btn-light' type='button' value = 'Play'> </div>";
+
+    var btnPreview = $(itmC);
+    var prevBtn = btnPreview.find( "input" );
+    prevBtn.click(function () {
+
+        //TODO: Call Api
+    });
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    let itmD  = "<div class='col'> <input class='btn btn-light' type='button' value='X'> </div>";
+
+    var btnRemove = $(itmD);
+    var remoBtn = btnRemove.find( "input" );
+    remoBtn.click(function () {
+        delete currentSamples[sampleId.toString()];
+        sampleRow.remove();
+    });
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    $(sampleRow).append(trgKeysInputLabel);
+    $(sampleRow).append(trgKeysInput);
+    $(sampleRow).append(btnPreview);
+    $(sampleRow).append(btnRemove);
+
+    $(sampleTableContainer).append(urlRow);
+    $(sampleTableContainer).append(sampleRow);
+}
+
+
+function AddSampleListRow(sampleId) {
+    let sItem = currentSamples[sampleId];
+
+    var sampleTableContainer = $("#sampleTableContainer");
+    var titleRow     = $("<div class='row py-2 top-sample-row'> <div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div> </div>");
+    var trigKeysRow = $("<div class='row py-2 mid-sample-row'> <div class='col'> <input class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div> </div>");
+    var samActionRow    = $('<div class="row py-2 btm-sample-row"> </div>');
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    let nameField = $("<div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div>");
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    let trgKeysInputLabel = $("<div class='col'> <input class='btn btn-dark keys-btn pull-right' type='button' value = 'Keys: '> </div>");
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -70,7 +133,7 @@ function AddSampleListRow(sampleId) {
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    let itmC = "<div class='col'> <input class='btn btn-dark' type='button' value = 'P'> </div>";
+    let itmC = "<div class='col-xs-1 col-auto'> <input class='btn btn-light' type='button' value = 'Play'> </div>";
 
     var btnPreview = $(itmC);
     var prevBtn = btnPreview.find( "input" );
@@ -80,24 +143,27 @@ function AddSampleListRow(sampleId) {
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    let itmD  = "<div class='col'> <input class='btn btn-dark' type='button' value='X'> </div>";
+    let itmD  = "<div class='col-xs-1 col-auto'> <input class='btn btn-light' type='button' value='X'> </div>";
 
     var btnRemove = $(itmD);
     var remoBtn = btnRemove.find( "input" );
     remoBtn.click(function () {
         delete currentSamples[sampleId.toString()];
-        sampleRow.remove();
+        titleRow.remove();
+        samActionRow.remove();
     });
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    $(sampleRow).append(nameField);
-    // $(sampleRow).append(itmA);
-    $(sampleRow).append(trgKeysInput);
-    $(sampleRow).append(btnPreview);
-    $(sampleRow).append(btnRemove);
+    //$(sampleRow).append(nameField);
+    //$(sampleRow).append(trgKeysInputLabel);
+    $(samActionRow).append(trgKeysInput);
+    $(samActionRow).append(btnPreview);
+    $(samActionRow).append(btnRemove);
 
-    $(sampleTableContainer).append(sampleRow);
+    $(sampleTableContainer).append(titleRow);
+    //$(sampleTableContainer).append(trigKeysRow);
+    $(sampleTableContainer).append(samActionRow);
 }
 
 
