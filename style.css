@@ -16,6 +16,8 @@ h4, h5, h6, h7, p, label {
 }
 
 .top-sample-row {
+    background-color: rgba(255, 255, 255, 0.1);
+
     margin-top:20px;
     margin-left:10px;
     margin-right:10px;
@@ -24,11 +26,15 @@ h4, h5, h6, h7, p, label {
 }
 
 .mid-sample-row {
+    background-color: rgba(255, 255, 255, 0.1);
+
     margin-left:10px;
     margin-right:10px;
 }
 
 .btm-sample-row {
+    background-color: rgba(255, 255, 255, 0.1);
+
     margin-left:10px;
     margin-right:10px;
     border-bottom-right-radius: 5px;
@@ -60,9 +66,6 @@ h4, h5, h6, h7, p, label {
     color: purple;
 }*/
 
-.row {
-    background-color: rgba(255, 255, 255, 0.1);
-}
 
 .form-control {
     background-color: rgba(180, 180, 180, 0.1);
