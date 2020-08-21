@@ -1,12 +1,12 @@
-body {
+
+html, body {
     background-color: rgb(40, 40, 50);
+    max-width: 100%;
 }
 
-html {
-    overflow-x: scroll;
-    overflow-y: scroll;
+.row{
+    width:100%;
 }
-
 
 h4, h5, h6, h7, p, label {
     text-align: center;
@@ -184,7 +184,7 @@ a.button {
 .button:active {
   background-color: rgba(255,255,255,0.25);
   box-shadow: 0 0px black;
-  transform: translateY(4px);
+  //transform: translateY(4px);
 }
 
 .navbar-light {

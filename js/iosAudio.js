@@ -1,8 +1,10 @@
 (function() {
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
 	if (window.AudioContext) {
 		window.audioContext = new window.AudioContext();
 	}
+
 	var fixAudioContext = function (e) {
 		if (window.audioContext) {
 			// Create empty buffer
@@ -11,6 +13,7 @@
 			source.buffer = buffer;
 			// Connect to output (speakers)
 			source.connect(window.audioContext.destination);
+
 			// Play sound
 			if (source.start) {
 				source.start(0);
