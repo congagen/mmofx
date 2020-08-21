@@ -1,5 +1,4 @@
 // WebAudio
-var audioCtx;
 var source;
 var songLength;
 
@@ -24,10 +23,32 @@ function connectMidi(){
 // SAMPLER  ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-function playBuffer(sample_path) {
+
+function playBuffer(path) {
+    var context = window.audioContext;
+    var request = new XMLHttpRequest();
+
+    request.open('GET', path, true);
+    request.responseType = 'arraybuffer';
+    request.addEventListener('load', function (e) {
+        context.decodeAudioData(this.response, function (buffer) {
+            var source = context.createBufferSource();
+            source.buffer = buffer;
+            source.connect(context.destination);
+            source.start(0);
+        });
+    }, false);
+
+    context.resume();
+    request.send();
+}
+
+
+
+function playBuffer_(sample_path) {
+    console.log("playBuffer");
     var curSource = audioCtx.createBufferSource();
     var curRequest = new XMLHttpRequest();
-    console.log(sample_path);
 
     curRequest.open('GET', sample_path, true);
     curRequest.responseType = 'arraybuffer';
@@ -43,13 +64,12 @@ function playBuffer(sample_path) {
             curSource.connect(audioCtx.destination);
             curSource.loop = false;
         },
-
-        function(e){"Error with decoding audio data" + e.error});
+            function(e){"Error with decoding audio data" + e.error
+        });
     }
 
     curRequest.send();
-    curSource.start(0);
-
+    curSource.start();
 }
 
 
@@ -199,7 +219,6 @@ function initAudio() {
                     alert("Sorry, but the Web Audio API is not supported by your browser. Please, consider upgrading to the latest version or downloading Google Chrome or Mozilla Firefox");
                 }
 
-                //context = Pizzicato.context;
             }
 
             console.log("Audio initialized... ");
@@ -209,12 +228,6 @@ function initAudio() {
         }
     }
 }
-
-
-//connectMidi();
-
-
-
 
 
 

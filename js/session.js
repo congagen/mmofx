@@ -1,5 +1,6 @@
 var isInitUI = false;
 var isInitAudio = false;
+var audioCtx;
 
 var currentChannelName = "Lobby";
 var currentUserId = "";

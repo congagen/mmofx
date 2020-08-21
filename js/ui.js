@@ -161,7 +161,6 @@ function addSampleListRow(sampleId, sampleUrl) {
 
     let nameField = $("<div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div>");
 
-
     // -----------------------------------------------------------------------------------------------------------------
 
     let itmB = "<div class='col'> <input class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div>"
