@@ -54,6 +54,50 @@ firebase.auth().signInAnonymously().catch(function(error) {
 });
 
 
+async function callRestApi(url, data) {
+    console.log("Calling: " + url);
+    console.log("Data: "    + data);
+
+   try {
+        const userAction = async() => {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: {data},
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const responseJson = await response.json();
+            console.log(responseJson);
+            return responseJson;
+        }
+    } catch (e) {
+        console.error(e);
+    } finally {
+        console.log("");
+    }
+
+}
+
+function callRestApi_(url, data) {
+    console.log("Calling: " + url);
+    console.log("Data: "    + data);
+
+    const userAction = async() => {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: {data},
+            headers: {
+                'Content-Type': 'application/json'
+            }
+    });
+        const responseJson = await response.json();
+        console.log(responseJson);
+        return responseJson;
+    }
+}
+
+
 function writeToDB(db_name, data_dct) {
     console.log("Writing");
     return firebase.database().ref(db_name).set(data_dct);

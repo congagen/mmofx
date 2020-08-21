@@ -87,9 +87,9 @@
             <div id="studio_tab" class="tab-pane">
                 <div style="background-color: rgb(0, 0, 0, 0.35)">
                     <ul class="nav nav-tabs justify-content-center navbar-light">
-    <!--                        <li><a class="tab" data-toggle="tab" href="#composer_tab">Comp</a></li>-->
-    <!--                        <li><a class="tab" data-toggle="tab" href="#mixer">Mixer</a></li>-->
-    <!--                        <li><a class="tab" data-toggle="tab" href="#synth">Synth</a></li>-->
+<!--                        <li><a class="tab" data-toggle="tab" href="#composer_tab">Comp</a></li>-->
+<!--                        <li><a class="tab" data-toggle="tab" href="#mixer">Mixer</a></li>-->
+<!--                        <li><a class="tab" data-toggle="tab" href="#api_tab">API</a></li>-->
                         <li><a class="tab" data-toggle="tab" href="#control_tab">Pads</a></li>
                         <li><a class="tab" data-toggle="tab" href="#sampler_tab">Samples</a></li>
                     </ul>
@@ -100,7 +100,7 @@
                         <br>
 
                         <div class="row">
-                            <div class="col-sm">
+                            <div class="col">
                                 <center>
                                     <div class="form-check">
                                         <input type="checkbox" checked class="form-check-input" id="receiveCommandsCheckbox">
@@ -109,14 +109,14 @@
                                 </center>
                             </div>
 
-                            <div class="col-sm">
+                            <div class="col">
                                 <center><div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="enableTransmissionCheckbox">
                                     <label class="form-check-label" for="enableTransmissionCheckbox">Client</label>
                                 </div></center>
                             </div>
 
-                            <div class="col-sm">
+                            <div class="col">
                                 <center>
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" id="randomizePlaybackCheckbox">
@@ -125,7 +125,7 @@
                                 </center>
                             </div>
 
-                            <div class="col-sm">
+                            <div class="col">
                                 <center><div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
                                     <label class="form-check-label" for="enablePreviewCheckbox">Keyboard</label>
@@ -149,11 +149,20 @@
                             <button id="add_samples_btn" class="btn btn-light" onclick="addSamplesBtnClicked()">+ Add</button>
 
                             <div class="container" id="sampleTableContainer">
-                                <div class="row">
-                                    <div class="col-sm">
 
-                                    </div>
-                                </div>
+                            </div>
+
+                            <br><br>
+                        </center>
+                    </div>
+
+                    <div id="api_tab" class="tab-pane">
+                        <center>
+                            <br>
+                            <button id="add_api_btn" class="btn btn-light" onclick="addApiListRow()">+ Add</button>
+
+                            <div class="container" id="apiConfContainer">
+
                             </div>
 
                             <br><br>

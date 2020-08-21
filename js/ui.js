@@ -44,65 +44,112 @@ var currentKeyboard = {"a": ["a1","b1","c1"]};
 var isTouchDevice = "ontouchstart" in document.documentElement;
 var padCount = 0;
 
+var apiDir = {};
+let charlist = ["0","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
+"c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
+"∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
+"÷","≈","ç","‹","›","‘","◊","…","–","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
+"c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
+"∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
+"÷","≈","ç","‹","›","‘","◊","…","–"]
 
-function addApiListRow(apiUrl) {
-    var apiListContainer = $("#sampleTableContainer");
+function addApiListRow() {
+    var apiListContainer = $("#apiConfContainer");
+    let rowID = uuidv4();
 
-    var urlRow  = $("<div class='row py-2 top-buffer'> <div class='col'> <input class='form-control' id='sNameField" + apiUrl + "' type='text' value='" + sItem[0] + "' readonly> </div> </div>");
-    var sampleRow = $('<div class="row py-2"> </div>');
+    apiDir[rowID] = {};
+    apiDir[rowID]["url"] = "";
+    apiDir[rowID]["data"] = "";
+    apiDir[rowID]["keys"] = [];
 
     // -----------------------------------------------------------------------------------------------------------------
+    var content = "<div class='col'> <input class='form-control' id='url" + rowID + "' type='text' placeholder='API Url' value='" + "" + "'> </div>"
+    var urlNameRow  = $("<div class='row py-2 top-sample-row'> " + content + " </div>");
+    var urlNameField = urlNameRow.find( "input" );
 
-    let trgKeysInputLabel = $("<div class='col'> <input class='btn btn-dark keys-btn pull-right' type='button' value = 'Keys: '> </div>");
+    urlNameField.change(function () {
+        var sId = $(urlNameField).attr('id');
+        let apiKey = document.getElementById(sId.toString());
+        let urlNameValue = apiKey.value.toString();
+        apiDir[rowID]["url"] = urlNameValue;
+        console.log(apiDir);
+    });
 
     // -----------------------------------------------------------------------------------------------------------------
+    content = "<div class='col'> <input class='form-control' id='msg" + rowID + "' type='text' placeholder='Data' value='" + "" + "'> </div>"
+    var messageRow  = $("<div class='row py-2 mid-sample-row'> " + content + " </div>");
+    var msgInputKeysField = messageRow.find( "input" );
 
-    let itmB = "<div class='col'> <input class='form-control' id='" + apiUrl.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div>"
+    msgInputKeysField.change(function () {
+        var sId = $(msgInputKeysField).attr('id');
+        let msgInputField = document.getElementById(sId.toString());
 
-    var trgKeysInput = $(itmB);
-    var trigInp = trgKeysInput.find( "input" );
+        let msg = msgInputField.value.toString();
+        apiDir[rowID]["data"] = msg;
+        console.log(apiDir);
+    });
 
-    trigInp.change(function () {
-        var sId = $(trigInp).attr('id');
+    // -----------------------------------------------------------------------------------------------------------------
+    content = "<div class='col'> <input class='form-control' id='" + rowID + "' type='text' placeholder='Trig Keys' value='" + "" + "'> </div>"
+    var trgKeyRow   = $("<div class='row py-2 mid-sample-row'> " + content + "</div>");
+
+    var trgInputKeysField = trgKeyRow.find( "input" );
+
+    trgInputKeysField.change(function () {
+        var sId = $(trgInputKeysField).attr('id');
         let trgKeyInputField = document.getElementById(sId.toString());
-        currentSamples[sId][2] = trgKeyInputField.value.toString();
+        let trgK = trgKeyInputField.value.toString();
+        apiDir[rowID]["keys"] = trgK;
+        console.log(apiDir);
     });
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    let itmC = "<div class='col'> <input class='btn btn-light' type='button' value = 'Play'> </div>";
+    let itmC = "<div class='col'> <input class='btn btn-light' type='button' value = 'Test'> </div>";
 
     var btnPreview = $(itmC);
     var prevBtn = btnPreview.find( "input" );
     prevBtn.click(function () {
-
         //TODO: Call Api
+        console.log(apiDir);
+        console.log("PrvBtn: " + apiDir[rowID]["url"] + ":" + apiDir[rowID]["data"]);
+        //callRestApi(apiDir[rowID]["url"], apiDir[rowID]["data"]);
+        const myValue = callRestApi(apiDir[rowID]["url"], apiDir[rowID]["data"]);
+        //console.log(myValue);
     });
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    let itmD  = "<div class='col'> <input class='btn btn-light' type='button' value='X'> </div>";
+    let itmD  = "<div class='col'> <input class='btn btn-light' type='button' value='Delete'> </div>";
 
     var btnRemove = $(itmD);
     var remoBtn = btnRemove.find( "input" );
     remoBtn.click(function () {
-        delete currentSamples[sampleId.toString()];
-        sampleRow.remove();
+        delete apiDir[rowID];
+        urlNameRow.remove();
+        messageRow.remove();
+        trgKeyRow.remove();
+        bottomRow.remove();
     });
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    $(sampleRow).append(trgKeysInputLabel);
-    $(sampleRow).append(trgKeysInput);
-    $(sampleRow).append(btnPreview);
-    $(sampleRow).append(btnRemove);
+    var bottomRow   = $("<div class='row py-2 btm-sample-row'> </div>");
 
-    $(sampleTableContainer).append(urlRow);
-    $(sampleTableContainer).append(sampleRow);
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // $(bottomRow).append(trgKeysInput);
+    $(bottomRow).append(btnPreview);
+    $(bottomRow).append(btnRemove);
+
+    $(apiListContainer).append(urlNameRow);
+    $(apiListContainer).append(messageRow);
+    $(apiListContainer).append(trgKeyRow);
+    $(apiListContainer).append(bottomRow);
 }
 
 
-function AddSampleListRow(sampleId) {
+function addSampleListRow(sampleId, sampleUrl) {
     let sItem = currentSamples[sampleId];
 
     var sampleTableContainer = $("#sampleTableContainer");
@@ -114,9 +161,6 @@ function AddSampleListRow(sampleId) {
 
     let nameField = $("<div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div>");
 
-    // -----------------------------------------------------------------------------------------------------------------
-
-    let trgKeysInputLabel = $("<div class='col'> <input class='btn btn-dark keys-btn pull-right' type='button' value = 'Keys: '> </div>");
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -138,7 +182,7 @@ function AddSampleListRow(sampleId) {
     var btnPreview = $(itmC);
     var prevBtn = btnPreview.find( "input" );
     prevBtn.click(function () {
-        previewSample(sampleId.toString());
+        previewSample(sampleId);
     });
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -156,7 +200,6 @@ function AddSampleListRow(sampleId) {
     // -----------------------------------------------------------------------------------------------------------------
 
     //$(sampleRow).append(nameField);
-    //$(sampleRow).append(trgKeysInputLabel);
     $(samActionRow).append(trgKeysInput);
     $(samActionRow).append(btnPreview);
     $(samActionRow).append(btnRemove);
@@ -166,6 +209,31 @@ function AddSampleListRow(sampleId) {
     $(sampleTableContainer).append(samActionRow);
 }
 
+
+
+async function addSamplesBtnClicked(){
+//    let files = await selectFile("audio/*", true);
+    let files = await selectFile("", true);
+    //console.log(files);
+    //console.log(URL.createObjectURL(files[0]));
+
+    for (var i=0; i < files.length; i++) {
+        //console.log(files[i]);
+        var fileName = files[i].name.toString();
+        var ext = fileName.substr(fileName.lastIndexOf('.') + 1);
+
+        if (ext == "wav" || ext == "mp3") {
+            let fName = files[i].name.toString();
+            var sKey = URL.createObjectURL(files[i]).toString();
+            let sUrl = URL.createObjectURL(files[i]);
+            let trgKeys = fName[0].toLowerCase();
+
+            // TODO: TrgKey from
+            currentSamples[sKey] = [fName, sUrl, fName[0].toLowerCase()];
+            addSampleListRow(sKey, sUrl);
+        }
+    }
+}
 
 function playNetworkCmd(cmdText) {
     let dbData = {
@@ -181,7 +249,6 @@ function playNetworkCmd(cmdText) {
     let rsp = writeToDB(currentChannelName, dbData);
     console.log(rsp);
 }
-
 
 function addKeyPad(keyId) {
     let keyItem = currentKeyboard[keyId];
@@ -243,29 +310,6 @@ function addKeyPad(keyId) {
 }
 
 
-async function addSamplesBtnClicked(){
-//    let files = await selectFile("audio/*", true);
-    let files = await selectFile("", true);
-    //console.log(files);
-    //console.log(URL.createObjectURL(files[0]));
-
-    for (var i=0; i < files.length; i++) {
-        //console.log(files[i]);
-        var fileName = files[i].name.toString();
-        var ext = fileName.substr(fileName.lastIndexOf('.') + 1);
-
-        if (ext == "wav" || ext == "mp3") {
-            let fName = files[i].name.toString();
-            var sKey = URL.createObjectURL(files[i]).toString();
-            let sUrl = URL.createObjectURL(files[i]);
-            let trgKeys = fName[0].toLowerCase();
-
-            // TODO: TrgKey from
-            currentSamples[sKey] = [fName, sUrl, fName[0].toLowerCase()];
-            AddSampleListRow(sKey);
-        }
-    }
-}
 
 
 function toggleEditMode(isEnabled) {
@@ -278,13 +322,6 @@ function toggleEditMode(isEnabled) {
 
 function initKeyMap(){
     padCount = 0;
-    let charlist = ["0","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
-    "c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
-    "∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
-    "÷","≈","ç","‹","›","‘","◊","…","–","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
-    "c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
-    "∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
-    "÷","≈","ç","‹","›","‘","◊","…","–"]
 
     for (var i = 0; i < charlist.length; i++) {
         var l = charlist[i].toLowerCase();
