@@ -149,13 +149,14 @@ function addApiListRow() {
 }
 
 
+
 function addSampleListRow(sampleId, sampleUrl) {
     let sItem = currentSamples[sampleId];
 
     var sampleTableContainer = $("#sampleTableContainer");
-    var titleRow     = $("<div class='row py-2 top-sample-row'> <div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div> </div>");
+    var titleRow     = $("<div class='row py-2 top-sample-row' id='sam_row_a" + sampleId + "'> <div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div> </div>");
     var trigKeysRow = $("<div class='row py-2 mid-sample-row'> <div class='col'> <input class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div> </div>");
-    var samActionRow    = $('<div class="row py-2 btm-sample-row"> </div>');
+    var samActionRow    = $("<div class='row py-2 btm-sample-row' id='sam_row_b" + sampleId + "'> </div>");
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -169,9 +170,10 @@ function addSampleListRow(sampleId, sampleUrl) {
     var trigInp = trgKeysInput.find( "input" );
 
     trigInp.change(function () {
-        var sId = $(trigInp).attr('id');
-        let trgKeyInputField = document.getElementById(sId.toString());
-        currentSamples[sId][2] = trgKeyInputField.value.toString();
+        var inputId = $(trigInp).attr('id').toString();
+        console.log(inputId);
+        let trgKeyInputField = document.getElementById(inputId.toString());
+        currentSamples[inputId][2] = trgKeyInputField.value.toString();
     });
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -210,7 +212,7 @@ function addSampleListRow(sampleId, sampleUrl) {
 
 
 
-async function addSamplesBtnClicked(){
+async function addSamplesLsDisk(){
 //    let files = await selectFile("audio/*", true);
     let files = await selectFile("", true);
     //console.log(files);
@@ -232,7 +234,36 @@ async function addSamplesBtnClicked(){
             addSampleListRow(sKey, sUrl);
         }
     }
+
+    console.log(currentSamples);
 }
+
+
+function initTrgKeys() {
+    var c = 0;
+    for (const [key, value] of Object.entries(currentSamples)) {
+        let s = currentSamples[key];
+        let currentKeys = s[2];
+
+        c += 1;
+        if (c > (charlist.length - 1)) {
+            c = 0;
+        }
+
+        currentSamples[key][2] = charlist[c];
+        document.getElementById(key).value = charlist[c];
+    }
+}
+
+
+function clearSamples() {
+    for (const [key, value] of Object.entries(currentSamples)) {
+        delete currentSamples[key];
+        document.getElementById("sam_row_a"+key).remove();
+        document.getElementById("sam_row_b"+key).remove();
+    }
+}
+
 
 function playNetworkCmd(cmdText) {
     let dbData = {
@@ -267,7 +298,7 @@ function addKeyPad(keyId) {
 
     var keyPanel = $(card_a + card_b + card_c + card_d + card_e + card_f + card_g);
     keyPanel.appendTo(padCol);
-    padCol.appendTo('#contentPanel');
+    padCol.appendTo('#keyPadPanel');
 
     //var nameField = $("<input id=keyNameField" + keyId + " size='4' type = 'text' value = " + keyItem[0] + " readonly>");
 

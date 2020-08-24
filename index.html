@@ -73,7 +73,7 @@
                 <center>
                     <br><br><br>
 
-                    <h4> Host (Desktop Only) </h4>
+                    <h4> Host </h4>
                     <p> 1. Load samples and configure keys</p>
                     <p> 2. Uncheck Client & check Host in Studio/Pads </p>
                     <br><br><br>
@@ -137,8 +137,7 @@
 
                         <center>
                             <div class="container">
-                                <br><div class="row" id="contentPanel">
-
+                                <br><div class="row" id="keyPadPanel">
                                 </div>
                             </div>
                         </center>
@@ -148,12 +147,11 @@
                     <div id="sampler_tab" class="tab-pane">
                         <center>
                             <br>
-                            <button id="add_samples_btn" class="btn btn-light" onclick="addSamplesBtnClicked()">+ Add</button>
+                            <button id="add_samples_btn" class="btn btn-light" onclick="addSamplesLsDisk()">+ Add</button>
+                            <button id="init_samples_btn" class="btn btn-light" onclick="initTrgKeys()">Init Trgs</button>
+                            <button id="clear_samples_btn" class="btn btn-light" onclick="clearSamples()">Clear</button>
 
-                            <div class="container" id="sampleTableContainer">
-
-                            </div>
-
+                            <div class="container" id="sampleTableContainer"></div>
                             <br><br>
                         </center>
                     </div>
@@ -162,11 +160,7 @@
                         <center>
                             <br>
                             <button id="add_api_btn" class="btn btn-light" onclick="addApiListRow()">+ Add</button>
-
-                            <div class="container" id="apiConfContainer">
-
-                            </div>
-
+                            <div class="container" id="apiConfContainer"></div>
                             <br><br>
                         </center>
                     </div>

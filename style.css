@@ -70,7 +70,7 @@ h4, h5, h6, h7, p, label {
 .form-control {
     background-color: rgba(180, 180, 180, 0.1);
     background: rgba(180, 180, 180, 0.1);
-    color: purple;
+    color: black;
 }
 
 .input {
@@ -172,7 +172,7 @@ a.button {
   text-align: center;
   text-decoration: none;
   outline: 2px;
-  color: purple;
+  color: black;
   background-color: rgba(255,255,255, 0.40);
   border: none;
   border-radius: 5px;

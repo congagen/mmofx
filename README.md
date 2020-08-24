@@ -6,8 +6,8 @@
 1. Highlight Remote
 2. Midi Out
 3. Effects
-4. Mic Input?
-5. Default Sample Pack
+4. Video Synth?
+5. Sample Packs
 
 ----------
 
@@ -27,18 +27,5 @@ sudo yum install nss-tools
 sudo pacman -S nss
 -> https://localhost
 ```
-
-#### Usage:
-
-Host Mode
-1. Load Samples
-2. Enable Receive
-
-Client:
-1. Enable Send
-2. Tap/Click Pads
-
-
-
 
 

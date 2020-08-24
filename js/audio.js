@@ -22,8 +22,6 @@ function connectMidi(){
 ////////////////////////////////////////////////////////////////////////////////
 // SAMPLER  ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-
-
 function playBuffer(path) {
     var context = window.audioContext;
     var request = new XMLHttpRequest();
@@ -41,35 +39,6 @@ function playBuffer(path) {
 
     context.resume();
     request.send();
-}
-
-
-
-function playBuffer_(sample_path) {
-    console.log("playBuffer");
-    var curSource = audioCtx.createBufferSource();
-    var curRequest = new XMLHttpRequest();
-
-    curRequest.open('GET', sample_path, true);
-    curRequest.responseType = 'arraybuffer';
-
-    curRequest.onload = function() {
-        let audioData = curRequest.response;
-
-        audioCtx.decodeAudioData(audioData, function(buffer) {
-            myBuffer = buffer;
-            songLength = buffer.duration;
-            curSource.buffer = myBuffer;
-            curSource.playbackRate.value = 1;
-            curSource.connect(audioCtx.destination);
-            curSource.loop = false;
-        },
-            function(e){"Error with decoding audio data" + e.error
-        });
-    }
-
-    curRequest.send();
-    curSource.start();
 }
 
 
