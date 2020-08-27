@@ -1,11 +1,25 @@
 
 # MMOSFX
 
-XUSIONE.COM^P2P^SFX lab (PeerJS + Pizzicato)
-Demo -> https://yphnaweb.s3.amazonaws.com/MMOSFXYS/index.html
+MMMOSFX is a webapp that enables networked 
 
+----------
 
-### Local testing:
-
+#### Testing:
+* HTTPS (MAC):
 ```sh
-$ python -m SimpleHTTPServer 8000
+brew install nss
+npm i -g --only=prod https-localhost
+serve .
+-> https://localhost
+```
+
+* HTTPS (LINUX):
+```sh
+sudo apt install libnss3-tools
+sudo yum install nss-tools
+sudo pacman -S nss
+-> https://localhost
+```
+
+

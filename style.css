@@ -1,32 +1,123 @@
-body {
-    /* background: linear-gradient(180deg, #39FF14, blue, red, red);
-    background-size: 500% 500%;
-    animation: gradient 100s infinite alternate; */
 
-    background-image: url('03.gif');
-    background-size: cover;
-
-    height: 200vh;
-    padding:0;
-    margin:0;
-
-    background-color: rgb(50, 50, 150);
+html, body {
+    background-color: rgb(40, 40, 50);
+    max-width: 100%;
 }
-/*
-@keyframes gradient {
-    0% {
-        background-position: 50% 0%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 50% 0%;
-    }
-} */
+
+.row{
+    width:100%;
+}
+
+h4, h5, h6, h7, p, label {
+    text-align: center;
+    align: center;
+
+    color: rgba(255, 255, 255, 1.0);
+}
+
+.top-sample-row {
+    background-color: rgba(255, 255, 255, 0.1);
+
+    margin-top:20px;
+    margin-left:10px;
+    margin-right:10px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+}
+
+.mid-sample-row {
+    background-color: rgba(255, 255, 255, 0.1);
+
+    margin-left:10px;
+    margin-right:10px;
+}
+
+.btm-sample-row {
+    background-color: rgba(255, 255, 255, 0.1);
+
+    margin-left:10px;
+    margin-right:10px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+#keyTable{
+    color: lime;
+}
+
+#sampleTableContainer{
+    color: rgba(180, 180, 180, 1);
+}
+
+.qr-code {
+  max-width: 200px;
+  margin: 10px;
+}
+
+.keys-btn{
+    background-color: rgba(180, 180, 180, 0);
+    background: rgba(180, 180, 180, 0);
+    border: none !important;
+    outline: none !important;
+
+}
+
+/*.btn {
+    color: purple;
+}*/
+
+
+.form-control {
+    background-color: rgba(180, 180, 180, 0.1);
+    background: rgba(180, 180, 180, 0.1);
+    color: black;
+}
+
+.input {
+    background-color: clear !important;
+    background: transparent !important;
+    color: clear !important;
+}
+
+.scroll-container {
+  scroll-padding: 0 0 0 0;
+}
+
+.keyPadInput, .keyPadInput:focus, .keyPadInput:active {
+    background-color: clear !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    -moz-outline-style: none !important;
+}
+
+.card-block {
+    border-radius: 5px;
+    background-color: rgba(100, 0, 255, 0);
+    outline: 0;
+    border: none !important;
+    -moz-outline-style: none !important;
+}
+
+.card {
+    font-size: 25px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.card:active, .card:focus {
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+.card-block {
+    border-radius: 5px;
+    color: rgba(255, 255, 255, 0.01);
+    background-color: rgba(255, 255, 255, 0.01);
+}
 
 .slidecontainer {
-  width: 90%; /* Width of the outside container */
+  width: 70%; /* Width of the outside container */
 }
 
 /* The slider itself */
@@ -63,13 +154,14 @@ body {
     color: black;
 }
 
+
 a.button {
     -webkit-appearance: button;
     -moz-appearance: button;
     appearance: button;
     font-size: 15px;
     text-decoration: none;
-    color: rgba(0, 0, 0, 0.7);
+    color: rgba(0, 0, 0, 0);
 }
 
 .button {
@@ -80,8 +172,8 @@ a.button {
   text-align: center;
   text-decoration: none;
   outline: 2px;
-  color: purple;
-  background-color: rgba(255,255,255,0.10);
+  color: black;
+  background-color: rgba(255,255,255, 0.40);
   border: none;
   border-radius: 5px;
   box-shadow: 0 1px black;
@@ -92,7 +184,7 @@ a.button {
 .button:active {
   background-color: rgba(255,255,255,0.25);
   box-shadow: 0 0px black;
-  transform: translateY(4px);
+  //transform: translateY(4px);
 }
 
 .navbar-light {
@@ -106,6 +198,7 @@ a.button {
     margin-right: 10px;
     margin-bottom: 30px;
 }
+
 
 .awesome {
     font-family: times;
@@ -128,14 +221,6 @@ a.button {
     font-weight: bold;
     -webkit-animation: colorchange 2s infinite alternate;
 }
-
-h4,h5,h6,h7,p,label {
-    text-align: center;
-    align: center;
-
-    color: rgba(255, 255, 255, 1.0);
-}
-
 
 @-webkit-keyframes colorchange {
   0% {
