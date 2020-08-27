@@ -1,8 +1,5 @@
 
 # MMOSFX
-
-MMMOSFX is a webapp that enables networked 
-
 ----------
 
 #### Testing:
