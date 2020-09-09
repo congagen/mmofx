@@ -30,8 +30,18 @@ if (Object.keys(url_vars).length > 0) {
         channelNameInputBox.value = currentChannelName;
     }
 
-    if ("password" in url_vars) {
+    if ("mode" in url_vars) {
+        console.log(url_vars["mode"]);
 
+        if (url_vars["mode"] == "client") {
+            document.getElementById("receiveCommandsCheckbox").checked = false;
+            document.getElementById("enableTransmissionCheckbox").checked = true;
+        }
+
+        if (url_vars["mode"] == "host") {
+            document.getElementById("receiveCommandsCheckbox").checked = true;
+            document.getElementById("enableTransmissionCheckbox").checked = false;
+        }
     }
 
 }

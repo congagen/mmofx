@@ -76,8 +76,8 @@ async function callRestApi(url, data) {
     } finally {
         console.log("");
     }
-
 }
+
 
 function callRestApi_(url, data) {
     console.log("Calling: " + url);

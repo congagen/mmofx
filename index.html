@@ -34,17 +34,49 @@
         <div class="tab-content ml-auto">
             <div id="settings_tab" class="tab-pane">
                 <center>
-                    <br><br>
-                    <h6 id="currentChannelDisplay"> Disconnected </h6>
-                    <br>
-                    <input type="text" id="channelNameInputBox" placeholder="Channel Name" autofocus="off" />
-                    <br><br>
-                    <button type="button" id="setChannelNameButton">Connect</button>
-                    <br><br><br><br>
 
+                    <br><br><br>
+
+                    <form>
+                        <div class="form-group">
+                            <h5 id="currentChannelDisplay"> Disconnected </h5><br>
+                            <input class="" type="text" id="channelNameInputBox" placeholder="Channel Name" autofocus="off" />
+                            <br><br>
+                            <button class="btn btn-light" type="button" id="setChannelNameButton">Connect</button>
+                        </div>
+                        <br>
+                        <div class="form-group">
+
+                            <div class="form-check">
+                            <input type="checkbox" class="form-check-input form-check-input" id="randomizePlaybackCheckbox">
+                            <label class="form-check-label" for="randomizePlaybackCheckbox">Randomize</label>
+                            </div>
+
+                            <div class="form-check">
+                            <input type="checkbox" class="form-check-input form-check-input" id="enablePreviewCheckbox">
+                            <label class="form-check-label" for="enablePreviewCheckbox">Keyboard Input</label>
+                            </div>
+
+                            <br>
+
+                            <div class="form-check">
+                            <input type="checkbox" checked class="form-check-input form-check-input" id="receiveCommandsCheckbox">
+                            <label class="form-check-label" for="receiveCommandsCheckbox">Host</label>
+                            </div>
+
+                            <div class="form-check">
+                            <input type="checkbox" class="form-check-input form-check-input" id="enableTransmissionCheckbox">
+                            <label class="form-check-label" for="enableTransmissionCheckbox">Client</label>
+                            </div>
+
+                        </div>
+                    </form>
+                    <br>
                     <div class="slidecontainer">
                         <input id="masterAmp" type="range" min="1" max="100" value="80" class="slider"><p> Volume </p>
                     </div><br>
+
+
 
 <!--                    <div class="container-fluid">-->
 <!--                      <div class="text-center">-->
@@ -75,11 +107,11 @@
 
                     <h4> Host </h4>
                     <p> 1. Load samples and configure keys</p>
-                    <p> 2. Uncheck Client & check Host in Studio/Pads </p>
+                    <p> 2. Open settings, uncheck client and check host </p>
                     <br><br><br>
 
                     <h4> Client </h4>
-                    <p> 1. Uncheck Host & check Client in Studio/Pads </p>
+                    <p> 1. Open settings, uncheck host and check client </p>
                     <p> 2. Click/Tap buttons in Studio/Pads </p>
 
                     <br><br>
@@ -88,7 +120,7 @@
 
             <div id="studio_tab" class="tab-pane">
                 <div style="background-color: rgb(0, 0, 0, 0.35)">
-                    <ul class="nav nav-tabs justify-content-center navbar-light">
+                    <ul class="nav nav-tabs justify-content-center navbar-light pt-2 pb-2">
 <!--                        <li><a class="tab" data-toggle="tab" href="#composer_tab">Comp</a></li>-->
 <!--                        <li><a class="tab" data-toggle="tab" href="#mixer">Mixer</a></li>-->
 <!--                        <li><a class="tab" data-toggle="tab" href="#api_tab">API</a></li>-->
@@ -99,41 +131,6 @@
 
                 <div class="tab-content ml-auto">
                     <div id="control_tab" class="tab-pane">
-                        <br>
-
-                        <div class="row">
-                            <div class="col">
-                                <center>
-                                    <div class="form-check">
-                                        <input type="checkbox" checked class="form-check-input" id="receiveCommandsCheckbox">
-                                        <label class="form-check-label" for="receiveCommandsCheckbox">Host</label>
-                                    </div>
-                                </center>
-                            </div>
-
-                            <div class="col">
-                                <center><div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="enableTransmissionCheckbox">
-                                    <label class="form-check-label" for="enableTransmissionCheckbox">Client</label>
-                                </div></center>
-                            </div>
-
-                            <div class="col">
-                                <center>
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="randomizePlaybackCheckbox">
-                                        <label class="form-check-label" for="randomizePlaybackCheckbox">Rnd</label>
-                                    </div>
-                                </center>
-                            </div>
-
-                            <div class="col">
-                                <center><div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
-                                    <label class="form-check-label" for="enablePreviewCheckbox">Keyboard</label>
-                                </div></center>
-                            </div>
-                        </div>
 
                         <center>
                             <br> <input type="text" id="" placeholder="Phone Pad" autofocus="off" />
@@ -148,10 +145,9 @@
                     <div id="sampler_tab" class="tab-pane">
                         <center>
                             <br>
-                            <button id="add_samples_btn" class="btn btn-light" onclick="addSamplesLsDisk()">+ Add</button>
-                            <button id="init_samples_btn" class="btn btn-light" onclick="initTrgKeys()">Init Trgs</button>
+                            <button id="add_samples_btn"   class="btn btn-light" onclick="addSamplesLsDisk()">+ Add</button>
+                            <button id="init_samples_btn"  class="btn btn-light" onclick="initTrgKeys()">Init Trgs</button>
                             <button id="clear_samples_btn" class="btn btn-light" onclick="clearSamples()">Clear</button>
-
                             <div class="container" id="sampleTableContainer"></div>
                             <br><br>
                         </center>

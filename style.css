@@ -123,7 +123,7 @@ h4, h5, h6, h7, p, label {
 /* The slider itself */
 .slider {
   -webkit-appearance: none;
-  width: 100%;
+  width: 40%;
   height: 25px;
   border-radius: 30px;
   background: rgba(255,255,255,0.35);

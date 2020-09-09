@@ -273,11 +273,11 @@ function playNetworkCmd(cmdText) {
 
     let clearData = {
         "session_id": currentSessionId,
-        "playedKey": ""
+        "playedKey": " "
     };
 
     let rsp = writeToDB(currentChannelName, dbData);
-    //writeToDB(currentChannelName, clearData);
+    writeToDB(currentChannelName, clearData);
 
     console.log(rsp);
 }
