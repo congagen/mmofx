@@ -36,46 +36,74 @@
                 <center>
 
                     <br><br><br>
+                    <div class="container">
 
-                    <form>
-                        <div class="form-group">
-                            <h5 id="currentChannelDisplay"> Disconnected </h5><br>
-                            <input class="" type="text" id="channelNameInputBox" placeholder="Channel Name" autofocus="off" />
-                            <br><br>
-                            <button class="btn btn-light" type="button" id="setChannelNameButton">Connect</button>
-                        </div>
-                        <br>
-                        <div class="form-group">
+                        <form role="form justify-content-center ">
+                            <div class="row justify-content-center ">
+                                <div class="form-group col-auto">
+                                <h4> Audio </h4><br>
 
-                            <div class="form-check">
-                            <input type="checkbox" class="form-check-input form-check-input" id="randomizePlaybackCheckbox">
-                            <label class="form-check-label" for="randomizePlaybackCheckbox">Randomize</label>
+                                <div>
+                                    <div class="slidecontainer">
+                                        <input id="masterAmp" type="range" min="1" max="100" value="80" class="slider"><p> Volume </p>
+                                    </div>
+                                </div>
+
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input form-check-input" id="randomizePlaybackCheckbox">
+                                    <label class="form-check-label" for="randomizePlaybackCheckbox">Randomize Samples</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input form-check-input" id="enablePreviewCheckbox">
+                                    <label class="form-check-label" for="enablePreviewCheckbox">Keyboard Input</label>
+                                </div>
+
+                                <br><br>
+
+                                </div>
+                            </div>
+                            <br>
+
+
+                            <h4> Network </h4>
+                            <br>
+
+                            <div class="row justify-content-center ">
+                                <div class="form-group col-auto">
+
+                                    <div class="form-check">
+                                        <input type="checkbox" checked class="form-check-input form-check-input" id="receiveCommandsCheckbox">
+                                        <label class="form-check-label" for="receiveCommandsCheckbox">Host</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-auto">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input form-check-input" id="enableTransmissionCheckbox">
+                                        <label class="form-check-label" for="enableTransmissionCheckbox">Client</label>
+                                    </div>
+                                </div>
+
                             </div>
 
-                            <div class="form-check">
-                            <input type="checkbox" class="form-check-input form-check-input" id="enablePreviewCheckbox">
-                            <label class="form-check-label" for="enablePreviewCheckbox">Keyboard Input</label>
+                            <div class="row justify-content-center ">
+                                <div class="form-group col-auto">
+                                    <p id="currentChannelDisplay"> Disconnected </p>
+                                    <input class="form-control" type="text" id="channelNameInputBox" placeholder="Channel name.." autofocus="off" />
+                                        <br>
+                                        <button class="btn btn-light" type="button" id="setChannelNameButton">Connect</button>
+                                    <button class="btn btn-light" type="button" id="shareChannelUrlButton">Share</button>
+                                    <br><br>
+                                </div>
                             </div>
 
                             <br>
 
-                            <div class="form-check">
-                            <input type="checkbox" checked class="form-check-input form-check-input" id="receiveCommandsCheckbox">
-                            <label class="form-check-label" for="receiveCommandsCheckbox">Host</label>
-                            </div>
-
-                            <div class="form-check">
-                            <input type="checkbox" class="form-check-input form-check-input" id="enableTransmissionCheckbox">
-                            <label class="form-check-label" for="enableTransmissionCheckbox">Client</label>
-                            </div>
-
-                        </div>
-                    </form>
-                    <br>
-                    <div class="slidecontainer">
-                        <input id="masterAmp" type="range" min="1" max="100" value="80" class="slider"><p> Volume </p>
-                    </div><br>
-
+                        </form>
+                        <br><br>
+                        <br><br>
+                    </div>
 
 
 <!--                    <div class="container-fluid">-->

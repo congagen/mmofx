@@ -9,6 +9,8 @@ var currentChannelDisplay = document.getElementById("currentChannelDisplay");
 var synthMasterAmp   = document.getElementById("synthMasterAmp");
 var samplerMasterAmp = document.getElementById("samplerMasterAmp");
 
+var shareChannelUrlButton = document.getElementById("shareChannelUrlButton");
+
 var duration_knob = document.getElementById("duration_knob");
 var attack_knob = document.getElementById("attack_knob");
 var release_knob = document.getElementById("release_knob");
@@ -52,102 +54,6 @@ let charlist = ["0","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y",
 "c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
 "∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
 "÷","≈","ç","‹","›","‘","◊","…","–"]
-
-function addApiListRow() {
-    var apiListContainer = $("#apiConfContainer");
-    let rowID = uuidv4();
-
-    apiDir[rowID] = {};
-    apiDir[rowID]["url"] = "";
-    apiDir[rowID]["data"] = "";
-    apiDir[rowID]["keys"] = [];
-
-    // -----------------------------------------------------------------------------------------------------------------
-    var content = "<div class='col'> <input class='form-control' id='url" + rowID + "' type='text' placeholder='API Url' value='" + "" + "'> </div>"
-    var urlNameRow  = $("<div class='row py-2 top-sample-row'> " + content + " </div>");
-    var urlNameField = urlNameRow.find( "input" );
-
-    urlNameField.change(function () {
-        var sId = $(urlNameField).attr('id');
-        let apiKey = document.getElementById(sId.toString());
-        let urlNameValue = apiKey.value.toString();
-        apiDir[rowID]["url"] = urlNameValue;
-        console.log(apiDir);
-    });
-
-    // -----------------------------------------------------------------------------------------------------------------
-    content = "<div class='col'> <input class='form-control' id='msg" + rowID + "' type='text' placeholder='Data' value='" + "" + "'> </div>"
-    var messageRow  = $("<div class='row py-2 mid-sample-row'> " + content + " </div>");
-    var msgInputKeysField = messageRow.find( "input" );
-
-    msgInputKeysField.change(function () {
-        var sId = $(msgInputKeysField).attr('id');
-        let msgInputField = document.getElementById(sId.toString());
-
-        let msg = msgInputField.value.toString();
-        apiDir[rowID]["data"] = msg;
-        console.log(apiDir);
-    });
-
-    // -----------------------------------------------------------------------------------------------------------------
-    content = "<div class='col'> <input class='form-control' id='" + rowID + "' type='text' placeholder='Trig Keys' value='" + "" + "'> </div>"
-    var trgKeyRow   = $("<div class='row py-2 mid-sample-row'> " + content + "</div>");
-
-    var trgInputKeysField = trgKeyRow.find( "input" );
-
-    trgInputKeysField.change(function () {
-        var sId = $(trgInputKeysField).attr('id');
-        let trgKeyInputField = document.getElementById(sId.toString());
-        let trgK = trgKeyInputField.value.toString();
-        apiDir[rowID]["keys"] = trgK;
-        console.log(apiDir);
-    });
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    let itmC = "<div class='col'> <input class='btn btn-light' type='button' value = 'Test'> </div>";
-
-    var btnPreview = $(itmC);
-    var prevBtn = btnPreview.find( "input" );
-    prevBtn.click(function () {
-        //TODO: Call Api
-        console.log(apiDir);
-        console.log("PrvBtn: " + apiDir[rowID]["url"] + ":" + apiDir[rowID]["data"]);
-        //callRestApi(apiDir[rowID]["url"], apiDir[rowID]["data"]);
-        const myValue = callRestApi(apiDir[rowID]["url"], apiDir[rowID]["data"]);
-        //console.log(myValue);
-    });
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    let itmD  = "<div class='col'> <input class='btn btn-light' type='button' value='Delete'> </div>";
-
-    var btnRemove = $(itmD);
-    var remoBtn = btnRemove.find( "input" );
-    remoBtn.click(function () {
-        delete apiDir[rowID];
-        urlNameRow.remove();
-        messageRow.remove();
-        trgKeyRow.remove();
-        bottomRow.remove();
-    });
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    var bottomRow   = $("<div class='row py-2 btm-sample-row'> </div>");
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    // $(bottomRow).append(trgKeysInput);
-    $(bottomRow).append(btnPreview);
-    $(bottomRow).append(btnRemove);
-
-    $(apiListContainer).append(urlNameRow);
-    $(apiListContainer).append(messageRow);
-    $(apiListContainer).append(trgKeyRow);
-    $(apiListContainer).append(bottomRow);
-}
-
 
 
 function addSampleListRow(sampleId, sampleUrl) {
@@ -282,6 +188,19 @@ function playNetworkCmd(cmdText) {
     console.log(rsp);
 }
 
+
+async function shareUrl() {
+    let channelUrl = "https://yphnaweb.s3.amazonaws.com/xusione.com/xunet/mmosfx/index.html?channel=" + currentChannelName + "&mode=client";
+
+    try {
+        await navigator.share({ title: currentChannelName, url: channelUrl });
+    } catch (err) {
+        alert(channelUrl);
+    }
+
+}
+
+
 function addKeyPad(keyId) {
     let keyItem = currentKeyboard[keyId];
     padCount += 1;
@@ -291,28 +210,13 @@ function addKeyPad(keyId) {
     let card_a = '<div class="card" style="width:100%; height:100%;" id="' + "playBtn" + keyId + '">';
     let card_b = '<div class="card-block"> <div id="' + 'pInput_' + keyId.toString() + '" class="card-title"></div>';
     let card_c = '<div class="keyPad" style="width:100%; height:100%;">';
-    let card_d = '<input type="text" class="form-control text-center keyPadInput" placeholder="' + keyId + '"> </input>'
-    let card_e = '</div>';
-    let card_f = '</div>';
-    let card_g = '';
+    let card_d = '<input type="text" class="form-control text-center keyPadInput" placeholder="' + keyId + '"></input>'
+    let card_e = '</div></div>';
 
-    // console.log("playBtn" + keyId);
-
-    var keyPanel = $(card_a + card_b + card_c + card_d + card_e + card_f + card_g);
+    var keyPanel = $(card_a + card_b + card_c + card_d + card_e);
     keyPanel.appendTo(padCol);
     padCol.appendTo('#keyPadPanel');
 
-    //var nameField = $("<input id=keyNameField" + keyId + " size='4' type = 'text' value = " + keyItem[0] + " readonly>");
-
-//    var trgKeysInput = $("<input id=" + keyId.toString() + " size='4' type = 'text' value = " + keyItem[2].toLowerCase() + "></input>");
-//    trgKeysInput.change(function () {
-//        var sId = trgKeysInput.attr('id');
-//
-//        let a = document.getElementById(sId.toString());
-//        currentKeyboard[sId][2] = a.value;
-//    });
-
-    //var btnPreview = $("<input id=" + keyId + " type = 'button' value = 'Play'/>");
     keyPanel.mousedown(function () {
         console.log("Mouse Down");
         console.log(keyId);
@@ -428,10 +332,11 @@ function updateChannel(){
         subscribeToDb(currentChannelName);
         console.log("Switching to channel: " + currentChannelName);
     }
-
 }
 
 setChannelNameButton.addEventListener("click", updateChannel);
+
+shareChannelUrlButton.addEventListener("click", shareUrl);
 
 document.addEventListener("DOMContentLoaded", initUI, false);
 
@@ -472,3 +377,115 @@ document.body.addEventListener('touchend', function() {
         initAudio();
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//function addApiListRow() {
+//    var apiListContainer = $("#apiConfContainer");
+//    let rowID = uuidv4();
+//
+//    apiDir[rowID] = {};
+//    apiDir[rowID]["url"] = "";
+//    apiDir[rowID]["data"] = "";
+//    apiDir[rowID]["keys"] = [];
+//
+//    // -----------------------------------------------------------------------------------------------------------------
+//    var content = "<div class='col'> <input class='form-control' id='url" + rowID + "' type='text' placeholder='API Url' value='" + "" + "'> </div>"
+//    var urlNameRow  = $("<div class='row py-2 top-sample-row'> " + content + " </div>");
+//    var urlNameField = urlNameRow.find( "input" );
+//
+//    urlNameField.change(function () {
+//        var sId = $(urlNameField).attr('id');
+//        let apiKey = document.getElementById(sId.toString());
+//        let urlNameValue = apiKey.value.toString();
+//        apiDir[rowID]["url"] = urlNameValue;
+//        console.log(apiDir);
+//    });
+//
+//    // -----------------------------------------------------------------------------------------------------------------
+//    content = "<div class='col'> <input class='form-control' id='msg" + rowID + "' type='text' placeholder='Data' value='" + "" + "'> </div>"
+//    var messageRow  = $("<div class='row py-2 mid-sample-row'> " + content + " </div>");
+//    var msgInputKeysField = messageRow.find( "input" );
+//
+//    msgInputKeysField.change(function () {
+//        var sId = $(msgInputKeysField).attr('id');
+//        let msgInputField = document.getElementById(sId.toString());
+//
+//        let msg = msgInputField.value.toString();
+//        apiDir[rowID]["data"] = msg;
+//        console.log(apiDir);
+//    });
+//
+//    // -----------------------------------------------------------------------------------------------------------------
+//    content = "<div class='col'> <input class='form-control' id='" + rowID + "' type='text' placeholder='Trig Keys' value='" + "" + "'> </div>"
+//    var trgKeyRow   = $("<div class='row py-2 mid-sample-row'> " + content + "</div>");
+//
+//    var trgInputKeysField = trgKeyRow.find( "input" );
+//
+//    trgInputKeysField.change(function () {
+//        var sId = $(trgInputKeysField).attr('id');
+//        let trgKeyInputField = document.getElementById(sId.toString());
+//        let trgK = trgKeyInputField.value.toString();
+//        apiDir[rowID]["keys"] = trgK;
+//        console.log(apiDir);
+//    });
+//
+//    // -----------------------------------------------------------------------------------------------------------------
+//
+//    let itmC = "<div class='col'> <input class='btn btn-light' type='button' value = 'Test'> </div>";
+//
+//    var btnPreview = $(itmC);
+//    var prevBtn = btnPreview.find( "input" );
+//    prevBtn.click(function () {
+//        //TODO: Call Api
+//        console.log(apiDir);
+//        console.log("PrvBtn: " + apiDir[rowID]["url"] + ":" + apiDir[rowID]["data"]);
+//        //callRestApi(apiDir[rowID]["url"], apiDir[rowID]["data"]);
+//        const myValue = callRestApi(apiDir[rowID]["url"], apiDir[rowID]["data"]);
+//        //console.log(myValue);
+//    });
+//
+//    // -----------------------------------------------------------------------------------------------------------------
+//
+//    let itmD  = "<div class='col'> <input class='btn btn-light' type='button' value='Delete'> </div>";
+//
+//    var btnRemove = $(itmD);
+//    var remoBtn = btnRemove.find( "input" );
+//    remoBtn.click(function () {
+//        delete apiDir[rowID];
+//        urlNameRow.remove();
+//        messageRow.remove();
+//        trgKeyRow.remove();
+//        bottomRow.remove();
+//    });
+//
+//    // -----------------------------------------------------------------------------------------------------------------
+//
+//    var bottomRow   = $("<div class='row py-2 btm-sample-row'> </div>");
+//
+//    // -----------------------------------------------------------------------------------------------------------------
+//
+//    // $(bottomRow).append(trgKeysInput);
+//    $(bottomRow).append(btnPreview);
+//    $(bottomRow).append(btnRemove);
+//
+//    $(apiListContainer).append(urlNameRow);
+//    $(apiListContainer).append(messageRow);
+//    $(apiListContainer).append(trgKeyRow);
+//    $(apiListContainer).append(bottomRow);
+//}
