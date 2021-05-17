@@ -1,6 +1,8 @@
 var masterAmp_slider = document.getElementById("masterAmp");
 
 var enablePreviewCheckbox = document.getElementById("enablePreviewCheckbox");
+var enablePolyphonyCheckbox = document.getElementById("enablePolyphonyCheckbox");
+
 var enableTransmissionCheckbox = document.getElementById("enableTransmissionCheckbox");
 var receiveCommandsCheckbox = document.getElementById("receiveCommandsCheckbox");
 var randomizePlaybackCheckbox = document.getElementById("randomizePlaybackCheckbox");

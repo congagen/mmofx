@@ -22,7 +22,7 @@
 
     <body>
 
-        <div style="background-color: rgb(255, 255, 255, 0.05)">
+        <div style="background-color: rgb(0, 0, 0, 0.5)">
 <!--            <center><h1 class="awesome"> MMOSFX! </h1></center><br>-->
             <br><br>
             <center><img src="logo.png" alt="MMOSFX!" width="190" height="70"></center><br>
@@ -114,6 +114,26 @@
                     </div>
 
 
+<!--                    <div class="container-fluid">-->
+<!--                      <div class="text-center">-->
+<!--                        <img src="https://chart.googleapis.com/chart?cht=qr&chl=XUSIONE.COM&chs=160x160&chld=L|0"-->
+<!--                             class="qr-code img-thumbnail img-responsive">-->
+<!--                      </div>-->
+
+<!--                      <div class="form-horizontal">-->
+<!--                        <div class="form-group">-->
+<!--                          <div class="col-sm-10">-->
+<!--                            <input type="text" class="form-control" id="qr_gen_content" placeholder="">-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                          <div class="col-sm-offset-2 col-sm-10">-->
+<!--                            <button type="button" class="btn btn-default" id="generate">Generate</button>-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </div>-->
+
                 </center>
             </div>
 
@@ -134,16 +154,14 @@
                 </center>
             </div>
 
-
             <div id="studio_tab" class="tab-pane">
-                <div style="background-color: rgb(255, 255, 255, 0.04)">
-                    <ul class="nav nav-tabs justify-content-center navbar-light pt-2 pb-2 subtabs">
-                        <li><a class="tab" data-toggle="tab" href="#control_tab"></a></li>
-                        <br>
-
+                <div style="background-color: rgb(0, 0, 0, 0.35)">
+                    <ul class="nav nav-tabs justify-content-center navbar-light pt-2 pb-2">
+<!--                        <li><a class="tab" data-toggle="tab" href="#composer_tab">Comp</a></li>-->
+<!--                        <li><a class="tab" data-toggle="tab" href="#mixer">Mixer</a></li>-->
+<!--                        <li><a class="tab" data-toggle="tab" href="#api_tab">API</a></li>-->
                         <li><a class="tab" data-toggle="tab" href="#control_tab">Pads</a></li>
                         <li><a class="tab" data-toggle="tab" href="#sampler_tab">Samples</a></li>
-                        <br>
                     </ul>
                 </div>
 
@@ -151,9 +169,7 @@
                     <div id="control_tab" class="tab-pane">
 
                         <center>
-                            <br>
-                            <input type="text" id="" placeholder="Phone Pad" autofocus="off" />
-                            <br>
+                            <br> <input type="text" id="" placeholder="Phone Pad" autofocus="off" />
                             <div class="container">
                                 <br><div class="row" id="keyPadPanel">
                                 </div>
@@ -164,7 +180,7 @@
 
                     <div id="sampler_tab" class="tab-pane">
                         <center>
-                            <br><br>
+                            <br>
                             <button id="add_samples_btn"   class="btn btn-light" onclick="addSamplesLsDisk()">+ Add</button>
                             <button id="stop_all_samples_btn" class="btn btn-light" onclick="stopAllSamples()">Stop</button>
                             <button id="clear_samples_btn" class="btn btn-light" onclick="clearSamples()">Clear</button>

@@ -9,6 +9,7 @@ var currentSamples = {};
 let testSampleBtn = document.getElementById("debugSample");
 
 let midiOutput = null;
+var currentBufferSources = {};
 
 
 function connectMidi(){
@@ -22,26 +23,45 @@ function connectMidi(){
 ////////////////////////////////////////////////////////////////////////////////
 // SAMPLER /////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+
+function stopAllSamples(){
+    console.log("stopAllSamples");
+
+    for (const [key, value] of Object.entries(currentBufferSources)) {
+        currentBufferSources[key].stop(0);
+    }
+}
+
+
 function playBuffer(path) {
-    var context = window.audioContext;
+    var bufContext = window.audioContext;
     var request = new XMLHttpRequest();
+
+    // TODO: If polyphony
+    if (enablePolyphonyCheckbox.checked == false) {
+        if (path in currentBufferSources) {
+            console.log("Stopping");
+            currentBufferSources[path].stop(0);
+        }
+    }
 
     request.open('GET', path, true);
     request.responseType = 'arraybuffer';
     request.addEventListener('load', function (e) {
-        context.decodeAudioData(this.response, function (buffer) {
-            var source = context.createBufferSource();
-            var gainNode = context.createGain();
+        bufContext.decodeAudioData(this.response, function (buffer) {
+            var source = bufContext.createBufferSource();
+            var gainNode = bufContext.createGain();
             source.connect(gainNode);
             source.buffer = buffer;
-            gainNode.connect(context.destination);
+            gainNode.connect(bufContext.destination);
             gainNode.gain.value = parseFloat((masterAmp_slider.value / 100));
-            //source.connect(context.destination);
+            //source.connect(bufContext.destination);
+            currentBufferSources[path] = source;
             source.start(0);
         });
     }, false);
 
-    context.resume();
+    bufContext.resume();
     request.send();
 }
 
