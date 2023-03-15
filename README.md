@@ -3,7 +3,7 @@
 ----------
 
 #### Testing:
-* macOS:
+* HTTPS (MAC):
 ```sh
 brew install nss
 npm i -g --only=prod https-localhost
@@ -11,7 +11,7 @@ serve .
 -> https://localhost
 ```
 
-* Linux:
+* HTTPS (LINUX):
 ```sh
 sudo apt install libnss3-tools
 sudo yum install nss-tools

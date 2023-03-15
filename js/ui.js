@@ -57,14 +57,18 @@ let charlist = ["0","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y",
 "∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
 "÷","≈","ç","‹","›","‘","◊","…","–"]
 
+//<div class="input-group mb-3">
+//  <div class="input-group-prepend"><span class="input-group-text" id="basic-addon1">@</span> </div>
+//  <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+//</div>
 
 function addSampleListRow(sampleId, sampleUrl) {
     let sItem = currentSamples[sampleId];
 
     var sampleTableContainer = $("#sampleTableContainer");
-    var titleRow     = $("<div class='row py-2 top-sample-row' id='sam_row_a" + sampleId + "'> <div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div> </div>");
-    var trigKeysRow = $("<div class='row py-2 mid-sample-row'> <div class='col'> <input class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div> </div>");
-    var samActionRow    = $("<div class='row py-2 btm-sample-row' id='sam_row_b" + sampleId + "'> </div>");
+    var titleRow     = $("<div style='width:100% !important;' class='row py-2 top-sample-row' id='sam_row_a" + sampleId + "'> <div class='col' style='width:100% !important;'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div> </div>");
+    var trigKeysRow  = $("<div class='row py-2 mid-sample-row'> <div class='col'> <div class='input-group mb-3'> <div class='input-group-prepend'><span class='input-group-text' id='basic-addon1'>@</span> </div>  <input aria-describedby='basic-addon1' class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div> </div> </div>");
+    var samActionRow = $("<div class='row py-2 btm-sample-row' id='sam_row_b" + sampleId + "'> </div>");
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -72,21 +76,25 @@ function addSampleListRow(sampleId, sampleUrl) {
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    let itmB = "<div class='col'> <input class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div>"
+    var itmB = "<div class='col'> <div class='input-group'>";
+    itmB += "<div class='input-group-prepend'><span class='input-group-text' id='basic-addon1'>Keys:</span> </div>";
+    itmB += "<input aria-describedby='basic-addon1' class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "></div></div>";
+
+    //var itmB = "<div class='col'><input class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "></div></div>";
 
     var trgKeysInput = $(itmB);
     var trigInp = trgKeysInput.find( "input" );
 
     trigInp.change(function () {
         var inputId = $(trigInp).attr('id').toString();
-        console.log(inputId);
+        //console.log(inputId);
         let trgKeyInputField = document.getElementById(inputId.toString());
         currentSamples[inputId][2] = trgKeyInputField.value.toString();
     });
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    let itmC = "<div class='col-xs-1 col-auto'> <input class='btn btn-light' type='button' value = 'Play'> </div>";
+    let itmC = "<div class='col-xs-1 col-auto'> <input class='btn btn-light' type='button' value = 'Preview'> </div>";
 
     var btnPreview = $(itmC);
     var prevBtn = btnPreview.find( "input" );
@@ -119,15 +127,41 @@ function addSampleListRow(sampleId, sampleUrl) {
 }
 
 
+function readFile(file) {
+  return new Promise((resolve, reject) => {
+    let fr = new FileReader();
+    fr.onload = x=> resolve(fr.result);
+    fr.readAsText(file);
+})}
+
+
+receiveCommandsCheckbox.addEventListener('change', (event) => {
+  if (event.currentTarget.checked) {
+    enableTransmissionCheckbox.checked = false;
+  } else {
+    enableTransmissionCheckbox.checked = true;
+  }
+  updateChannel();
+})
+
+enableTransmissionCheckbox.addEventListener('change', (event) => {
+  if (event.currentTarget.checked) {
+    receiveCommandsCheckbox.checked = false;
+  } else {
+    receiveCommandsCheckbox.checked = true;
+  }
+  updateChannel();
+})
+
 
 async function addSamplesLsDisk(){
 //    let files = await selectFile("audio/*", true);
     let files = await selectFile("", true);
-    //console.log(files);
-    //console.log(URL.createObjectURL(files[0]));
+    ////console.log(files);
+    ////console.log(URL.createObjectURL(files[0]));
 
     for (var i=0; i < files.length; i++) {
-        //console.log(files[i]);
+        ////console.log(files[i]);
         var fileName = files[i].name.toString();
         var ext = fileName.substr(fileName.lastIndexOf('.') + 1);
 
@@ -143,7 +177,42 @@ async function addSamplesLsDisk(){
         }
     }
 
-    console.log(currentSamples);
+    //console.log(currentSamples);
+}
+
+function shareSamples(){
+    let sampleMap = "1:a";
+    var keyMap = {};
+
+    for (var i = 0; i < Object.keys(currentSamples).length; i++) {
+        let k = Object.keys(currentSamples)[i];
+
+        let sampleName = currentSamples[k][0];
+        let sampleKeys = currentSamples[k][2];
+
+        for (let i = 0; i < sampleKeys.length; i++) {
+            let tChar = sampleKeys[i];
+
+           if (Object.keys(keyMap).includes(tChar)) {
+                keyMap[tChar].push(sampleName);
+           } else {
+                keyMap[tChar] = [];
+                keyMap[tChar].push(sampleName);
+           }
+
+        }
+    }
+
+    //alert(Object.keys(currentSamples).toString());
+    //console.log(JSON.stringify(keyMap));
+
+    let copyText = JSON.stringify(keyMap, null, 2);
+    //navigator.clipboard.writeText(copyText);
+
+    navigator.clipboard.writeText(copyText).then(function(x) {
+      alert("Keymap copied to clipboard");
+    });
+
 }
 
 
@@ -187,12 +256,13 @@ function playNetworkCmd(cmdText) {
     let rsp = writeToDB(currentChannelName, dbData);
     writeToDB(currentChannelName, clearData);
 
-    console.log(rsp);
+    //console.log(rsp);
 }
 
 
 async function shareUrl() {
-    let channelUrl = "https://yphnaweb.s3.amazonaws.com/xusione.com/xunet/mmosfx/index.html?channel=" + currentChannelName + "&mode=client";
+    let channelUrl = "https://yphnago.com/xusione/xusionet/mmosfx/index.html?channel=" + currentChannelName + "&mode=client";
+    updateChannel();
 
     try {
         await navigator.share({ title: currentChannelName, url: channelUrl });
@@ -220,11 +290,11 @@ function addKeyPad(keyId) {
     padCol.appendTo('#keyPadPanel');
 
     keyPanel.mousedown(function () {
-        console.log("Mouse Down");
-        console.log(keyId);
+        ////console.log("Mouse Down");
+        //console.log(keyId);
 
         if (enableTransmissionCheckbox.checked == true) {
-            console.log("Sending: " + keyId.toString());
+            //console.log("Sending: " + keyId.toString());
             playNetworkCmd(keyId);
         } else {
             playKey(keyId, false, false);
@@ -236,13 +306,13 @@ function addKeyPad(keyId) {
     let synCheckboxId = keyId + "_" + "synActiveForKey";
     var synthCheckbox = $("<input checked type=\"checkbox\" id=\"" + synCheckboxId + "\" type = 'button' />");
     synthCheckbox.click(function () {
-        console.log(synCheckboxId);
+        //console.log(synCheckboxId);
     });
 
     let samplerCheckboxId = keyId + "_" + "synActiveForKey";
     var samplerCheckbox = $("<input checked type=\"checkbox\" id=\"" + samplerCheckboxId + "\" type = 'button' />");
     samplerCheckbox.click(function () {
-        console.log(samplerCheckboxId);
+        //console.log(samplerCheckboxId);
     });
 
 }
@@ -297,7 +367,7 @@ function handleFileSelect(e) {
 
 
 function initUI() {
-    console.log("Initializing Host");
+    //console.log("Initializing Host");
 
     window.onbeforeunload = function () {
       window.scrollTo(0, 0);
@@ -320,19 +390,19 @@ function initUI() {
 }
 
 duration_knob.oninput = function () {
-    console.log(duration_knob.value);
+    //console.log(duration_knob.value);
 };
 
 
 // TODO:
 function updateChannel(){
-    console.log("TODO: Update DB Channel Name");
-    console.log("New Channel: " + currentChannelName);
+    //console.log("TODO: Update DB Channel Name");
+    //console.log("New Channel: " + currentChannelName);
 
     if (channelNameInputBox.value != "") {
         currentChannelName = channelNameInputBox.value;
         subscribeToDb(currentChannelName);
-        console.log("Switching to channel: " + currentChannelName);
+        //console.log("Switching to channel: " + currentChannelName);
     }
 }
 
@@ -346,11 +416,11 @@ window.addEventListener('keydown', function(evt) {
 
     if (enablePreviewCheckbox.checked == true) {
         playKey(evt.key.toString(), false, false);
-        console.log("playKbd");
+        //console.log("playKbd");
     }
 
     if (enableTransmissionCheckbox.checked == true) {
-        console.log("Send");
+        //console.log("Send");
         let data = {};
 
         let dbData = {
@@ -359,7 +429,7 @@ window.addEventListener('keydown', function(evt) {
         };
 
         let rsp = writeToDB(currentChannelName, dbData);
-        console.log(rsp);
+        //console.log(rsp);
     }
 
 });
@@ -416,7 +486,7 @@ document.body.addEventListener('touchend', function() {
 //        let apiKey = document.getElementById(sId.toString());
 //        let urlNameValue = apiKey.value.toString();
 //        apiDir[rowID]["url"] = urlNameValue;
-//        console.log(apiDir);
+//        //console.log(apiDir);
 //    });
 //
 //    // -----------------------------------------------------------------------------------------------------------------
@@ -430,7 +500,7 @@ document.body.addEventListener('touchend', function() {
 //
 //        let msg = msgInputField.value.toString();
 //        apiDir[rowID]["data"] = msg;
-//        console.log(apiDir);
+//        //console.log(apiDir);
 //    });
 //
 //    // -----------------------------------------------------------------------------------------------------------------
@@ -444,7 +514,7 @@ document.body.addEventListener('touchend', function() {
 //        let trgKeyInputField = document.getElementById(sId.toString());
 //        let trgK = trgKeyInputField.value.toString();
 //        apiDir[rowID]["keys"] = trgK;
-//        console.log(apiDir);
+//        //console.log(apiDir);
 //    });
 //
 //    // -----------------------------------------------------------------------------------------------------------------
@@ -455,11 +525,11 @@ document.body.addEventListener('touchend', function() {
 //    var prevBtn = btnPreview.find( "input" );
 //    prevBtn.click(function () {
 //        //TODO: Call Api
-//        console.log(apiDir);
-//        console.log("PrvBtn: " + apiDir[rowID]["url"] + ":" + apiDir[rowID]["data"]);
+//        //console.log(apiDir);
+//        //console.log("PrvBtn: " + apiDir[rowID]["url"] + ":" + apiDir[rowID]["data"]);
 //        //callRestApi(apiDir[rowID]["url"], apiDir[rowID]["data"]);
 //        const myValue = callRestApi(apiDir[rowID]["url"], apiDir[rowID]["data"]);
-//        //console.log(myValue);
+//        ////console.log(myValue);
 //    });
 //
 //    // -----------------------------------------------------------------------------------------------------------------

@@ -16,10 +16,6 @@ let firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
-//firebase.analytics();
-//const messaging = firebase.messaging();
-
 var database = firebase.database();
 
 
@@ -47,16 +43,16 @@ firebase.auth().signInAnonymously().catch(function(error) {
     var errorMessage = error.message;
 
     if (errorCode === 'auth/operation-not-allowed') {
-        alert('You must enable Anonymous auth in the Firebase Console.');
+        alert('You must enable Anonymous auth in the Firebase //console.');
     } else {
-        console.error(error);
+        //console.error(error);
     }
 });
 
 
 async function callRestApi(url, data) {
-    console.log("Calling: " + url);
-    console.log("Data: "    + data);
+    //console.log("Calling: " + url);
+    //console.log("Data: "    + data);
 
    try {
         const userAction = async() => {
@@ -68,20 +64,20 @@ async function callRestApi(url, data) {
                 }
             });
             const responseJson = await response.json();
-            console.log(responseJson);
+            //console.log(responseJson);
             return responseJson;
         }
     } catch (e) {
-        console.error(e);
+        //console.error(e);
     } finally {
-        console.log("");
+        //console.log("");
     }
 }
 
 
 function callRestApi_(url, data) {
-    console.log("Calling: " + url);
-    console.log("Data: "    + data);
+    //console.log("Calling: " + url);
+    //console.log("Data: "    + data);
 
     const userAction = async() => {
         const response = await fetch(url, {
@@ -92,14 +88,14 @@ function callRestApi_(url, data) {
             }
     });
         const responseJson = await response.json();
-        console.log(responseJson);
+        //console.log(responseJson);
         return responseJson;
     }
 }
 
 
 function writeToDB(db_name, data_dct) {
-    console.log("Writing");
+    //console.log("Writing");
     return firebase.database().ref(db_name).set(data_dct);
 }
 
@@ -118,30 +114,30 @@ function sendTokenToServer(currentToken) {
     currentFbToken = currentToken;
 
     if (!isTokenSentToServer()) {
-        console.log('Sending token to server...');
+        //console.log('Sending token to server...');
         // TODO(developer): Send the current token to your server.
         setTokenSentToServer(true);
     } else {
-        console.log('Token already sent to server so won\'t send it again ' + 'unless it changes');
+        //console.log('Token already sent to server so won\'t send it again ' + 'unless it changes');
     }
 }
 
 
 function subscribeToDb(dbChannelName) {
     if (prevChannelName != "") {
-        console.log("Unsubscribing: " + prevChannelName);
+        //console.log("Unsubscribing: " + prevChannelName);
         var prevDb = firebase.database().ref(prevChannelName);
         prevDb.off();
     }
 
-    console.log("Connecting to DB: " + dbChannelName);
+    //console.log("Connecting to DB: " + dbChannelName);
     var newDbChannel = firebase.database().ref(dbChannelName);
 
     currentChannelDisplay.innerHTML = "Current Channel: " + dbChannelName;
 
     newDbChannel.on('child_changed', function (data) {
-        console.log("Data change");
-        console.log(data.val());
+        //console.log("Data change");
+        //console.log(data.val());
 
         if (receiveCommandsCheckbox.checked == true) {
             playKey(data.val(), true, false);

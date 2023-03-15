@@ -16,7 +16,7 @@ function connectMidi(){
     navigator.requestMIDIAccess()
     .then(function(midiAccess) {
       const outputs = Array.from(midiAccess.outputs.values());
-      console.log(outputs);
+      //console.log(outputs);
     });
 }
 
@@ -25,7 +25,7 @@ function connectMidi(){
 ////////////////////////////////////////////////////////////////////////////////
 
 function stopAllSamples(){
-    console.log("stopAllSamples");
+    //console.log("stopAllSamples");
 
     for (const [key, value] of Object.entries(currentBufferSources)) {
         currentBufferSources[key].stop(0);
@@ -40,7 +40,7 @@ function playBuffer(path) {
     // TODO: If polyphony
     if (enablePolyphonyCheckbox.checked == false) {
         if (path in currentBufferSources) {
-            console.log("Stopping");
+            //console.log("Stopping");
             currentBufferSources[path].stop(0);
         }
     }
@@ -67,7 +67,7 @@ function playBuffer(path) {
 
 
 function playKey(sampleKey, isRemote, randomize) {
-    console.log(sampleKey);
+    //console.log(sampleKey);
     let sampleUrls = getSamplesFromTxt(sampleKey);
 
     if (randomizePlaybackCheckbox.checked == true) {
@@ -103,7 +103,7 @@ function getSamplesFromTxt(samKey) {
 
         if (sKeys.includes(samKey)) {
             let sUrl = sam[1];
-            console.log(sUrl);
+            //console.log(sUrl);
             sToPlay.push(sUrl);
         }
     }
@@ -113,7 +113,7 @@ function getSamplesFromTxt(samKey) {
 
 
 function initDefSamples(){
-    console.log("initDefSamples");
+    //console.log("initDefSamples");
 
     var f = new File([""], "xus.wav");
     var files = [f];
@@ -164,7 +164,7 @@ function strToNum(inputString) {
     for (var i = 0; i < inputString.length; i++) {
         composite += inputString.charCodeAt(i).toString();
     }
-    console.log(composite);
+    //console.log(composite);
     return parseInt(composite);
 }
 
@@ -175,9 +175,9 @@ function getRandomArbitrary(min, max) {
 
 
 function highlightCard(cardID) {
-    console.log("HL: " + cardID);
+    //console.log("HL: " + cardID);
     var sCard = document.getElementById(cardID);
-    console.log(sCard);
+    //console.log(sCard);
     sCard.classList.add("active");
     sCard.style.color = "blue";
     sCard.parentNode.style.color = "red";
@@ -204,22 +204,52 @@ function initAudio() {
                         audioCtx = new window.AudioContext();
                     }
 
-                    console.log("AudioContext OK");
+                    //console.log("AudioContext OK");
                     isInitAudio = true;
 
                 } else {
-                    console.log("AudioContext ERR");
+                    //console.log("AudioContext ERR");
                     alert("Sorry, but the Web Audio API is not supported by your browser. Please, consider upgrading to the latest version or downloading Google Chrome or Mozilla Firefox");
                 }
 
             }
 
-            console.log("Audio initialized... ");
+            //console.log("Audio initialized... ");
         }
             catch(e) {
             alert('Web Audio API is not supported in this browser');
         }
     }
+}
+
+
+function sendMiddleC(midiAccess, portID) {
+  const noteOnMessage = [0x90, 60, 0x7f]; // note on middle C, full velocity
+  const output = midiAccess.outputs.get(portID);
+  output.send(noteOnMessage); //omitting the timestamp means send immediately.
+  output.send([0x80, 60, 0x40], window.performance.now() + 1000.0); // timestamp = now + 1000ms.
+}
+
+
+function onMIDISuccess(midiAccess) {
+    console.log(midiAccess);
+    var inputs = midiAccess.inputs;
+    var outputs = midiAccess.outputs;
+    console.log(outputs);
+    sendMiddleC(midiAccess, outputs[0]);
+    //MIDIOutput.send("Note On": 64});
+    //outputs[0].send();
+}
+
+function onMIDIFailure() {
+    console.log('Could not access your MIDI devices.');
+}
+
+if (navigator.requestMIDIAccess) {
+    console.log('This browser supports WebMIDI!');
+    navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+} else {
+    console.log('WebMIDI is not supported in this browser.');
 }
 
 
@@ -326,7 +356,7 @@ function initAudio() {
 //
 ////    for(var i=0; i < oscList.length; i++) {
 ////        if (client_seed == lastPlayedKey) {
-////            console.log("client_seed == lastPlayedKey");
+////            //console.log("client_seed == lastPlayedKey");
 ////            oscList[i].stop();
 ////        }
 ////

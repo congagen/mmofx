@@ -7,6 +7,29 @@ var currentUserId = "";
 var currentSessionId = "";
 var currentFbToken = "";
 
+var originalSeq = "";
+
+var playSeq = false;
+var seqChars = [];
+var seqIndexMaster = 0;
+var seqIndex = 0;
+
+var fibonaIndex = 0;
+var fiboSeq = [];
+let fibonacci = [0,1];
+
+
+function listFibonacci(num) {
+    for (let i = 1; i < num; i++) {
+        fibonacci.push(fibonacci[i] + fibonacci[i - 1]);
+    }
+}
+
+listFibonacci(300);
+
+fiboSeq = fibonacci.join('').replace(/[^\d]/g, '').split('');
+console.log(fiboSeq);
+
 function getUrlVars() {
     var vars = {};
 
