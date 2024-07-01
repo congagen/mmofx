@@ -4,8 +4,6 @@
 
     <head>
         <meta charset="utf-8" />
-<!--        <meta name="viewport" content="width=device-width">-->
-<!--        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">-->
 
         <meta name="keywords" content="SFX, Sampler, Instrument">
         <meta name="description" content="MMO sampler">
@@ -14,21 +12,13 @@
         <title>MMOSFX! - XUSIONE.COM</title>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<!--        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>-->
-
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
-<!--        <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.17.1/firebase-app-compat.min.js" integrity="sha512-pJcjxn5D9YZ24EH38RDsrkfCLv3wNT06LRUSLPqYfJ6+RwNjR8yhHkVocl3IH/bNnYkk4zzeWfUb1foTk5HLwA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<!--        <script src="https://www.gstatic.com/firebasejs/7.17.2/firebase-database.js"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.17.1/firebase-database-compat.min.js" integrity="sha512-lxH6K5tdW0F9BqsLi2JCLPp6PA6OWwrjNEmrQ9cL3qD+4ZXIf3qkAB6Tagf4+t8bpv+nGA5qf772aVMHWSQyGw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<!--        <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-auth.js"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.17.1/firebase-auth-compat.min.js" integrity="sha512-/NS1QKerCtcq23x9dkk/InVPw5vJNLeYEZeLgJtgXkh6vQ/PMKvuzjxg8nLQOS3Abs0dTGKWLG9gPkGL26jYwQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-<!--        <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">-->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
         <link rel="stylesheet" type="text/css" href="style.css">
+
     </head>
 
     <body>
@@ -68,6 +58,11 @@
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input form-check-input" id="enablePreviewCheckbox">
                                     <label class="form-check-label" for="enablePreviewCheckbox">Keyboard Input</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input type="checkbox" checked class="form-check-input form-check-input" id="enableMidiOutCheckbox">
+                                    <label class="form-check-label" for="enableMidiOutCheckbox">MIDI Out</label>
                                 </div>
 
                                  <div class="form-check">
@@ -426,8 +421,8 @@
         <script type="text/javascript" src="js/ui.js"></script>
 
         <script>
-            $('.nav-tabs a[href="#studio_tab"]').tab('show');
-            $('.nav-tabs a[href="#control_tab"]').tab('show');
+            //$('.nav-tabs a[href="#studio_tab"]').tab('show');
+            //$('.nav-tabs a[href="#control_tab"]').tab('show');
             window.scrollTo(0,0);
         </script>
 

@@ -14,7 +14,7 @@ html, body {
 
 button:focus {outline:0;}
 
-h4, h5, h6, h7, p, label {
+h4, h5, h6, h7, label{
     font-family: "Courier", "Courier New", monospace;
     text-align: center;
     align: center;
@@ -24,6 +24,20 @@ h4, h5, h6, h7, p, label {
     outline: none !important;
 
     color: rgba(255, 255, 255, 0.8);
+}
+
+p {
+    color: rgba(190, 190, 190, 1) !important;
+    font-size: 17px;
+}
+
+.noselect {
+    -webkit-touch-callout: none !important; /* iOS Safari */
+    -webkit-user-select: none !important; /* Safari */
+    -khtml-user-select: none !important; /* Konqueror HTML */
+    -moz-user-select: none !important; /* Old versions of Firefox */
+    -ms-user-select: none !important; /* Internet Explorer/Edge */
+    user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
 .top-sample-row {

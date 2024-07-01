@@ -5,20 +5,20 @@ var songLength;
 var noteTimer;
 var keysdown = {};
 
+let output = null; 
+
 var currentSamples = {};
 let testSampleBtn = document.getElementById("debugSample");
 
-let midiOutput = null;
 var currentBufferSources = {};
 
-
-function connectMidi(){
-    navigator.requestMIDIAccess()
-    .then(function(midiAccess) {
-      const outputs = Array.from(midiAccess.outputs.values());
-      //console.log(outputs);
-    });
-}
+// function connectMidi(){
+//     navigator.requestMIDIAccess()
+//     .then(function(midiAccess) {
+//       const outputs = Array.from(midiAccess.outputs.values());
+//       //console.log(outputs);
+//     });
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 // SAMPLER /////////////////////////////////////////////////////////////////////
@@ -32,20 +32,20 @@ function stopAllSamples(){
     }
 }
 
+function playBuffer(sampleFilePath) {
+    console.log("playBuffer");    
 
-function playBuffer(path) {
     var bufContext = window.audioContext;
     var request = new XMLHttpRequest();
 
     // TODO: If polyphony
     if (enablePolyphonyCheckbox.checked == false) {
-        if (path in currentBufferSources) {
-            //console.log("Stopping");
-            currentBufferSources[path].stop(0);
+        if (sampleFilePath in currentBufferSources) {
+            currentBufferSources[sampleFilePath].stop(0);
         }
     }
 
-    request.open('GET', path, true);
+    request.open('GET', sampleFilePath, true);
     request.responseType = 'arraybuffer';
     request.addEventListener('load', function (e) {
         bufContext.decodeAudioData(this.response, function (buffer) {
@@ -56,7 +56,7 @@ function playBuffer(path) {
             gainNode.connect(bufContext.destination);
             gainNode.gain.value = parseFloat((masterAmp_slider.value / 100));
             //source.connect(bufContext.destination);
-            currentBufferSources[path] = source;
+            currentBufferSources[sampleFilePath] = source;
             source.start(0);
         });
     }, false);
@@ -65,11 +65,18 @@ function playBuffer(path) {
     request.send();
 }
 
+function characterToNote(character) {
+    const index = charlist.indexOf(character);
+    if (index === -1) {
+        return null; 
+    }
+    return 12 + index;
+}
 
 function playKey(sampleKey, isRemote, randomize) {
-    //console.log(sampleKey);
-    let sampleUrls = getSamplesFromTxt(sampleKey);
+    console.log(sampleKey);
 
+    let sampleUrls = getSamplesFromTxt(sampleKey);
     if (randomizePlaybackCheckbox.checked == true) {
         var curKeys = Object.keys(currentSamples);
 
@@ -77,20 +84,22 @@ function playKey(sampleKey, isRemote, randomize) {
         let sam = currentSamples[sKey];
         let sUrl = sam[1];
         playBuffer(sUrl);
-
     } else {
-        for (var i=0; i < sampleUrls.length; i++) {
+        for (var i=0; i < sampleUrls.length; i++) {                        
             playBuffer(sampleUrls[i]);
         }
     }
 
+    if (enableMidiOutCheckbox.checked == true) {
+        let noteInt = characterToNote(sampleKey);                
+        sendNoteOn(noteInt, 127);
+        sendNoteOff(noteInt);
+    }
 }
-
 
 function previewSample(sampleUrl) {
     playBuffer(sampleUrl);
 }
-
 
 function getSamplesFromTxt(samKey) {
     var sToPlay = [];
@@ -111,7 +120,6 @@ function getSamplesFromTxt(samKey) {
     return sToPlay;
 }
 
-
 function initDefSamples(){
     //console.log("initDefSamples");
 
@@ -129,11 +137,9 @@ function initDefSamples(){
     }
 }
 
-
 function clearSamplesList() {
     $("#sampleTableContainer tr").remove();
 }
-
 
 function selectFile (contentType, multiple){
     return new Promise(resolve => {
@@ -154,10 +160,10 @@ function selectFile (contentType, multiple){
     });
 }
 
-
 // -------------------------------------------------------------
 // -------------------------------------------------------------
 // MAIN: -------------------------------------------------------
+
 function strToNum(inputString) {
     var composite = "1";
 
@@ -168,11 +174,9 @@ function strToNum(inputString) {
     return parseInt(composite);
 }
 
-
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
-
 
 function highlightCard(cardID) {
     //console.log("HL: " + cardID);
@@ -184,11 +188,8 @@ function highlightCard(cardID) {
     sCard.parentNode.parentNode.style.color = "red";
 }
 
-
-
 function initAudio() {
     if (!isInitAudio) {
-
         try {
             if (!isInitAudio) {
                 var AudioContext = window.AudioContext // Default
@@ -211,9 +212,7 @@ function initAudio() {
                     //console.log("AudioContext ERR");
                     alert("Sorry, but the Web Audio API is not supported by your browser. Please, consider upgrading to the latest version or downloading Google Chrome or Mozilla Firefox");
                 }
-
             }
-
             //console.log("Audio initialized... ");
         }
             catch(e) {
@@ -222,192 +221,34 @@ function initAudio() {
     }
 }
 
+navigator.requestMIDIAccess().then(function(midiAccess) {
+    var outputs = midiAccess.outputs.values();
+    for (var outputItem = outputs.next(); outputItem && !outputItem.done; outputItem = outputs.next()) {
+        output = outputItem.value; // Assign the first available output
+        break; // Exit loop after getting the first output
+    }
+}).catch(error => {
+    console.error("Error accessing MIDI devices:", error);
+});
 
-function sendMiddleC(midiAccess, portID) {
-  const noteOnMessage = [0x90, 60, 0x7f]; // note on middle C, full velocity
-  const output = midiAccess.outputs.get(portID);
-  output.send(noteOnMessage); //omitting the timestamp means send immediately.
-  output.send([0x80, 60, 0x40], window.performance.now() + 1000.0); // timestamp = now + 1000ms.
+function sendNoteOn(note, velocity) {
+    console.log("sendNoteOn");
+    console.log(note);
+
+    if (output !== null) {
+        output.send([0x90, note, velocity]); // Note on message
+    } else {
+        console.warn("No MIDI output device available.");
+    }
 }
 
-
-function onMIDISuccess(midiAccess) {
-    console.log(midiAccess);
-    var inputs = midiAccess.inputs;
-    var outputs = midiAccess.outputs;
-    console.log(outputs);
-    sendMiddleC(midiAccess, outputs[0]);
-    //MIDIOutput.send("Note On": 64});
-    //outputs[0].send();
+function sendNoteOff(note, velocity = 64) {
+    console.log("sendNoteOff");
+    if (output !== null) {
+        setTimeout(() => {
+            output.send([0x80, note, velocity]); // Note off message (delayed)
+        }, 100); // Adjust delay (in milliseconds) as needed
+    } else {
+        console.warn("No MIDI output device available.");
+    }
 }
-
-function onMIDIFailure() {
-    console.log('Could not access your MIDI devices.');
-}
-
-if (navigator.requestMIDIAccess) {
-    console.log('This browser supports WebMIDI!');
-    navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
-} else {
-    console.log('WebMIDI is not supported in this browser.');
-}
-
-
-
-
-
-
-
-
-
-//var oscA = new Pizzicato.Sound({
-//    source: 'wave',
-//    options: {
-//        type: 'sine'
-//    }
-//});
-//
-//var oscB = new Pizzicato.Sound({
-//    source: 'wave',
-//    options: {
-//        type: 'square'
-//    }
-//});
-//
-//var oscC = new Pizzicato.Sound({
-//    source: 'wave',
-//    options: {
-//        type: 'sawtooth'
-//    }
-//});
-
-//var pingPongDelay = new Pizzicato.Effects.PingPongDelay({
-//    feedback: 0.6,
-//    time: 0.4,
-//    mix: 0.5
-//});
-//
-//var dubDelayA = new Pizzicato.Effects.DubDelay({
-//    feedback: 0.6,
-//    time: 0.25,
-//    mix: 0.5,
-//    cutoff: 3000
-//});
-//
-//var dubDelayB = new Pizzicato.Effects.DubDelay({
-//    feedback: 0.6,
-//    time: 0.25,
-//    mix: 0.5,
-//    cutoff: 1500
-//});
-//
-//var reverb = new Pizzicato.Effects.Reverb({
-//    time: 1,
-//    decay: 0.8,
-//    reverse: false,
-//    mix: 0.5
-//});
-//
-//
-//// var sample = new Pizzicato.Sound();
-//var oscillators = new Pizzicato.Group([oscA, oscB, oscC]);
-//
-//oscillators.addEffect(dubDelayA);
-//oscillators.addEffect(dubDelayB);
-//oscillators.addEffect(reverb);
-
-//let oscList = [oscA, oscB, oscC];
-
-
-//function playKey(client_seed, isRemote) {
-//
-//    Pizzicato.volume = (masterAmp_slider.value / 110);
-//    var dur = (duration_knob.value + 1);
-//    //clearTimeout(noteTimer);
-//
-//    oscA.volume = ((osc_a_vol_knob.value + 1.0) / 1001.0);
-//    oscA.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
-//
-//    oscB.volume = ((osc_b_vol_knob.value + 1.0) / 1001.0);
-//    oscB.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
-//
-//    oscC.volume = ((osc_c_vol_knob.value + 1.0) / 1001.0);
-//    oscC.frequency = parseInt(1000 * Math.abs(Math.sin(strToNum(client_seed))));
-//
-//    reverb.time = (reverb_speed_knob.value / 100);
-//    reverb.decay = (reverb_feedback_knob.value / 100);
-//    reverb.mix = (reverb_drywet_knob.value / 100);
-//
-//    dubDelayA.time = (delay_speed_knob.value / 100);
-//    dubDelayA.feedback = (delay_feedback_knob.value / 110);
-//    dubDelayA.cutoff = parseInt(5000 * (delay_cutoff_knob.value / 100));
-//    dubDelayA.mix = (delay_drywet_knob.value / 100.0);
-//
-//    dubDelayB.time = (delayB_speed_knob.value / 100);
-//    dubDelayB.feedback = (delayB_feedback_knob.value / 110);
-//    dubDelayB.cutoff = parseInt(5000 * (delayB_cutoff_knob.value / 100));
-//    dubDelayB.mix = (delayB_drywet_knob.value / 100.0);
-//
-//    oscillators.volume = ((synthMasterAmp.value + 0.01) / 1000.0);
-//
-//    var now = parseFloat(context.currentTime);
-//    let releaseKnobVal = parseFloat(release_knob.value * 0.1);
-//    let stopTime = (now + 0.5);
-//
-////    for(var i=0; i < oscList.length; i++) {
-////        if (client_seed == lastPlayedKey) {
-////            //console.log("client_seed == lastPlayedKey");
-////            oscList[i].stop();
-////        }
-////
-////        oscList[i].attack  = parseFloat(attack_knob.value / 100);
-////        oscList[i].release = parseFloat(release_knob.value / 1000);
-////    }
-//
-//    // oscillators.attack  = parseFloat(attack_knob.value / 100);
-//    // oscillators.release = parseFloat(release_knob.value / 1000);
-//
-//    //oscillators.play();
-//    //oscillators.stop();
-//
-//    let sUrls = getSamplesFromTxt(client_seed);
-//    for(var i=0; i < sUrls.length; i++) {
-//        sU = sUrls[i];
-//
-////        var dubDelayAA = new Pizzicato.Effects.DubDelay({
-////            feedback: 0.6,
-////            time: 0.25,
-////            mix: 0.5,
-////            cutoff: 3000
-////        });
-////
-////        var dubDelayBB = new Pizzicato.Effects.DubDelay({
-////            feedback: 0.6,
-////            time: 0.25,
-////            mix: 0.5,
-////            cutoff: 1500
-////        });
-////
-////
-////        var reverbS = new Pizzicato.Effects.Reverb({
-////            time: 1,
-////            decay: 0.8,
-////            reverse: false,
-////            mix: 0.5
-////        });
-//
-//        var sampler = new Pizzicato.Sound(sU, () => {
-//            //oscillators.addSound(sampler); samplerMasterAmp
-//            //sampler.play();
-//            sampler.volume = ((samplerMasterAmp.value + 0.01) / 1000);
-////            sampler.addEffect(dubDelayAA);
-////            sampler.addEffect(dubDelayBB);
-////            sampler.addEffect(reverbS);
-//            sampler.play();
-//        });
-//
-//
-//    }
-//
-//    lastPlayedKey = client_seed.toString();
-//}

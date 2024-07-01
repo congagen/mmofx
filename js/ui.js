@@ -1,6 +1,7 @@
 var masterAmp_slider = document.getElementById("masterAmp");
 
 var enablePreviewCheckbox = document.getElementById("enablePreviewCheckbox");
+var enableMidiOutCheckbox = document.getElementById("enableMidiOutCheckbox");
 var enablePolyphonyCheckbox = document.getElementById("enablePolyphonyCheckbox");
 
 var enableTransmissionCheckbox = document.getElementById("enableTransmissionCheckbox");
@@ -35,7 +36,6 @@ var reverb_speed_knob = document.getElementById("reverb_speed_knob");
 var reverb_feedback_knob = document.getElementById("reverb_feedback_knob");
 var reverb_drywet_knob = document.getElementById("reverb_drywet_knob");
 
-// var setChannelButton = document.getElementById("setChannelNameButton");
 var noteTimer;
 
 var username_input_box = document.getElementById("username_input_box");
@@ -49,18 +49,7 @@ var isTouchDevice = "ontouchstart" in document.documentElement;
 var padCount = 0;
 
 var apiDir = {};
-let charlist = ["0","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
-"c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
-"∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
-"÷","≈","ç","‹","›","‘","◊","…","–","1","2","3","4","5","6","7","8","9","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x",
-"c","v","b","n","m",",",".","-","!","#","€","%","/","(",")","0","`","^","*","'","¨",">","<","°","§","©","@","£","$",
-"∞","§","|","[","]","≈","±","~","™","•","Ω","é","®","†","µ","ü","ı","œ","π","˙","","ß","∂","ƒ","¸","˛","√","ª","ø",
-"÷","≈","ç","‹","›","‘","◊","…","–"]
 
-//<div class="input-group mb-3">
-//  <div class="input-group-prepend"><span class="input-group-text" id="basic-addon1">@</span> </div>
-//  <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
-//</div>
 
 function addSampleListRow(sampleId, sampleUrl) {
     let sItem = currentSamples[sampleId];
@@ -281,8 +270,9 @@ function addKeyPad(keyId) {
     var padCol = $('<div class="col-sm-1 px-1 py-1" style="width:20%;"></div>');
     let card_a = '<div class="card" style="width:100%; height:100%;" id="' + "playBtn" + keyId + '">';
     let card_b = '<div class="card-block"> <div id="' + 'pInput_' + keyId.toString() + '" class="card-title"></div>';
-    let card_c = '<div class="keyPad" style="width:100%; height:100%;">';
-    let card_d = '<input type="text" class="form-control text-center keyPadInput" placeholder="' + keyId + '"></input>'
+    let card_c = '<div class="keyPad" style="width:100%; height:100%; overflow: auto !important">';
+    //let card_d = '<input type="text" class="form-control text-center keyPadInput" placeholder="' + keyId + '"></input>'
+    let card_d = '<p class="text-center keyPadInput noselect">' + keyId + '</p>'
     let card_e = '</div></div>';
 
     var keyPanel = $(card_a + card_b + card_c + card_d + card_e);
@@ -433,6 +423,7 @@ window.addEventListener('keydown', function(evt) {
     }
 
 });
+
 
 
 window.addEventListener('keyup', function(evt) {});
