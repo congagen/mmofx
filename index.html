@@ -36,112 +36,123 @@
 
         <div class="tab-content ml-auto" id="myTabContent">
             <div id="settings_tab" class="tab-pane fade">
-                <center>
-                    <br><br>
-                    <div class="container">
-                        <form role="form" class="justify-content-center">
-                            <div class="row justify-content-center">
-                                <div class="form-group col-auto align-items-center">
+            
+                <br><br>
+                <div class="container">
+
+                    <form role="form" class="d-flex justify-content-center align-items-center">                        
+                        <div class="row d-flex justify-content-center align-items-center" style="width: 100%;">
+
+                            <div class="row justify-content-center mt-1">
                                 <h4> Audio </h4>
-
-                                <div>
-                                    <div class="slidecontainer">
-                                        <input id="masterAmp" type="range" min="1" max="100" value="80" class="slider"><p> Volume </p>
-                                    </div>
+                                
+                                <div class="slidecontainer mt-2 macro-slider">
+                                    <input id="masterAmp" type="range" min="0" max="100" value="80" class="slider">
+                                    <label for="masterAmp" class="form-label me-3 d-flex justify-content-center">Volume</label>
                                 </div>
 
-                                <div class="form-check">
+                                <div class="form-check d-flex justify-content-center mt-3">
                                     <input type="checkbox" class="form-check-input form-check-input" id="randomizePlaybackCheckbox">
-                                    <label class="form-check-label" for="randomizePlaybackCheckbox">Randomize Samples</label>
+                                    <label class="form-check-label ml-2" for="randomizePlaybackCheckbox">Randomize Samples</label>
                                 </div>
 
-                                <div class="form-check">
+                                <div class="form-check d-flex justify-content-center">
                                     <input type="checkbox" class="form-check-input form-check-input" id="enablePreviewCheckbox">
-                                    <label class="form-check-label" for="enablePreviewCheckbox">Keyboard Input</label>
+                                    <label class="form-check-label ml-2" for="enablePreviewCheckbox">Keyboard Input</label>
                                 </div>
 
-                                <div class="form-check">
-                                    <input type="checkbox" checked class="form-check-input form-check-input" id="enableMidiOutCheckbox">
-                                    <label class="form-check-label" for="enableMidiOutCheckbox">MIDI Out</label>
-                                </div>
-
-                                 <div class="form-check">
+                                <div class="form-check d-flex justify-content-center">
                                     <input type="checkbox" checked class="form-check-input form-check-input" id="enablePolyphonyCheckbox">
-                                    <label class="form-check-label" for="enablePolyphonyCheckbox">Sample Polyphony</label>
+                                    <label class="form-check-label ml-2" for="enablePolyphonyCheckbox">Sample Polyphony</label>
                                 </div>
 
-                                <button id="stop_all_samples_btn" class="btn btn-light mt-2" onclick="stopAllSamples()">Reset</button>
+                                <button id="stop_all_samples_btn" class="btn btn-light mt-4" onclick="stopAllSamples()">Reset</button>                                    
+                            </div>      
 
-                                </div>
-                            </div>
-
-
-                            <h4 class="mt-5"> Network </h4>
-
-                            <div class="row justify-content-center ">
-                                <div class="form-group col-auto">
-
+                            <div class="row justify-content-center mt-5">
+                                <h4> Network </h4>
+                                <div class="form-group col-auto mt-2">
                                     <div class="form-check">
                                         <input type="checkbox" checked class="form-check-input form-check-input" id="receiveCommandsCheckbox">
-                                        <label class="form-check-label" for="receiveCommandsCheckbox">Host</label>
+                                        <label class="form-check-label ml-2" for="receiveCommandsCheckbox">Host</label>
                                     </div>
                                 </div>
 
-                                <div class="form-group col-auto">
+                                <div class="form-group col-auto mt-2">
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input form-check-input" id="enableTransmissionCheckbox">
-                                        <label class="form-check-label" for="enableTransmissionCheckbox">Client</label>
+                                        <label class="form-check-labe ml-2" for="enableTransmissionCheckbox">Client</label>
                                     </div>
                                 </div>
-
                             </div>
 
                             <div class="row justify-content-center mt-3">
                                 <div class="form-group col-auto">
-                                    <p id="currentChannelDisplay"> Disconnected </p>
-                                    <input class="form-control" type="text" id="channelNameInputBox" placeholder="Channel name.." autofocus="off" />
-                                    <button class="btn btn-light mt-2" type="button" id="setChannelNameButton">Connect</button>
-                                    <button class="btn btn-light mt-2" type="button" id="shareChannelUrlButton">Share</button>
-                                    <br><br>
+                                    <center>
+                                        <p id="currentChannelDisplay"> Disconnected </p>
+                                        <input class="form-control" type="text" id="channelNameInputBox" placeholder="Channel name.." autofocus="off" />
+                                        <button class="btn btn-light mt-2" type="button" id="setChannelNameButton">Connect</button>
+                                        <button class="btn btn-light mt-2" type="button" id="shareChannelUrlButton">Share</button>
+                                    </center>
                                 </div>
                             </div>
 
-                            <br>
+                            <div class="row justify-content-center mt-5">
+                                <h4> MIDI </h4>
+                                    
+                                <div class="slidecontainer mt-2">
+                                    <input id="midiNotDuration" type="range" min="0" max="10000" value="200" class="slider">
+                                    <label for="midiNotDuration" class="form-label me-3 d-flex justify-content-center">Note Length (0-10S)</label>
+                                </div>   
 
-                        </form>
-                        <br><br>
-                        <br><br>
-                    </div>
-                </center>
+                                <div class="form-check d-flex justify-content-center mt-2">
+                                    <input type="checkbox" checked class="form-check-input form-check-input" id="enableMidiOutCheckbox">
+                                    <label class="form-check-label ml-2" for="enableMidiOutCheckbox">Enable MIDI Out</label>
+                                </div>                                                                                   
+                            </div>                                          
+
+                        </div>
+                    </form>
+                </div>            
             </div>
 
             <div id="help_tab" class="tab-pane fade">
                 <center>
-                    <div style="max-width:300px;">
-                    <br><br>
+                    <div class="mb-5" style="max-width: 300px;">
+                        <br><br>
 
-                    <h4> Host: </h4>
-                    <p> 1. ->Settings / Specify channel and connect (Optional)</p>
-                    <p> 2. ->Settings / Tap/Click Host</p>
-                    <p> 3. ->Studio/Samples -> Load samples and configure keys</p>
-                    <br><br><br>
+                        <div>
+                            <p style="color:blue !important;">(If you're experiencing connection issues, try disabling your VPN and reloading the page.)</p>
+                        </div>
 
-                    <h4> Client: </h4>
-                    <p> 1. ->Settings / Specify channel and connect (Optional)</p>
-                    <p> 2. ->Settings / Tap/Click Client</p>
-                    <p> 3. ->Studio/Pads -> Tap/Click pads</p>
+                        <div class="mt-5">
+                            <h4 class="mt-2"> Host Mode: </h4>
+                            <p> 1. Open settings and navigate to the Network section </p>
+                            <p> 2. Select "Host"</p>
+                            <p> 3. (Optional) Specify a channel and connect</p>
+                            <p> 4. Open Studio / Samples </p>           
+                            <p> 5. Add samples and configure keys </p>
+                        </div>
 
-                    <br><br>
+                        <div class="mt-5 mb-5">
+                            <h4> Client Mode: </h4>
+                            <p> 1. Open settings and navigate to the Network section </p>
+                            <p> 2. Select "Client" </p>
+                            <p> 3. (Optional) Specify a channel and connect </p>
+                            <p> 4. Open Studio / Pads </p>           
+                            <p> 5. Tap/Click pads</p>
+                        </div>
+                    
                     </div>
 
-<!--                    <footer class="footer mb-5 mt-5">-->
-<!--                        <center>-->
-<!--                            <a href="https://xusione.com/pages/support-xusione">-->
-<!--&lt;!&ndash;                                <img src="suppo.gif"> &ndash;&gt;-->
-<!--                                <p style="color:DarkSlateBlue !important;"><i>Love MMOSFX? Support XUSIONE!</i></p>-->
-<!--                            </a>-->
-<!--                        </center>-->
-<!--                    </footer>-->
+                   <!-- <footer class="footer mb-5 mt-5">
+                       <center>
+                           <a href="https://xusione.com/pages/support-xusione">
+                               <img src="suppo.gif"> &ndash;&gt;
+                               <p style="color:DarkSlateBlue !important;"><i>Love MMOSFX? Support XUSIONE!</i></p>
+                           </a>
+                       </center>
+                   </footer> -->
 
                 </center>
             </div>
@@ -213,7 +224,7 @@
                                                 <div class="mt-0 mb-4">
                                                     <button class="btn btn-light" type="button" onclick="sampleTrigsToSeq()">Init</button>
                                                     <button class="btn btn-light" type="button" id="revSeq" onclick="reverseSeq()">Rev</button>
-                                                    <button class="btn btn-light" type="button" id="randomizeSeq" onclick="randomizeSeq()">?</button>
+                                                    <button class="btn btn-light" type="button" id="randomizeSeq" onclick="randomizeSequencer()">?</button>
                                                     <button class="btn btn-light" type="button" id="resetSeq" onclick="resetOrigSeq()">Reset</button>
                                                 </div>
 

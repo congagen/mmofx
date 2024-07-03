@@ -73,5 +73,4 @@ if (Object.keys(url_vars).length > 0) {
             document.getElementById("enableTransmissionCheckbox").checked = false;
         }
     }
-
 }

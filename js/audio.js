@@ -232,8 +232,8 @@ navigator.requestMIDIAccess().then(function(midiAccess) {
 });
 
 function sendNoteOn(note, velocity) {
-    console.log("sendNoteOn");
-    console.log(note);
+    // console.log("sendNoteOn");
+    // console.log(note);
 
     if (output !== null) {
         output.send([0x90, note, velocity]); // Note on message
@@ -242,12 +242,14 @@ function sendNoteOn(note, velocity) {
     }
 }
 
-function sendNoteOff(note, velocity = 64) {
-    console.log("sendNoteOff");
+function sendNoteOff(note, velocity = 64) {        
+    // console.log("sendNoteOff");
+    midiNotDurationSlider = document.getElementById("midiNotDuration");
+
     if (output !== null) {
         setTimeout(() => {
-            output.send([0x80, note, velocity]); // Note off message (delayed)
-        }, 100); // Adjust delay (in milliseconds) as needed
+            output.send([0x80, note, velocity]);
+        }, midiNotDurationSlider.value); 
     } else {
         console.warn("No MIDI output device available.");
     }

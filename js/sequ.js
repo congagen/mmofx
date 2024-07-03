@@ -1,12 +1,20 @@
-
 var naiveReverse = function(string) {
     return string.split('').reverse().join('');
 }
 
 
-function randomizeSeq() {
+function shuffleString(str) {
+    const arr = str.split(''); // Convert string to array
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1)); // Pick random index
+        [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap elements
+    }
+    return arr.join(''); // Convert back to string
+}
+
+function randomizeSequencer() {
     var curSeqChars = document.getElementById("maxlerZone").value;
-    curSeqChars = curSeqChars.split('').sort(function(){return 0.5-Math.random()}).join('');
+    curSeqChars = shuffleString(curSeqChars);
     document.getElementById("maxlerZone").value = curSeqChars;
 }
 
@@ -22,7 +30,6 @@ function nthFib(n) {
 }
 
 //originalSeq
-
 
 function resetOrigSeq() {
     document.getElementById("maxlerZone").value = originalSeq;

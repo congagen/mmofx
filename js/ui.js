@@ -1,7 +1,10 @@
 var masterAmp_slider = document.getElementById("masterAmp");
 
 var enablePreviewCheckbox = document.getElementById("enablePreviewCheckbox");
+
+var midiNotDurationSlider = document.getElementById("midiNotDuration");
 var enableMidiOutCheckbox = document.getElementById("enableMidiOutCheckbox");
+
 var enablePolyphonyCheckbox = document.getElementById("enablePolyphonyCheckbox");
 
 var enableTransmissionCheckbox = document.getElementById("enableTransmissionCheckbox");
@@ -115,14 +118,12 @@ function addSampleListRow(sampleId, sampleUrl) {
     $(sampleTableContainer).append(samActionRow);
 }
 
-
 function readFile(file) {
   return new Promise((resolve, reject) => {
     let fr = new FileReader();
     fr.onload = x=> resolve(fr.result);
     fr.readAsText(file);
 })}
-
 
 receiveCommandsCheckbox.addEventListener('change', (event) => {
   if (event.currentTarget.checked) {
@@ -141,7 +142,6 @@ enableTransmissionCheckbox.addEventListener('change', (event) => {
   }
   updateChannel();
 })
-
 
 async function addSamplesLsDisk(){
 //    let files = await selectFile("audio/*", true);
@@ -165,11 +165,9 @@ async function addSamplesLsDisk(){
             addSampleListRow(sKey, sUrl);
         }
     }
-
-    //console.log(currentSamples);
 }
 
-function shareSamples(){
+function shareSamples() {
     let sampleMap = "1:a";
     var keyMap = {};
 
@@ -204,7 +202,6 @@ function shareSamples(){
 
 }
 
-
 function initTrgKeys() {
     var c = 0;
     for (const [key, value] of Object.entries(currentSamples)) {
@@ -221,7 +218,6 @@ function initTrgKeys() {
     }
 }
 
-
 function clearSamples() {
     for (const [key, value] of Object.entries(currentSamples)) {
         delete currentSamples[key];
@@ -229,7 +225,6 @@ function clearSamples() {
         document.getElementById("sam_row_b"+key).remove();
     }
 }
-
 
 function playNetworkCmd(cmdText) {
     let dbData = {
@@ -248,7 +243,6 @@ function playNetworkCmd(cmdText) {
     //console.log(rsp);
 }
 
-
 async function shareUrl() {
     let channelUrl = "https://yphnago.com/xusione/xusionet/mmosfx/index.html?channel=" + currentChannelName + "&mode=client";
     updateChannel();
@@ -260,7 +254,6 @@ async function shareUrl() {
     }
 
 }
-
 
 function addKeyPad(keyId) {
     let keyItem = currentKeyboard[keyId];
@@ -307,14 +300,12 @@ function addKeyPad(keyId) {
 
 }
 
-
 function toggleEditMode(isEnabled) {
     var all = document.getElementsByClassName("keyPadInput");
     for (var i=0, max=all.length; i < max; i++) {
         all[i].readOnly = !isEnabled;
     }
 }
-
 
 function initKeyMap(){
     padCount = 0;
@@ -329,7 +320,6 @@ function initKeyMap(){
     toggleEditMode(false);
 }
 
-
 function strToNum(inputString) {
     var composite = "1";
 
@@ -339,11 +329,9 @@ function strToNum(inputString) {
     return parseInt(composite);
 }
 
-
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
-
 
 function handleFileSelect(e) {
     if(!e.target.files) return;
@@ -354,7 +342,6 @@ function handleFileSelect(e) {
     }
 
 }
-
 
 function initUI() {
     //console.log("Initializing Host");
@@ -369,7 +356,8 @@ function initUI() {
 
     initKeyMap();
 
-    masterAmp_slider.value= 50;
+    midiNotDurationSlider.value = 500;
+    masterAmp_slider.value = 50;
     attack_knob.value = 5;
     duration_knob.value = 30;
     release_knob.value = 15;
@@ -382,7 +370,6 @@ function initUI() {
 duration_knob.oninput = function () {
     //console.log(duration_knob.value);
 };
-
 
 // TODO:
 function updateChannel(){
@@ -424,10 +411,7 @@ window.addEventListener('keydown', function(evt) {
 
 });
 
-
-
 window.addEventListener('keyup', function(evt) {});
-
 
 document.body.addEventListener('click', function() {
     if (!isInitAudio) {
