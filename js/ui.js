@@ -3,6 +3,11 @@ var masterAmp_slider = document.getElementById("masterAmp");
 var enablePreviewCheckbox = document.getElementById("enablePreviewCheckbox");
 
 var midiNotDurationSlider = document.getElementById("midiNotDuration");
+const midiNotDurationLabel = document.getElementById("midiNotDurationLabel");
+
+var midiOutChannelSlider = document.getElementById("midiOutChannel");
+const midiOutChannelLabel = document.getElementById("midiOutChannelLabel");
+
 var enableMidiOutCheckbox = document.getElementById("enableMidiOutCheckbox");
 
 var enablePolyphonyCheckbox = document.getElementById("enablePolyphonyCheckbox");
@@ -356,6 +361,7 @@ function initUI() {
 
     initKeyMap();
 
+    midiOutChannelSlider.value = 0
     midiNotDurationSlider.value = 500;
     masterAmp_slider.value = 50;
     attack_knob.value = 5;
@@ -387,6 +393,14 @@ setChannelNameButton.addEventListener("click", updateChannel);
 
 shareChannelUrlButton.addEventListener("click", shareUrl);
 
+midiOutChannelSlider.addEventListener("input", (event) => {
+    midiOutChannelLabel.textContent = "Channel: " + event.target.value;
+});
+
+midiNotDurationSlider.addEventListener("input", (event) => {
+    midiNotDurationLabel.textContent = "Duration: " + event.target.value;
+});
+
 document.addEventListener("DOMContentLoaded", initUI, false);
 
 window.addEventListener('keydown', function(evt) {
@@ -414,15 +428,11 @@ window.addEventListener('keydown', function(evt) {
 window.addEventListener('keyup', function(evt) {});
 
 document.body.addEventListener('click', function() {
-    if (!isInitAudio) {
-        initAudio();
-    }
+    if (!isInitAudio) { initAudio(); }
 });
 
 document.body.addEventListener('touchend', function() {
-    if (!isInitAudio) {
-        initAudio();
-    }
+    if (!isInitAudio) { initAudio(); }
 });
 
 

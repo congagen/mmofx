@@ -74,7 +74,7 @@ function characterToNote(character) {
 }
 
 function playKey(sampleKey, isRemote, randomize) {
-    console.log(sampleKey);
+    console.log("sampleKey: " + sampleKey);    
 
     let sampleUrls = getSamplesFromTxt(sampleKey);
     if (randomizePlaybackCheckbox.checked == true) {
@@ -89,12 +89,16 @@ function playKey(sampleKey, isRemote, randomize) {
             playBuffer(sampleUrls[i]);
         }
     }
-
-    if (enableMidiOutCheckbox.checked == true) {
-        let noteInt = characterToNote(sampleKey);                
-        sendNoteOn(noteInt, 127);
-        sendNoteOff(noteInt);
+    
+    if (sampleKey != " ") {
+        if (enableMidiOutCheckbox.checked == true) {
+            let noteInt = characterToNote(sampleKey);
+            let midiChannel = document.getElementById("midiOutChannel").value;
+            sendNoteOn(midiChannel, noteInt, 127);
+            sendNoteOff(midiChannel, noteInt);
+        }
     }
+    
 }
 
 function previewSample(sampleUrl) {
@@ -231,24 +235,22 @@ navigator.requestMIDIAccess().then(function(midiAccess) {
     console.error("Error accessing MIDI devices:", error);
 });
 
-function sendNoteOn(note, velocity) {
-    // console.log("sendNoteOn");
-    // console.log(note);
-
+function sendNoteOn(channel, note, velocity) {
+    let operation = 0x90 | channel;
     if (output !== null) {
-        output.send([0x90, note, velocity]); // Note on message
+        output.send([operation, note, velocity]);
     } else {
         console.warn("No MIDI output device available.");
     }
 }
 
-function sendNoteOff(note, velocity = 64) {        
-    // console.log("sendNoteOff");
+function sendNoteOff(channel, note, velocity = 64) {        
     midiNotDurationSlider = document.getElementById("midiNotDuration");
+    let operation = 0x80 | channel;
 
     if (output !== null) {
         setTimeout(() => {
-            output.send([0x80, note, velocity]);
+            output.send([operation, note, velocity]);
         }, midiNotDurationSlider.value); 
     } else {
         console.warn("No MIDI output device available.");

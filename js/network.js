@@ -4,6 +4,11 @@ const messageBox = document.querySelector('#messageBox');
 
 var prevChannelName = "";
 
+const maxRetryCount = 50; 
+const initialDelay = 1000; // Initial delay in milliseconds
+const backoffFactor = 2;   // Factor to increase delay by
+
+
 let firebaseConfig = {
     apiKey: "AIzaSyDx3-4RSc8fpkQcL2O_DsDSZ29qJ_JoRx8",
     authDomain: "xtation-2.firebaseapp.com",
@@ -17,7 +22,34 @@ let firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
+var connectedRef = firebase.database().ref(".info/connected");
 
+connectedRef.on("value", function(snap) {
+    if (snap.val() === false) {
+      console.log('Connection lost!');
+      attemptReconnect();
+    }
+});
+
+function attemptReconnect(retryCount = 0) {
+    if (retryCount >= maxRetryCount) {
+      console.error('Max retry count exceeded. Unable to reconnect.');
+      return;
+    }
+  
+    const delay = initialDelay * Math.pow(backoffFactor, retryCount);
+    console.log(`Attempting to reconnect in ${delay}...`);
+  
+    setTimeout(() => {
+      firebase.database().ref(".info/connected").once("value", function(snap) {
+        if (snap.val() === true) {
+          console.log('Reconnected!');
+        } else {
+          attemptReconnect(retryCount + 1); // Retry with increased count
+        }
+      });
+    }, delay);
+}
 
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -49,11 +81,7 @@ firebase.auth().signInAnonymously().catch(function(error) {
     }
 });
 
-
 async function callRestApi(url, data) {
-    //console.log("Calling: " + url);
-    //console.log("Data: "    + data);
-
    try {
         const userAction = async() => {
             const response = await fetch(url, {
@@ -68,31 +96,11 @@ async function callRestApi(url, data) {
             return responseJson;
         }
     } catch (e) {
-        //console.error(e);
+        console.error(e);
     } finally {
         //console.log("");
     }
 }
-
-
-function callRestApi_(url, data) {
-    //console.log("Calling: " + url);
-    //console.log("Data: "    + data);
-
-    const userAction = async() => {
-        const response = await fetch(url, {
-            method: 'POST',
-            body: {data},
-            headers: {
-                'Content-Type': 'application/json'
-            }
-    });
-        const responseJson = await response.json();
-        //console.log(responseJson);
-        return responseJson;
-    }
-}
-
 
 function writeToDB(db_name, data_dct) {
     //console.log("Writing");
@@ -114,31 +122,22 @@ function sendTokenToServer(currentToken) {
     currentFbToken = currentToken;
 
     if (!isTokenSentToServer()) {
-        //console.log('Sending token to server...');
-        // TODO(developer): Send the current token to your server.
         setTokenSentToServer(true);
     } else {
-        //console.log('Token already sent to server so won\'t send it again ' + 'unless it changes');
+        console.log('Token already sent to server');
     }
 }
 
-
 function subscribeToDb(dbChannelName) {
     if (prevChannelName != "") {
-        //console.log("Unsubscribing: " + prevChannelName);
         var prevDb = firebase.database().ref(prevChannelName);
         prevDb.off();
     }
 
-    //console.log("Connecting to DB: " + dbChannelName);
     var newDbChannel = firebase.database().ref(dbChannelName);
-
     currentChannelDisplay.innerHTML = "Current Channel: " + dbChannelName;
 
     newDbChannel.on('child_changed', function (data) {
-        //console.log("Data change");
-        //console.log(data.val());
-
         if (receiveCommandsCheckbox.checked == true) {
             playKey(data.val(), true, false);
         }

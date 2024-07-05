@@ -102,10 +102,15 @@
                                     
                                 <div class="slidecontainer mt-2">
                                     <input id="midiNotDuration" type="range" min="0" max="10000" value="200" class="slider">
-                                    <label for="midiNotDuration" class="form-label me-3 d-flex justify-content-center">Note Length (0-10S)</label>
-                                </div>   
+                                    <label id="midiNotDurationLabel" for="midiNotDuration" class="form-label me-3 d-flex justify-content-center">Duration: 500</label>
+                                </div>
 
-                                <div class="form-check d-flex justify-content-center mt-2">
+                                <div class="slidecontainer mt-2">
+                                    <input id="midiOutChannel" type="range" min="0" max="15" value="0" class="slider">
+                                    <label id="midiOutChannelLabel" for="midiOutChannel" class="form-label me-3 d-flex justify-content-center">Channel: 0</label>
+                                </div>
+
+                                <div class="form-check d-flex justify-content-center mt-2 mb-5">
                                     <input type="checkbox" checked class="form-check-input form-check-input" id="enableMidiOutCheckbox">
                                     <label class="form-check-label ml-2" for="enableMidiOutCheckbox">Enable MIDI Out</label>
                                 </div>                                                                                   
