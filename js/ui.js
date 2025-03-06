@@ -1,55 +1,4 @@
-var masterAmp_slider = document.getElementById("masterAmp");
-
-var enablePreviewCheckbox = document.getElementById("enablePreviewCheckbox");
-
-var midiNotDurationSlider = document.getElementById("midiNotDuration");
-const midiNotDurationLabel = document.getElementById("midiNotDurationLabel");
-
-var midiOutChannelSlider = document.getElementById("midiOutChannel");
-const midiOutChannelLabel = document.getElementById("midiOutChannelLabel");
-
-var enableMidiOutCheckbox = document.getElementById("enableMidiOutCheckbox");
-
-var enablePolyphonyCheckbox = document.getElementById("enablePolyphonyCheckbox");
-
-var enableTransmissionCheckbox = document.getElementById("enableTransmissionCheckbox");
-var receiveCommandsCheckbox = document.getElementById("receiveCommandsCheckbox");
-var randomizePlaybackCheckbox = document.getElementById("randomizePlaybackCheckbox");
-
-var currentChannelDisplay = document.getElementById("currentChannelDisplay");
-var synthMasterAmp   = document.getElementById("synthMasterAmp");
-var samplerMasterAmp = document.getElementById("samplerMasterAmp");
-
-var shareChannelUrlButton = document.getElementById("shareChannelUrlButton");
-
-var duration_knob = document.getElementById("duration_knob");
-var attack_knob = document.getElementById("attack_knob");
-var release_knob = document.getElementById("release_knob");
-
-var osc_a_vol_knob = document.getElementById("osc_a_vol_knob");
-var osc_b_vol_knob = document.getElementById("osc_b_vol_knob");
-var osc_c_vol_knob = document.getElementById("osc_c_vol_knob");
-
-var delay_speed_knob = document.getElementById("delay_speed_knob");
-var delay_feedback_knob = document.getElementById("delay_feedback_knob");
-var delay_cutoff_knob = document.getElementById("delay_cutoff_knob");
-var delay_drywet_knob = document.getElementById("delay_drywet_knob");
-
-var delayB_speed_knob = document.getElementById("delayB_speed_knob");
-var delayB_feedback_knob = document.getElementById("delayB_feedback_knob");
-var delayB_cutoff_knob = document.getElementById("delayB_cutoff_knob");
-var delayB_drywet_knob = document.getElementById("delayB_drywet_knob");
-
-var reverb_speed_knob = document.getElementById("reverb_speed_knob");
-var reverb_feedback_knob = document.getElementById("reverb_feedback_knob");
-var reverb_drywet_knob = document.getElementById("reverb_drywet_knob");
-
 var noteTimer;
-
-var username_input_box = document.getElementById("username_input_box");
-
-var channelNameInputBox = document.getElementById("channelNameInputBox");
-var setChannelNameButton = document.getElementById("setChannelNameButton");
 
 var cueString = "<span class=\"cueMsg\">Cue: </span>";
 var currentKeyboard = {"a": ["a1","b1","c1"]};
@@ -57,7 +6,6 @@ var isTouchDevice = "ontouchstart" in document.documentElement;
 var padCount = 0;
 
 var apiDir = {};
-
 
 function addSampleListRow(sampleId, sampleUrl) {
     let sItem = currentSamples[sampleId];
@@ -159,7 +107,7 @@ async function addSamplesLsDisk(){
         var fileName = files[i].name.toString();
         var ext = fileName.substr(fileName.lastIndexOf('.') + 1);
 
-        if (ext == "wav" || ext == "mp3") {
+        if (ext === "wav" || ext === "mp3") {
             let fName = files[i].name.toString();
             var sKey = URL.createObjectURL(files[i]).toString();
             let sUrl = URL.createObjectURL(files[i]);
@@ -232,6 +180,8 @@ function clearSamples() {
 }
 
 function playNetworkCmd(cmdText) {
+    console.log("playNetworkCmd: " + cmdText.toString());
+
     let dbData = {
         "session_id": currentSessionId,
         "playedKey": cmdText.toString()
@@ -245,11 +195,11 @@ function playNetworkCmd(cmdText) {
     let rsp = writeToDB(currentChannelName, dbData);
     writeToDB(currentChannelName, clearData);
 
-    //console.log(rsp);
+    // console.log(rsp);
 }
 
 async function shareUrl() {
-    let channelUrl = "https://yphnago.com/xusione/xusionet/mmosfx/index.html?channel=" + currentChannelName + "&mode=client";
+    let channelUrl = "https://yphnago.com/xusione/xusionet/mmofx/index.html?channel=" + currentChannelName + "&mode=client";
     updateChannel();
 
     try {
@@ -281,7 +231,7 @@ function addKeyPad(keyId) {
         ////console.log("Mouse Down");
         //console.log(keyId);
 
-        if (enableTransmissionCheckbox.checked == true) {
+        if (enableTransmissionCheckbox.checked === true) {
             //console.log("Sending: " + keyId.toString());
             playNetworkCmd(keyId);
         } else {
@@ -383,7 +333,8 @@ function updateChannel(){
     //console.log("New Channel: " + currentChannelName);
 
     if (channelNameInputBox.value != "") {
-        currentChannelName = channelNameInputBox.value;
+        currentChannelName = channelNameInputBox.value.replaceAll(" ", "_").replaceAll("%", "_");
+        console.log(currentChannelName);
         subscribeToDb(currentChannelName);
         //console.log("Switching to channel: " + currentChannelName);
     }
@@ -392,6 +343,11 @@ function updateChannel(){
 setChannelNameButton.addEventListener("click", updateChannel);
 
 shareChannelUrlButton.addEventListener("click", shareUrl);
+
+midiInChannelSlider.addEventListener("input", (event) => {
+    currentChannel = parseInt(midiInChannelSlider.value);
+    midiInChannelLabel.textContent = "Channel: " + event.target.value;
+});
 
 midiOutChannelSlider.addEventListener("input", (event) => {
     midiOutChannelLabel.textContent = "Channel: " + event.target.value;
@@ -405,12 +361,12 @@ document.addEventListener("DOMContentLoaded", initUI, false);
 
 window.addEventListener('keydown', function(evt) {
 
-    if (enablePreviewCheckbox.checked == true) {
+    if (enablePreviewCheckbox.checked === true) {
         playKey(evt.key.toString(), false, false);
         //console.log("playKbd");
     }
 
-    if (enableTransmissionCheckbox.checked == true) {
+    if (enableTransmissionCheckbox.checked === true) {
         //console.log("Send");
         let data = {};
 

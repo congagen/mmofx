@@ -1,7 +1,7 @@
 
 html, body {
     font-family: "Courier", "Courier New", monospace;
-    background-color: rgb(14, 10, 25);
+    background-color: rgb(10, 10, 30);
     max-width: 100%;
     outline:0 !important;
     border: none !important;
@@ -10,6 +10,14 @@ html, body {
 
 .row {
     width:100%;
+}
+
+.disable-dbl-tap-zoom {
+  touch-action: manipulation;
+}
+
+li {
+  color: white !important;
 }
 
 button:focus { outline: 0; }
@@ -45,8 +53,8 @@ p {
     margin-top: 20px;
     margin-left: 0px;
     margin-right: 0px !important;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
+    /* border-top-right-radius: 5px;
+    border-top-left-radius: 5px; */
     max-width: 500px;
 }
 
@@ -58,7 +66,6 @@ p {
     color: rgba(255,255,255,0.65) !important;
     background-color:  rgba(255, 255, 255, 0.0) !important;
 }
-
 
 .mid-sample-row {
     background-color: rgba(255, 255, 255, 0.1);
@@ -74,10 +81,10 @@ p {
 .btm-sample-row {
     max-width: 500px;
     background-color: rgba(255, 255, 255, 0.1);
-    margin-left:0px;
-    margin-right:0px;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
+    margin-left: 0px;
+    margin-right: 0px;
+    /* border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px; */
 }
 
 #keyTable{
@@ -94,9 +101,9 @@ p {
 }
 
 .keys-btn{
-    outline:0 !important;
+    /* outline:0 !important;
     border: none !important;
-    outline: none !important;
+    outline: none !important; */
 
     background-color: rgba(180, 180, 180, 0);
     background: rgba(180, 180, 180, 0);
@@ -104,17 +111,17 @@ p {
 }
 
 .btn {
-    outline:0 !important;
+    /* outline:0 !important;
     border: none !important;
-    outline: none !important;
+    outline: none !important; */
     /*color: purple;*/
 }
 
 
 .form-control {
     outline:0;
-    background-color: rgba(180, 180, 180, 0.1);
-    background: rgba(180, 180, 180, 0.1);
+    /* background-color: rgba(180, 180, 180, 0.1);
+    background: rgba(180, 180, 180, 0.1); */
     color: black;
 }
 
@@ -188,7 +195,8 @@ p {
 }
 
 .slidecontainer {
-  width: 300px;
+  /* width: 300px; */
+  align-items: center !important;
   text-align: center !important;
 }
 
@@ -245,7 +253,7 @@ a.button {
     outline: 2px;
 
     border: none;
-    border-radius: 5px;
+    /* border-radius: 5px; */
     box-shadow: 0 1px black;
 }
 
@@ -253,25 +261,39 @@ a.button {
 
 .button:active {
   background-color: rgba(255,255,255,1);
-  box-shadow: 0 0px black;  
+  box-shadow: 0 0px black;
 }
 
 .navbar-light {
   border: none;
 }
 
-.tab {
-    outline:0 !important;
-    border: none !important;
-    outline: none !important;
+.nav-tabs .nav-link { /* Styles for all tabs */
+  border: none; /* Remove default border */
+  /* Other styling like padding, margin, colors, etc. */
+}
 
+.nav-tabs .nav-link.active { /* Styles for the active tab */
+    /* Add bottom border (underline) */
+    /* border-bottom: 3px solid rgba(50, 50, 50, 1); */
+
+    /* Or use a different underline style: */
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-decoration-color: rgba(120, 120, 120, 1);
+}
+
+/* .nav-tabs .nav-link:hover {
+    border-bottom: 2px solid rgba(120, 120, 120, 1);
+} */
+
+.tab {
     color: white;
     margin-top: 0px;
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 30px;
 }
-
 
 .awesome {
     font-family: times;

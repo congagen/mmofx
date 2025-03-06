@@ -4,10 +4,22 @@ const messageBox = document.querySelector('#messageBox');
 
 var prevChannelName = "";
 
-const maxRetryCount = 50; 
+const maxRetryCount = 50; // Adjust as needed
 const initialDelay = 1000; // Initial delay in milliseconds
 const backoffFactor = 2;   // Factor to increase delay by
+var showNetworkAlerts = true;
+var retryCount = 0;
 
+function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+}
+
+currentUserId = uuidv4();
+currentSessionToken = uuidv4();
+currentSessionId = uuidv4();
 
 let firebaseConfig = {
     apiKey: "AIzaSyDx3-4RSc8fpkQcL2O_DsDSZ29qJ_JoRx8",
@@ -26,41 +38,40 @@ var connectedRef = firebase.database().ref(".info/connected");
 
 connectedRef.on("value", function(snap) {
     if (snap.val() === false) {
-      console.log('Connection lost!');
-      attemptReconnect();
+        console.log('Connection lost!');
+        attemptReconnect(retryCount);
     }
 });
 
 function attemptReconnect(retryCount = 0) {
     if (retryCount >= maxRetryCount) {
       console.error('Max retry count exceeded. Unable to reconnect.');
+      currentChannelDisplay.innerHTML = `Connection refused. If you're using a VPN, try disabling it. Otherwise, please check your internet connection`;
       return;
+    } else {
+        retryCount += 1;
     }
   
     const delay = initialDelay * Math.pow(backoffFactor, retryCount);
     console.log(`Attempting to reconnect in ${delay}...`);
+    currentChannelDisplay.innerHTML = `Connection refused, attempting to reconnect in ${delay / 1000} s...`;
   
     setTimeout(() => {
       firebase.database().ref(".info/connected").once("value", function(snap) {
         if (snap.val() === true) {
-          console.log('Reconnected!');
+            console.log('Connected!');
+            currentChannelDisplay.innerHTML = "Current Channel: " + currentChannelName;
+            showNetworkAlerts = true;
         } else {
-          attemptReconnect(retryCount + 1); // Retry with increased count
+            if ((showNetworkAlerts === true) && (retryCount > 2)) {
+                alert("Network Error: Connection to the server has been interrupted.  If you're using a VPN, try disabling it temporarily.  Otherwise, please check your internet connection and visit the Connection section in the Config tab to check status and reconnect.");        
+                showNetworkAlerts = false;
+            }
+            attemptReconnect(retryCount);
         }
       });
     }, delay);
 }
-
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
-currentUserId = uuidv4();
-currentSessionToken = uuidv4();
-currentSessionId = uuidv4();
 
 function setTokenSentToServer(sent) {
     window.localStorage.setItem('sentToServer', sent ? '1' : '0');
@@ -129,6 +140,8 @@ function sendTokenToServer(currentToken) {
 }
 
 function subscribeToDb(dbChannelName) {
+    retryCount = 0;
+
     if (prevChannelName != "") {
         var prevDb = firebase.database().ref(prevChannelName);
         prevDb.off();
@@ -138,14 +151,16 @@ function subscribeToDb(dbChannelName) {
     currentChannelDisplay.innerHTML = "Current Channel: " + dbChannelName;
 
     newDbChannel.on('child_changed', function (data) {
-        if (receiveCommandsCheckbox.checked == true) {
+        if (receiveCommandsCheckbox.checked === true) {
             playKey(data.val(), true, false);
         }
     });
 
-    prevChannelName = dbChannelName;
+    prevChannelName = dbChannelName;    
 }
 
 
 subscribeToDb(currentChannelName);
 prevChannelName = currentChannelName;
+
+
