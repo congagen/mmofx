@@ -1,130 +1,145 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="favicon.png" type="image/png">
-        <link rel="apple-touch-icon" sizes="180x180" href="icon_180x180.png"> 
 
-        <!-- HTML Meta Tags -->
-        <title>MMOFX! - XUSIONE.COM</title>
-        <meta name="keywords" content="SFX, Sampler, Instrument, MIDI">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        <!-- Facebook Meta Tags -->
-        <meta property="og:url" content="https://yphnago.com/xusione/xusionet/mmofx">
-        <meta property="og:type" content="website">
-        <meta property="og:title" content="MMOFX!">
-        <meta property="og:image" content="https://yphnago.com/content/logos/xus/mmofx.png">
-        
-        <!-- Twitter Meta Tags -->
-        <meta name="twitter:card" content="https://yphnago.com/xusione/xusionet/mmofx">
-        <meta name="twitter:title" content="MMOFX!">
-        <meta name="twitter:image" content="https://yphnago.com/content/logos/xus/mmofx.png">
- 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.17.1/firebase-app-compat.min.js" integrity="sha512-pJcjxn5D9YZ24EH38RDsrkfCLv3wNT06LRUSLPqYfJ6+RwNjR8yhHkVocl3IH/bNnYkk4zzeWfUb1foTk5HLwA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.17.1/firebase-database-compat.min.js" integrity="sha512-lxH6K5tdW0F9BqsLi2JCLPp6PA6OWwrjNEmrQ9cL3qD+4ZXIf3qkAB6Tagf4+t8bpv+nGA5qf772aVMHWSQyGw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.17.1/firebase-auth-compat.min.js" integrity="sha512-/NS1QKerCtcq23x9dkk/InVPw5vJNLeYEZeLgJtgXkh6vQ/PMKvuzjxg8nLQOS3Abs0dTGKWLG9gPkGL26jYwQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        
-        <link rel="stylesheet" type="text/css" href="css/styles.css">
-    </head>
+    <!-- HTML Meta Tags -->
+    <title>MMOFX! - XUSIONE.COM</title>
+    <meta name="keywords" content="SFX, Sampler, Instrument, MIDI">
+    <meta name="description" content="Transform Your Event Into An Interactive Wonderland! Let Your Guests Control The Show With Their Phones! Connect Lights, Cameras, Instruments, And More!" />
 
-    <body>
-        <div style="background-color: rgb(255, 255, 255, 0.05)">            
-                <div class="d-flex align-items-center justify-content-center">
-                    <img class="mb-4 mt-5" src="logo.png" alt="MMOFX!" width="190" height="70" id="topLogo">
-                </div>
-                
-                <div id="guestInstruct" style="display: none;" class="pb-2">
-                    <center>
-                        <h1 id="guestInstructText" class="d-flex justify-content-center ps-4 pe-4 pt-4" style="color: white !important;">Tab the buttons or use the phone pad to interact!</h1>
-                    </center>
-                </div>
+    <script src="js/libs/jquery.min.js"></script>
+    <script src="js/libs/bootstrap.bundle.min.js"></script>
+    <script src="js/libs/firebase-app-compat.min.js"></script>
+    <script src="js/libs/firebase-database-compat.min.js"></script>
+    <script src="js/libs/firebase-auth-compat.min.js"></script>
 
-                <ul id="topNav" class="nav nav-tabs justify-content-center navbar-light pb-2">
-                    <li><a class="tab btn nav-link" data-bs-toggle="tab" href="#settings_tab" style="width: 90px; display: flex; justify-content: center;">Config</a></li>
-                    <li><a class="tab btn nav-link active" aria-current="page" data-bs-toggle="tab" href="#studio_tab" style="width: 90px; display: flex; justify-content: center;">Studio</a></li>
-                    <li><a class="tab btn nav-link" data-bs-toggle="tab" href="#help_tab" style="width: 90px; display: flex; justify-content: center;">mDocs</a></li>
-                </ul>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/styles.css">    
+    <link rel="stylesheet" type="text/css" href="css/pianoroll.css">
+</head>
+
+<body>
+    <div style="background-color: rgb(255, 255, 255, 0.05)" id="topMenuSection">
+        <div class="d-flex align-items-center justify-content-center">
+            <img class="mb-4 mt-5" src="logo.png" alt="MMOFX!" width="190" height="70" id="topLogo">
         </div>
 
-        <div class="tab-content ml-auto">
+        <div id="guestInstruct" style="display: none;" class="pb-2">
+            <center>
+                <h1 id="guestInstructText" class="d-flex justify-content-center ps-4 pe-4 pt-4"
+                    style="color: white !important;">Tab the buttons or use the phone pad to interact!</h1>
+            </center>
+        </div>
 
-            <div id="settings_tab" class="tab-pane fade">             
-               
-                <div class="container">
-                    <center>
-                    
-                        <div class="d-flex justify-content-center align-items-center">
+        <ul id="topNav" class="nav nav-tabs justify-content-center navbar-light pb-2">
+            <li><a class="tab btn nav-link" data-bs-toggle="tab" href="#settings_tab"
+                    style="width: 90px; display: flex; justify-content: center;">Config</a></li>
+            <li><a class="tab btn nav-link active" aria-current="page" data-bs-toggle="tab" href="#studio_tab"
+                    style="width: 90px; display: flex; justify-content: center;">Studio</a></li>
+            <li><a class="tab btn nav-link" data-bs-toggle="tab" href="#help_tab"
+                    style="width: 90px; display: flex; justify-content: center;">mDocs</a></li>
+        </ul>
+    </div>
+
+    <div class="tab-content ml-auto">
+
+        <div id="settings_tab" class="tab-pane fade">
+
+            <div class="container">
+                <center>
+
+                    <div class="d-flex justify-content-center align-items-center">
                         <center>
                             <div class="row d-flex justify-content-center align-items-center" style="width: 300px;">
 
                                 <div class="justify-content-center mt-1">
                                     <h4 class="mt-5" style="font-weight: 800;"> Audio </h4>
-                                    
+
                                     <div class="slidecontainer mt-2 macro-slider">
                                         <input id="masterAmp" type="range" min="0" max="100" value="80" class="slider">
-                                        <label for="masterAmp" class="form-label me-3 d-flex justify-content-center">Volume</label>
+                                        <label for="masterAmp"
+                                            class="form-label me-3 d-flex justify-content-center">Volume</label>
                                     </div>
 
                                     <div class="form-check d-flex justify-content-center mt-3">
-                                        <input type="checkbox" class="form-check-input form-check-input" id="randomizePlaybackCheckbox">
-                                        <label class="form-check-label ml-2" for="randomizePlaybackCheckbox">Randomize Samples</label>
+                                        <input type="checkbox" class="form-check-input form-check-input"
+                                            id="randomizePlaybackCheckbox">
+                                        <label class="form-check-label ml-2" for="randomizePlaybackCheckbox">Randomize
+                                            Samples</label>
                                     </div>
 
                                     <div class="form-check d-flex justify-content-center">
-                                        <input type="checkbox" class="form-check-input form-check-input" id="enablePreviewCheckbox">
-                                        <label class="form-check-label ml-2" for="enablePreviewCheckbox">Keyboard Input</label>
+                                        <input type="checkbox" class="form-check-input form-check-input"
+                                            id="enablePreviewCheckbox">
+                                        <label class="form-check-label ml-2" for="enablePreviewCheckbox">Keyboard
+                                            Input</label>
                                     </div>
 
                                     <div class="form-check d-flex justify-content-center" style="display: none;">
-                                        <input type="checkbox" checked class="form-check-input form-check-input" id="enablePolyphonyCheckbox">
-                                        <label class="form-check-label ml-2" for="enablePolyphonyCheckbox">Sample Polyphony</label>
+                                        <input type="checkbox" checked class="form-check-input form-check-input"
+                                            id="enablePolyphonyCheckbox">
+                                        <label class="form-check-label ml-2" for="enablePolyphonyCheckbox">Sample
+                                            Polyphony</label>
                                     </div>
 
-                                    <button id="stop_all_samples_btn" class="btn btn-light mt-3" onclick="stopAllSamples()">Reset</button>                                    
-                                </div>      
+                                    <button id="stop_all_samples_btn" class="btn btn-light mt-3"
+                                        onclick="stopAllSamples()">Reset</button>
+                                </div>
 
                                 <div class="justify-content-center mt-5">
                                     <h4 style="font-weight: 800;" id="connectionHeader"> Connection </h4>
-                
+
                                     <div class="justify-content-center form-group col-auto mt-2">
                                         <div class="form-check d-flex justify-content-center">
-                                            <input type="checkbox" class="form-check-input" id="receiveCommandsCheckbox" checked>
-                                            <label class="form-check-label ml-2" for="receiveCommandsCheckbox">Host</label>
+                                            <input type="checkbox" class="form-check-input" id="receiveCommandsCheckbox"
+                                                checked>
+                                            <label class="form-check-label ml-2"
+                                                for="receiveCommandsCheckbox">Host</label>
                                         </div>
                                         <div class="form-check d-flex justify-content-center">
-                                            <input type="checkbox" class="form-check-input" id="enableTransmissionCheckbox">
-                                            <label class="form-check-label ml-2" for="enableTransmissionCheckbox">Client</label>
+                                            <input type="checkbox" class="form-check-input"
+                                                id="enableTransmissionCheckbox">
+                                            <label class="form-check-label ml-2"
+                                                for="enableTransmissionCheckbox">Client</label>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="d-flex justify-content-center mt-2">
                                     <center>
-                                    <div class="d-flex justify-content-center">                                        
-                                        <center>
-                                        <p id="currentChannelDisplay" style="font-size: 0.8em;"> Disconnected </p>
-                                        <input class="form-control" type="text" id="channelNameInputBox" placeholder="Channel name.." autofocus="off" />
-                                        <button class="btn btn-light mt-2" type="button" id="setChannelNameButton">Connect</button>
-                                        <button class="btn btn-light mt-2" type="button" id="shareChannelUrlButton">Share</button>                                                                        
-                                        </center>
-                                    </div>  
-                                    </center>                                                                      
+                                        <div class="d-flex justify-content-center">
+                                            <center>
+                                                <p id="currentChannelDisplay" style="font-size: 0.8em;"> Disconnected
+                                                </p>
+                                                <input class="form-control" type="text" id="channelNameInputBox"
+                                                    placeholder="Channel name.." autofocus="off" />
+                                                <button class="btn btn-light mt-2" type="button"
+                                                    id="setChannelNameButton">Connect</button>
+                                                <button class="btn btn-light mt-2" type="button"
+                                                    id="sharePadsChannelUrlButton">Share Pads</button>
+                                                <button class="btn btn-light mt-2" type="button"
+                                                    id="sharePianoChannelUrlButton">Share Piano</button>
+                                            </center>
+                                        </div>
+                                    </center>
                                 </div>
-                                
+
                                 <div class="pt-2">
-                                    <p style="color:rgb(120, 120, 120) !important; font-size: 0.8em;" class="align-items-center ps-2 pe-2">If you're experiencing connection issues, try disabling your VPN and connecting manually.</p>
+                                    <p style="color:rgb(120, 120, 120) !important; font-size: 0.8em;"
+                                        class="align-items-center ps-2 pe-2">If you're experiencing connection issues,
+                                        try disabling your VPN and connecting manually.</p>
                                 </div>
 
                                 <div class="justify-content-center mt-3">
                                     <h4 class="mt-4" style="font-weight: 800;"> MIDI IN (Client)</h4>
 
                                     <div class="form-check d-flex justify-content-center mt-1">
-                                        <input type="checkbox" class="form-check-input form-check-input" id="enableMidiInCheckbox">
+                                        <input type="checkbox" class="form-check-input form-check-input"
+                                            id="enableMidiInCheckbox">
                                         <label class="form-check-label ml-2" for="enableMidiInCheckbox">Enabled</label>
                                     </div>
 
@@ -133,18 +148,21 @@
                                         <select class="form-control" id="midiInputSelect">
                                         </select>
                                     </div>
-                                
+
                                     <div>
                                         <div class="slidecontainer mt-3">
-                                            <input id="midiInChannel" type="range" min="0" max="15" value="0" class="slider">
-                                            <label id="midiInChannelLabel" for="midiInChannel" class="form-label me-3 d-flex justify-content-center">Channel: 0</label>
+                                            <input id="midiInChannel" type="range" min="0" max="15" value="0"
+                                                class="slider">
+                                            <label id="midiInChannelLabel" for="midiInChannel"
+                                                class="form-label me-3 d-flex justify-content-center">Channel: 0</label>
                                         </div>
                                     </div>
 
                                     <h4 class="mt-5" style="font-weight: 800;"> MIDI OUT (Host)</h4>
 
                                     <div class="form-check d-flex justify-content-center mt-1">
-                                        <input type="checkbox" checked class="form-check-input form-check-input" id="enableMidiOutCheckbox">
+                                        <input type="checkbox" checked class="form-check-input form-check-input"
+                                            id="enableMidiOutCheckbox">
                                         <label class="form-check-label ml-2" for="enableMidiOutCheckbox">Enabled</label>
                                     </div>
 
@@ -153,23 +171,29 @@
                                         <select class="form-control" id="midiOutputSelect">
                                         </select>
                                     </div>
-                                    
+
                                     <div>
                                         <div class="slidecontainer mt-3">
-                                            <input id="midiOutChannel" type="range" min="0" max="15" value="0" class="slider">
-                                            <label id="midiOutChannelLabel" for="midiOutChannel" class="form-label me-3 d-flex justify-content-center">Channel: 0</label>
+                                            <input id="midiOutChannel" type="range" min="0" max="15" value="0"
+                                                class="slider">
+                                            <label id="midiOutChannelLabel" for="midiOutChannel"
+                                                class="form-label me-3 d-flex justify-content-center">Channel: 0</label>
                                         </div>
                                     </div>
 
                                     <div justify-content-center>
                                         <div class="slidecontainer mt-2">
-                                            <input id="midiNotDuration" type="range" min="0" max="10000" value="200" class="slider">
-                                            <label id="midiNotDurationLabel" for="midiNotDuration" class="form-label me-3 d-flex justify-content-center">Duration: 500</label>
+                                            <input id="midiNotDuration" type="range" min="0" max="10000" value="200"
+                                                class="slider">
+                                            <label id="midiNotDurationLabel" for="midiNotDuration"
+                                                class="form-label me-3 d-flex justify-content-center">Duration:
+                                                500</label>
                                         </div>
                                     </div>
                                     <center>
                                         <div style="padding-top: 50x; padding-bottom: 30px;">
-                                            <button id="scanButton" class="btn btn-light mt-3 mb-5">Refresh Devices</button>
+                                            <button id="scanButton" class="btn btn-light mt-3 mb-5">Refresh
+                                                Devices</button>
                                         </div>
                                     </center>
                                 </div>
@@ -179,74 +203,83 @@
                                 </div> -->
                             </div>
                         </center>
-                        </div>
-                    
-                    </center>
-                </div>            
+                    </div>
+
+                </center>
             </div>
+        </div>
 
-            <div id="help_tab" class="tab-pane fade">
-                
-                <div class="d-flex justify-content-center">                
-                    <div class="mb-5" style="max-width: 300px;">
+        <div id="help_tab" class="tab-pane fade">
 
-                        <div class="mt-5 d-flex justify-content-center ">
-                            <center>
+            <div class="d-flex justify-content-center">
+                <div class="mb-5" style="max-width: 300px;">
+
+                    <div class="mt-5 d-flex justify-content-center ">
+                        <center>
                             <p style="font-weight: 800;">
                                 Welcome to MMOFX! Use the guides below to get started!
                             </p>
                             <div class="pt-3">
-                                <a href="#host-mode" class="scroll-link">Host Mode</a> | 
+                                <a href="#host-mode" class="scroll-link">Host Mode</a> |
                                 <a href="#client-mode" class="scroll-link">Client Mode</a>
                             </div>
 
                             <div class="pt-2">
-                                <a href="#midi-in" class="scroll-link">MIDI-In</a> | 
+                                <a href="#midi-in" class="scroll-link">MIDI-In</a> |
                                 <a href="#midi-out" class="scroll-link">MIDI-Out</a>
                             </div>
-                            </center>
-                        </div>
-
-                        <div class="mt-5" id="host-mode">
-                            <h4 class="mt-3" style="font-weight: 800;"> Host Mode: </h4>
-                            <p style="font-size: 0.9em;">Use this mode to receive key commands and MIDI note values from all connected clients on the specified MMOFX channel.</p>
-                            <p style="font-size: 0.9em;"> 1. Tap/click config and navigate to the connection section. </p>
-                            <p style="font-size: 0.9em;"> 2. Select "Host"</p>
-                            <p style="font-size: 0.9em;"> 3. (Optional) Specify a channel and connect</p>
-                            <p style="font-size: 0.9em;"> 4. (Optional) Connect and configure a MIDI out device</p>
-                            <p style="font-size: 0.9em;"> 5. (Optional) Open Studio / Samples to configure samples and keys</p>
-                        </div>
-
-                        <div class="mt-5" id="midi-out" style="padding-top: 20px;">
-                            <h4 style="font-weight: 800;"> MIDI Out: </h4>
-                            <p style="font-size: 0.9em;">Enable MIDI out to forward MIDI input from connected clients to the selected MIDI output device. Use multiple instances of MMOFX for multiple MIDI output devices.</p>
-                            <p style="font-size: 0.9em;"> 1. Connect your device</p>
-                            <p style="font-size: 0.9em;"> 2. Tap/click config and navigate to the MIDI section </p>
-                            <p style="font-size: 0.9em;"> 3. Tap/click 'Refresh Devices' if you connected your device after launching the app</p>
-                            <p style="font-size: 0.9em;"> 4. Select the device in the Output Device Menu</p>
-                        </div>
-
-                        <div class="mt-5" id="client-mode" style="padding-top: 20px;">
-                            <h4 style="font-weight: 800;"> Client Mode: </h4>
-                            <p style="font-size: 0.9em;">Use this mode to send key commands and MIDI note values to all connected hosts on the specified MMOFX channel.</p>
-                            <p style="font-size: 0.9em;"> 1. Tap/click config and navigate to the connection section. </p>
-                            <p style="font-size: 0.9em;"> 2. Select "Client" </p>
-                            <p style="font-size: 0.9em;"> 3. (Optional) Specify a channel and connect </p>
-                            <p style="font-size: 0.9em;"> 4. (Optional) Connect and configure a MIDI In device</p>
-                            <p style="font-size: 0.9em;"> 5. Open Studio / Pads and tap/click pads or use MIDI device</p>
-                        </div>                
-
-                        <div class="mt-5 mb-3" id="midi-in" style="padding-top: 20px;">
-                            <h4 style="font-weight: 800;"> MIDI In: </h4>
-                            <p style="font-size: 0.9em;">Enable MIDI In to send MIDI input from the selected device to all connected hosts on the specified channel. Use multiple instances of MMOFX for multiple input devices.</p>
-                            <p style="font-size: 0.9em;"> 1. Connect your device</p>
-                            <p style="font-size: 0.9em;"> 2. Tap/click config and navigate to the MIDI section </p>
-                            <p style="font-size: 0.9em;"> 3. Tap/click 'Refresh Devices' if you connected your device after launching the app</p>
-                            <p style="font-size: 0.9em;"> 4. Select the device in the Input Device Menu</p>
-                        </div>
+                        </center>
                     </div>
 
-                   <!-- <footer class="footer mb-5 mt-5">
+                    <div class="mt-5" id="host-mode">
+                        <h4 class="mt-3" style="font-weight: 800;"> Host Mode: </h4>
+                        <p style="font-size: 0.9em;">Use this mode to receive key commands and MIDI note values from all
+                            connected clients on the specified MMOFX channel.</p>
+                        <p style="font-size: 0.9em;"> 1. Tap/click config and navigate to the connection section. </p>
+                        <p style="font-size: 0.9em;"> 2. Select "Host"</p>
+                        <p style="font-size: 0.9em;"> 3. (Optional) Specify a channel and connect</p>
+                        <p style="font-size: 0.9em;"> 4. (Optional) Connect and configure a MIDI out device</p>
+                        <p style="font-size: 0.9em;"> 5. (Optional) Open Studio / Samples to configure samples and keys
+                        </p>
+                    </div>
+
+                    <div class="mt-5" id="midi-out" style="padding-top: 20px;">
+                        <h4 style="font-weight: 800;"> MIDI Out: </h4>
+                        <p style="font-size: 0.9em;">Enable MIDI out to forward MIDI input from connected clients to the
+                            selected MIDI output device. Use multiple instances of MMOFX for multiple MIDI output
+                            devices.</p>
+                        <p style="font-size: 0.9em;"> 1. Connect your device</p>
+                        <p style="font-size: 0.9em;"> 2. Tap/click config and navigate to the MIDI section </p>
+                        <p style="font-size: 0.9em;"> 3. Tap/click 'Refresh Devices' if you connected your device after
+                            launching the app</p>
+                        <p style="font-size: 0.9em;"> 4. Select the device in the Output Device Menu</p>
+                    </div>
+
+                    <div class="mt-5" id="client-mode" style="padding-top: 20px;">
+                        <h4 style="font-weight: 800;"> Client Mode: </h4>
+                        <p style="font-size: 0.9em;">Use this mode to send key commands and MIDI note values to all
+                            connected hosts on the specified MMOFX channel.</p>
+                        <p style="font-size: 0.9em;"> 1. Tap/click config and navigate to the connection section. </p>
+                        <p style="font-size: 0.9em;"> 2. Select "Client" </p>
+                        <p style="font-size: 0.9em;"> 3. (Optional) Specify a channel and connect </p>
+                        <p style="font-size: 0.9em;"> 4. (Optional) Connect and configure a MIDI In device</p>
+                        <p style="font-size: 0.9em;"> 5. Open Studio / Pads and tap/click pads or use MIDI device</p>
+                    </div>
+
+                    <div class="mt-5 mb-3" id="midi-in" style="padding-top: 20px;">
+                        <h4 style="font-weight: 800;"> MIDI In: </h4>
+                        <p style="font-size: 0.9em;">Enable MIDI In to send MIDI input from the selected device to all
+                            connected hosts on the specified channel. Use multiple instances of MMOFX for multiple input
+                            devices.</p>
+                        <p style="font-size: 0.9em;"> 1. Connect your device</p>
+                        <p style="font-size: 0.9em;"> 2. Tap/click config and navigate to the MIDI section </p>
+                        <p style="font-size: 0.9em;"> 3. Tap/click 'Refresh Devices' if you connected your device after
+                            launching the app</p>
+                        <p style="font-size: 0.9em;"> 4. Select the device in the Input Device Menu</p>
+                    </div>
+                </div>
+
+                <!-- <footer class="footer mb-5 mt-5">
                        <center>
                            <a href="https://xusione.com/pages/support-xusione">
                                <img src="suppo.gif"> &ndash;&gt;
@@ -254,303 +287,393 @@
                            </a>
                        </center>
                    </footer> -->
-                </div>
-                
             </div>
 
-            <div id="studio_tab" class="tab-pane show active fade">
-                <div id="subNav" style="background-color: rgb(255, 255, 255, 0.025)">
-                    <ul class="nav nav-tabs justify-content-center navbar-light pt-1 pb-1 subtabs">
-                        <!-- <li><a class="tab" data-bs-toggle="tab" href="#control_tab"></a></li> -->
-                        <li><a class="tab nav-link" data-bs-toggle="tab" href="#seq_tab" style="width: 70px !important; display: flex; justify-content: right;">Seq</a></li>
-                        <li><a class="tab nav-link" data-bs-toggle="tab" href="#sampler_tab" style="width: 70px !important; display: flex; justify-content: center;">Samples</a></li>
-                        <li><a class="tab nav-link active" data-bs-toggle="tab" href="#control_tab" style="width: 70px !important; display: flex; justify-content: left;">Pads</a></li>
-                    </ul>
+        </div>
+
+        <div id="studio_tab" class="tab-pane show active fade">
+
+            <div id="subNav" style="background-color: rgb(255, 255, 255, 0.025)">
+                <ul class="nav nav-tabs justify-content-center navbar-light pt-1 pb-1 subtabs">
+                    <li><a class="tab nav-link" data-bs-toggle="tab" href="#sampler_tab"
+                            style="width: 70px !important; display: flex; justify-content: center;">Samples</a></li>
+                    <li><a class="tab nav-link" data-bs-toggle="tab" href="#seq_tab"
+                            style="width: 70px !important; display: flex; justify-content: right;">Seq</a></li>
+                    <li><a id="padTabLink" class="tab nav-link active" data-bs-toggle="tab" href="#control_tab"
+                            style="width: 70px !important; display: flex; justify-content: left;">Pads</a></li>
+                    <li><a id="pianoTabLink" class="tab nav-link" data-bs-toggle="tab" href="#piano_tab"
+                            style="width: 70px !important; display: flex; justify-content: left;">Keys</a></li>
+                </ul>
+            </div>
+
+            <div class="tab-content ml-auto">
+                <div id="sampler_tab" class="tab-pane">
+                    <center>
+                        <br>
+                        <button id="add_samples_btn" class="btn btn-light" onclick="addSamplesLsDisk()">+ Add</button>
+                        <button id="init_samples_btn" class="btn btn-light" onclick="initTrgKeys()">Init Keys</button>
+                        <button id="clear_samples_btn" class="btn btn-light" onclick="clearSamples()">Clear</button>
+                        <button id="shareSampleMapBtn" class="btn btn-light" onclick="shareSamples()">Share</button>
+                        <div class="container" id="sampleTableContainer" style="width:100% !important;"></div>
+                        <br><br>
+                    </center>
                 </div>
 
-                <div class="tab-content ml-auto">
-                    <div id="control_tab" class="tab-pane show active">
-                        <center>
-                            <!-- <p>Received MIDI Messages:</p>
-                            <ul id="midiMessages"></ul> -->
-                            <div class="mt-4 mb-4">
-                                <input type="text" id="" placeholder="Phone Pad"/>
-                                <br>
-                                <div class="container">
-                                    <br><div class="row" id="keyPadPanel">
+                <div id="seq_tab" class="tab-pane justify-content-center">
+                    <center>
+                        <div class="mt-5 mb-3">
+                            <h1 class="mt+3" id="curSeqCharH" style="color:white !important">?</h1>
+                        </div>
+
+                        <div class="container">
+                            <form role="form" class="d-flex justify-content-center">
+                                <div class="row justify-content-center">
+                                    <div class="form-group col-auto align-items-center">
+
+                                        <input class="mt-4 mb-1" type="text" value="?" id="maxlerZone"
+                                            placeholder="Trig Keys" onchange="setOrigSeq()"
+                                            style="width:80%; max-width:500px;" />
+
+                                        <div class="mt-0 mb-4">
+                                            <button class="btn btn-light" type="button"
+                                                onclick="sampleTrigsToSeq()">Init</button>
+                                            <button class="btn btn-light" type="button" id="revSeq"
+                                                onclick="reverseSeq()">Rev</button>
+                                            <button class="btn btn-light" type="button" id="randomizeSeq"
+                                                onclick="randomizeSequencer()">?</button>
+                                            <button class="btn btn-light" type="button" id="resetSeq"
+                                                onclick="resetOrigSeq()">Reset</button>
+                                        </div>
+
+                                        <button class="btn btn-light" type="button" id="playSeq"
+                                            onclick="togglePlaySeq()">Start</button>
+
+                                        <div class="slidecontaine mt-5 mb-5">
+                                            <input id="seqRateTextField" class="mb-2" type="number"
+                                                onchange="setSeqRateText()" value="750"
+                                                style="width:100px !important;" /><br>
+                                            <input id="seqRateSlider" class="slider" type="range" step="0.1" min="10"
+                                                max="1000" value="750" style="width:300px"
+                                                onchange="setSeqRateSlider()">
+                                            <p> Rate </p>
+                                        </div>
+
+                                        <div style="max-width:100px;">
+                                            <div class="form-check mt-5 mb-2">
+                                                <input class="form-check-input" type="checkbox" id="fibonaSequ">
+                                                <label class="form-check-label" for="fibonaSequ">Automate</label>
+                                            </div>
+                                        </div>
+
+                                        <form>
+                                            <div class="form-group form-inline">
+                                                <label for="fiboPatterLength">Ptn Length:</label>
+                                                <input id="fiboPatterLength" value="64" class="mb-2" type="number"
+                                                    onchange="setSeqRateText()" style="width:100px !important;" /><br>
+                                            </div>
+                                        </form>
+
+                                        <div class="slidecontaine mt-2 mb-5">
+                                            <input id="maxlerMulti" class="slider" type="range" min="1" max="50"
+                                                value="1" step="0.1" style="width:300px">
+                                            <p>Multi</p>
+                                        </div>
+
+                                        <div style="max-width:100px;">
+                                            <div class="form-check mb-3">
+                                                <input type="checkbox" class="form-check-input form-check-input"
+                                                    id="randomizeTrgs">
+                                                <label class="form-check-label" for="randomizeTrgs">Randomize</label>
+                                            </div>
+                                        </div>
+
+                                        <div style="max-width: 60px;">
+                                            <div class="form-check mb-5">
+                                                <input type="checkbox" class="form-check-input form-check-input"
+                                                    id="stallSeq">
+                                                <label class="form-check-label" for="stallSeq">Hold</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <h1>.</h1>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </center>
-                    </div>
-
-                        <div id="sampler_tab" class="tab-pane">
-                            <center>
-                                <br>
-                                <button id="add_samples_btn"   class="btn btn-light" onclick="addSamplesLsDisk()">+ Add</button>
-                                <button id="init_samples_btn"  class="btn btn-light" onclick="initTrgKeys()">Init Keys</button>
-                                <button id="clear_samples_btn" class="btn btn-light" onclick="clearSamples()">Clear</button>
-                                <button id="shareSampleMapBtn" class="btn btn-light" onclick="shareSamples()">Share</button>
-                                <div class="container" id="sampleTableContainer" style="width:100% !important;"></div>
-                                <br><br>
-                            </center>
+                            </form>
                         </div>
+                    </center>
+                </div>
 
-                        <div id="api_tab" class="tab-pane">
-                            <center>
-                                <br>
-                                <button id="add_api_btn" class="btn btn-light" onclick="addApiListRow()">+ Add</button>
-                                <div class="container" id="apiConfContainer"></div>
-                                <br><br>
-                            </center>
-                        </div>
-
-                        <div id="seq_tab" class="tab-pane justify-content-center">
-                                <center>
-                                <div class="mt-5 mb-3">
-                                    <h1 class="mt+3" id="curSeqCharH" style="color:white !important">?</h1>
-                                </div>
-
-                                 <div class="container">
-                                    <form role="form" class="d-flex justify-content-center">
-                                        <div class="row justify-content-center">
-                                            <div class="form-group col-auto align-items-center">
-
-                                                <input class="mt-4 mb-1" type="text" value="?" id="maxlerZone" placeholder="Trig Keys" onchange="setOrigSeq()" style="width:80%; max-width:500px;"/>
-
-                                                <div class="mt-0 mb-4">
-                                                    <button class="btn btn-light" type="button" onclick="sampleTrigsToSeq()">Init</button>
-                                                    <button class="btn btn-light" type="button" id="revSeq" onclick="reverseSeq()">Rev</button>
-                                                    <button class="btn btn-light" type="button" id="randomizeSeq" onclick="randomizeSequencer()">?</button>
-                                                    <button class="btn btn-light" type="button" id="resetSeq" onclick="resetOrigSeq()">Reset</button>
-                                                </div>
-
-                                                <button class="btn btn-light" type="button" id="playSeq" onclick="togglePlaySeq()">Start</button>
-
-                                                <div class="slidecontaine mt-5 mb-5">
-                                                    <input id="seqRateTextField" class="mb-2" type="number" onchange="setSeqRateText()" value="750" style="width:100px !important;"/><br>
-                                                    <input id="seqRateSlider" class="slider" type="range" step="0.1" min="10" max="1000" value="750" style="width:300px" onchange="setSeqRateSlider()"><p> Rate </p>
-                                                </div>
-
-                                                <div style="max-width:100px;">
-                                                    <div class="form-check mt-5 mb-2">
-                                                        <input class="form-check-input" type="checkbox" id="fibonaSequ">
-                                                        <label class="form-check-label" for="fibonaSequ">Automate</label>
-                                                    </div>
-                                                </div>
-
-                                                <form>
-                                                    <div class="form-group form-inline">
-                                                        <label for="fiboPatterLength">Ptn Length:</label>
-                                                        <input id="fiboPatterLength" value="64" class="mb-2" type="number" onchange="setSeqRateText()" style="width:100px !important;"/><br>
-                                                    </div>
-                                                </form>
-
-
-                                                <div class="slidecontaine mt-2 mb-5">
-                                                <input id="maxlerMulti" class="slider" type="range" min="1" max="50" value="1" step="0.1" style="width:300px"><p>Multi</p>
-                                                </div>
-
-                                                <div style="max-width:100px;">
-                                                <div class="form-check mb-3">
-                                                <input type="checkbox" class="form-check-input form-check-input" id="randomizeTrgs">
-                                                <label class="form-check-label" for="randomizeTrgs">Randomize</label>
-                                                </div>
-                                                </div>
-
-                                                <div style="max-width: 60px;">
-                                                    <div class="form-check mb-5">
-                                                    <input type="checkbox" class="form-check-input form-check-input" id="stallSeq">
-                                                    <label class="form-check-label" for="stallSeq">Hold</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="mt-4">
-                                                <h1>.</h1>
-                                                </div>
-                                             </div>
-                                         </div>
-                                     </form>
-                                </div>
-                            </center>   
-                        </div>
-                    </div>
-            </div>
-
-            <div id="composer_tab" class="tab-pane">
-                <div class="container">
+                <div id="control_tab" class="tab-pane show active">
                     <center>
-                        <br><br>
-                        <button type="button" name="button">Play</button>
-                        <button type="button" name="button">Pause</button>
-                        <br><br>
-                        <div id="compPlot" class=""></div>
-                        <br><br>
-                        <button type="button" name="button">Load</button>
-                        <button type="button" name="button">Save</button>
-                        <button type="button" name="button">Clear</button>
+                        <div class="mt-4 mb-4">
+                            <input type="text" id="" placeholder="Phone Pad" />
+                            <br>
+                            <div class="container">
+                                <br>
+                                <div class="row" id="keyPadPanel">
+                                </div>
+                            </div>
+                        </div>
+                    </center>
+                </div>
+
+                <div id="piano_tab" class="tab-pane" style="width: 100% !important; height: 100vh !important;">
+                    <div id="controlCenter" style="display: flex; flex-direction: column; align-items: center; padding: 10px;">
+
+                        <!-- <div class="row mt-3" id="pianoControls">
+                            <div class="col-4" style="display: flex; flex-direction: column; align-items: center;">
+                                <button id="scrollDownButton" class="btn btn-light">-</button>
+                            </div>
+                            <div class="col-4" style="display: flex; flex-direction: column; align-items: center;">
+                                <button id="fullscreenButton" class="btn btn-light">Fullscreen</button>
+                            </div>
+                            <div class="col-4" style="display: flex; flex-direction: column; align-items: center;">
+                                <button id="scrollUpButton" class="btn btn-light">+</button>
+                            </div>
+                        </div> -->
+
+                        <div class="mt-3" id="pianoScaleSliderElement" style="width: 50%;">
+                            <div class="col-12">
+                                <div style="display: flex; flex-direction: column; align-items: center;" id="pianoScaleSlider" style="width: 100% !important;">
+                                    <input type="range" id="keyHeight" min="5" max="80" value="40" style="width: 80% !important;">
+                                    <label for="keyHeight" style="margin-top: 0px;" class="no-select">Key Width</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="container pb-5 pt-2">
+                        <div class="outerPianoContainer mx-auto">
+                            <div class="controls mx-auto"></div>                            
+                            <div class="mx-auto" id="pianoContainer"></div>                            
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="api_tab" class="tab-pane">
+                    <center>
+                        <br>
+                        <button id="add_api_btn" class="btn btn-light" onclick="addApiListRow()">+ Add</button>
+                        <div class="container" id="apiConfContainer"></div>
                         <br><br>
                     </center>
                 </div>
-            </div>
 
-            <div id="synth" class="tab-pane">
-                <center>
-                    <br><br><br>
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm">
-                                <center> <h5> Oscs </h5> </center><br>
-
-                                <div class="slidecontainer">
-                                    <input id="osc_a_vol_knob" type="range" min="1" max="100" value="50" class="slider"><p>Sine</p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="osc_b_vol_knob" type="range" min="1" max="100" value="50" class="slider" ><p>Square</p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="osc_c_vol_knob" type="range" min="1" max="100" value="50" class="slider"><p>Sawtooth</p>
-                                </div><br>
-                            </div>
-
-                            <div class="col-sm">
-                                <center><h5> Envelope </h5></center><br>
-
-                                <div class="slidecontainer">
-                                    <input id="attack_knob" type="range" min="1" max="100" value="50" class="slider"><p>Attack</p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="duration_knob" type="range" min="1" max="100" value="50" class="slider"><p>Decay</p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="release_knob" type="range" min="1" max="100" value="50" class="slider"><p>Release</p>
-                                </div><br>
-                            </div>
-                        </div>
-                    </div>
-                </center>
-            </div>
-
-            <div id="mixer" class="tab-pane">
-                <center>
-                    <br><br>
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm">
-                                <center> <h5> Mix </h5> </center>
-                                <br>
-                                <div class="slidecontainer">
-                                    <input id="samplerMasterAmp" type="range" min="0" max="100" value="50" class="slider"><p> Sampler </p>
-                                </div>
-
-                            </div>
-                            <br><br>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <center><h5> Delay A</h5></center><br>
-
-                                <div class="slidecontainer">
-                                    <input id="delay_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Time </p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="delay_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="delay_cutoff_knob" type="range" min="1" max="100" value="50" class="slider"><p> Cutoff </p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="delay_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
-                                </div><br>
-                            </div>
-
-                            <div class="col-sm">
-                                <center><h5> Delay B</h5></center><br>
-
-                                <div class="slidecontainer">
-                                    <input id="delayB_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Time </p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="delayB_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="delayB_cutoff_knob" type="range" min="1" max="100" value="50" class="slider"><p> Cutoff </p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="delayB_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
-                                </div><br>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <center><h5> Reverb </h5></center><br>
-
-                                <div class="slidecontainer">
-                                    <input id="reverb_speed_knob" type="range" min="1" max="100" value="50" class="slider"><p> Room Size </p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="reverb_feedback_knob" type="range" min="1" max="100" value="50" class="slider"><p> Feedback </p>
-                                </div><br>
-
-                                <div class="slidecontainer">
-                                    <input id="reverb_drywet_knob" type="range" min="1" max="100" value="50" class="slider"><p> Dry/Wet </p>
-                                </div><br>
-                            </div>
-                        </div>
-
-                        </div>
-                    </center>
             </div>
         </div>
 
-        <footer>
+        <div id="composer_tab" class="tab-pane">
+            <div class="container">
+                <center>
+                    <br><br>
+                    <button type="button" name="button">Play</button>
+                    <button type="button" name="button">Pause</button>
+                    <br><br>
+                    <div id="compPlot" class=""></div>
+                    <br><br>
+                    <button type="button" name="button">Load</button>
+                    <button type="button" name="button">Save</button>
+                    <button type="button" name="button">Clear</button>
+                    <br><br>
+                </center>
+            </div>
+        </div>
+
+        <div id="synth" class="tab-pane">
             <center>
-                <div style="padding-top: 50px; padding-bottom: 50px;">
-                    <a href="https://xusione.com" target="_blank">© XUSIONE</a>
-                </div>                
+                <br><br><br>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <center>
+                                <h5> Oscs </h5>
+                            </center><br>
+
+                            <div class="slidecontainer">
+                                <input id="osc_a_vol_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Sine</p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="osc_b_vol_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Square</p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="osc_c_vol_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Sawtooth</p>
+                            </div><br>
+                        </div>
+
+                        <div class="col-sm">
+                            <center>
+                                <h5> Envelope </h5>
+                            </center><br>
+
+                            <div class="slidecontainer">
+                                <input id="attack_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Attack</p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="duration_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Decay</p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="release_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Release</p>
+                            </div><br>
+                        </div>
+                    </div>
+                </div>
             </center>
-        </footer>
+        </div>
 
-        <script type="text/javascript" src="js/elements.js"></script>
-        <script type="text/javascript" src="js/params.js"></script>
-        <script type="text/javascript" src="js/network.js"></script>
-        <script type="text/javascript" src="js/ui.js"></script>
-        <script type="text/javascript" src="js/session.js"></script>
-        <script type="text/javascript" src="js/iosAudio.js"></script>
-        <script type="text/javascript" src="js/audio.js"></script>
-        <script type="text/javascript" src="js/sequ.js"></script>
+        <div id="mixer" class="tab-pane">
+            <center>
+                <br><br>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <center>
+                                <h5> Mix </h5>
+                            </center>
+                            <br>
+                            <div class="slidecontainer">
+                                <input id="samplerMasterAmp" type="range" min="0" max="100" value="50" class="slider">
+                                <p> Sampler </p>
+                            </div>
 
-        <script>
-            window.scrollTo(0,0);
-        </script>
+                        </div>
+                        <br><br>
+                    </div>
 
-        <script>
-            function htmlEncode(value) {
-                return $('<div/>').text(value).html();
-            }
+                    <div class="row">
+                        <div class="col-sm">
+                            <center>
+                                <h5> Delay A</h5>
+                            </center><br>
 
-            let chUrl = "https://yphnago.com/xusione/xusionet/mmofx/index.html?channel=" + currentChannelName.value;
-            //let uhmm = "https://chart.googleapis.com/chart?cht=qr&chl=" + htmlEncode(chUrl) + "&chs=160x160&chld=L|0";
+                            <div class="slidecontainer">
+                                <input id="delay_speed_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Time </p>
+                            </div><br>
 
-            $(function() {
-                $("#generate").click(function() {
-                    $(".qr-code").attr("src", "https://chart.googleapis.com/chart?cht=qr&chl=" + htmlEncode($("#qr_gen_content").val()) + "&chs=160x160&chld=L|0");
-                });
+                            <div class="slidecontainer">
+                                <input id="delay_feedback_knob" type="range" min="1" max="100" value="50"
+                                    class="slider">
+                                <p> Feedback </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delay_cutoff_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Cutoff </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delay_drywet_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Dry/Wet </p>
+                            </div><br>
+                        </div>
+
+                        <div class="col-sm">
+                            <center>
+                                <h5> Delay B</h5>
+                            </center><br>
+
+                            <div class="slidecontainer">
+                                <input id="delayB_speed_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Time </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delayB_feedback_knob" type="range" min="1" max="100" value="50"
+                                    class="slider">
+                                <p> Feedback </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delayB_cutoff_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Cutoff </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delayB_drywet_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Dry/Wet </p>
+                            </div><br>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm">
+                            <center>
+                                <h5> Reverb </h5>
+                            </center><br>
+
+                            <div class="slidecontainer">
+                                <input id="reverb_speed_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Room Size </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="reverb_feedback_knob" type="range" min="1" max="100" value="50"
+                                    class="slider">
+                                <p> Feedback </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="reverb_drywet_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Dry/Wet </p>
+                            </div><br>
+                        </div>
+                    </div>
+
+                </div>
+            </center>
+        </div>
+    </div>
+
+    <!-- <footer>
+        <center>
+            <div style="padding-top: 50px; padding-bottom: 50px;">
+                <a href="https://xusione.com" target="_blank">© XUSIONE</a>
+            </div>
+        </center>
+    </footer> -->
+
+    <script type="text/javascript" src="js/elements.js"></script>
+    <script type="text/javascript" src="js/params.js"></script>
+    <script type="text/javascript" src="js/network.js"></script>
+    <script type="text/javascript" src="js/ui.js"></script>
+    <script type="text/javascript" src="js/session.js"></script>
+    <script type="text/javascript" src="js/iosAudio.js"></script>
+    <script type="text/javascript" src="js/audio.js"></script>
+    <script type="text/javascript" src="js/sequ.js"></script>
+    <script type="text/javascript" src="js/pianoroll.js"></script>
+
+    <script>
+        window.scrollTo(0, 0);
+    </script>
+
+    <script>
+        function htmlEncode(value) {
+            return $('<div/>').text(value).html();
+        }
+
+        let chUrl = "https://yphnago.com/xusione/xusionet/mmofx/index.html?channel=" + currentChannelName.value;
+        let uhmm = "https://chart.googleapis.com/chart?cht=qr&chl=" + htmlEncode(chUrl) + "&chs=160x160&chld=L|0";
+
+        $(function () {
+            $("#generate").click(function () {
+                $(".qr-code").attr("src", "https://chart.googleapis.com/chart?cht=qr&chl=" + htmlEncode($("#qr_gen_content").val()) + "&chs=160x160&chld=L|0");
             });
-        </script>
+        });
+    </script>
 
-    </body>
+</body>
+
 </html>

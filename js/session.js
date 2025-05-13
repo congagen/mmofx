@@ -35,7 +35,8 @@ if (Object.keys(url_vars).length > 0) {
     if ("mode" in url_vars) {
         console.log(url_vars["mode"]);
 
-        if (url_vars["mode"] === "client") {
+        if (url_vars["mode"] === "padClient" || url_vars["mode"] === "pianoClient") {
+
             document.getElementById("receiveCommandsCheckbox").checked = false;
             document.getElementById("enableTransmissionCheckbox").checked = true;
             document.getElementById("enableMidiOutCheckbox").checked = false;
@@ -55,6 +56,20 @@ if (Object.keys(url_vars).length > 0) {
 
             let nav_b = document.getElementById("subNav");
             nav_b.style = "display: none !important";
+
+            if (url_vars["mode"] === "pianoClient") {
+                const pianoTabLink = document.getElementById('pianoTabLink');
+                const pianoTab = new bootstrap.Tab(pianoTabLink);
+                                
+                pianoTab.show();
+            }
+
+            if (url_vars["mode"] === "padClient") {
+                const pianoTabLink = document.getElementById('padTabLink');
+                const pianoTab = new bootstrap.Tab(pianoTabLink);
+                                
+                pianoTab.show();
+            }
         }
 
         if (url_vars["mode"] === "host") {

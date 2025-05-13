@@ -407,6 +407,7 @@ function onMIDIMessage(event) {
                 console.log("! MIDI INPUT == MIDI OUTPUT !");
             } else {                
                 if (enableTransmissionCheckbox.checked === true) {
+                    console.log("Sending MIDI note");
                     playNetworkCmd(note);
                 }
             }

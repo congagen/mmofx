@@ -194,12 +194,10 @@ function playNetworkCmd(cmdText) {
 
     let rsp = writeToDB(currentChannelName, dbData);
     writeToDB(currentChannelName, clearData);
-
-    // console.log(rsp);
 }
 
-async function shareUrl() {
-    let channelUrl = "https://yphnago.com/xusione/xusionet/mmofx/index.html?channel=" + currentChannelName + "&mode=client";
+async function sharePadsUrl() {
+    let channelUrl = "https://yphnago.com/xusione/xusionet/mmofx/index.html?channel=" + currentChannelName + "&mode=padClient";
     updateChannel();
 
     try {
@@ -207,7 +205,17 @@ async function shareUrl() {
     } catch (err) {
         alert(channelUrl);
     }
+}
 
+async function sharePianoUrl() {
+    let channelUrl = "https://yphnago.com/xusione/xusionet/mmofx/index.html?channel=" + currentChannelName + "&mode=pianoClient";
+    updateChannel();
+
+    try {
+        await navigator.share({ title: currentChannelName, url: channelUrl });
+    } catch (err) {
+        alert(channelUrl);
+    }
 }
 
 function addKeyPad(keyId) {
@@ -342,7 +350,8 @@ function updateChannel(){
 
 setChannelNameButton.addEventListener("click", updateChannel);
 
-shareChannelUrlButton.addEventListener("click", shareUrl);
+sharePadsChannelUrlButton.addEventListener("click", sharePadsUrl);
+sharePianoChannelUrlButton.addEventListener("click", sharePianoUrl);
 
 midiInChannelSlider.addEventListener("input", (event) => {
     currentChannel = parseInt(midiInChannelSlider.value);

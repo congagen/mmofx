@@ -1,4 +1,3 @@
-
 html, body {
     font-family: "Courier", "Courier New", monospace;
     background-color: rgb(10, 10, 30);
@@ -12,8 +11,14 @@ html, body {
     width:100%;
 }
 
+button, .btn {
+  touch-action: manipulation !important;
+  touch-action: none;
+}
+
 .disable-dbl-tap-zoom {
   touch-action: manipulation;
+  touch-action: none;
 }
 
 li {
@@ -293,28 +298,6 @@ a.button {
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 30px;
-}
-
-.awesome {
-    font-family: times;
-    font-style: italic;
-
-    width:100%;
-
-    margin-top: 0px;
-    margin-bottom: 0px;
-
-    padding-top: 40px;
-    padding-bottom: 0px;
-
-    /* margin: 0 auto; */
-    text-align: center;
-    align: center;
-
-    color:#313131;
-    font-size 70px;
-    font-weight: bold;
-    -webkit-animation: colorchange 2s infinite alternate;
 }
 
 @-webkit-keyframes colorchange {
