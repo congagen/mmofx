@@ -5,11 +5,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="manifest.json">
 
     <!-- HTML Meta Tags -->
     <title>MMOFX! - XUSIONE.COM</title>
     <meta name="keywords" content="SFX, Sampler, Instrument, MIDI">
-    <meta name="description" content="Transform Your Event Into An Interactive Wonderland! Let Your Guests Control The Show With Their Phones! Connect Lights, Cameras, Instruments, And More!" />
+    <meta name="description"
+        content="Transform Your Event Into An Interactive Wonderland! Let Your Guests Control The Show With Their Phones! Connect Lights, Cameras, Instruments, And More!" />
 
     <script src="js/libs/jquery.min.js"></script>
     <script src="js/libs/bootstrap.bundle.min.js"></script>
@@ -18,7 +20,7 @@
     <script src="js/libs/firebase-auth-compat.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/styles.css">    
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
     <link rel="stylesheet" type="text/css" href="css/pianoroll.css">
 </head>
 
@@ -296,7 +298,7 @@
             <div id="subNav" style="background-color: rgb(255, 255, 255, 0.025)">
                 <ul class="nav nav-tabs justify-content-center navbar-light pt-1 pb-1 subtabs">
                     <li><a class="tab nav-link" data-bs-toggle="tab" href="#sampler_tab"
-                            style="width: 70px !important; display: flex; justify-content: center;">Samples</a></li>
+                            style="width: 70px !important; display: flex; justify-content: left !important;">Samples</a></li>
                     <li><a class="tab nav-link" data-bs-toggle="tab" href="#seq_tab"
                             style="width: 70px !important; display: flex; justify-content: right;">Seq</a></li>
                     <li><a id="padTabLink" class="tab nav-link active" data-bs-toggle="tab" href="#control_tab"
@@ -645,6 +647,7 @@
         </center>
     </footer> -->
 
+    <script type="text/javascript" src="js/alerts.js"></script>
     <script type="text/javascript" src="js/elements.js"></script>
     <script type="text/javascript" src="js/params.js"></script>
     <script type="text/javascript" src="js/network.js"></script>
@@ -654,10 +657,6 @@
     <script type="text/javascript" src="js/audio.js"></script>
     <script type="text/javascript" src="js/sequ.js"></script>
     <script type="text/javascript" src="js/pianoroll.js"></script>
-
-    <script>
-        window.scrollTo(0, 0);
-    </script>
 
     <script>
         function htmlEncode(value) {
@@ -672,6 +671,8 @@
                 $(".qr-code").attr("src", "https://chart.googleapis.com/chart?cht=qr&chl=" + htmlEncode($("#qr_gen_content").val()) + "&chs=160x160&chld=L|0");
             });
         });
+
+        window.scrollTo(0, 0);
     </script>
 
 </body>

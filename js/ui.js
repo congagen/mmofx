@@ -150,7 +150,7 @@ function shareSamples() {
     //navigator.clipboard.writeText(copyText);
 
     navigator.clipboard.writeText(copyText).then(function(x) {
-      alert("Keymap copied to clipboard");
+      showCustomAlert("Keymap copied to clipboard");
     });
 
 }
@@ -203,7 +203,7 @@ async function sharePadsUrl() {
     try {
         await navigator.share({ title: currentChannelName, url: channelUrl });
     } catch (err) {
-        alert(channelUrl);
+        showCustomAlert(channelUrl);
     }
 }
 
@@ -214,7 +214,7 @@ async function sharePianoUrl() {
     try {
         await navigator.share({ title: currentChannelName, url: channelUrl });
     } catch (err) {
-        alert(channelUrl);
+        showCustomAlert(channelUrl);
     }
 }
 

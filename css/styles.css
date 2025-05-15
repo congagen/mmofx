@@ -355,3 +355,37 @@ a.button {
     color: pink;
   }
 }
+
+.custom-alert {  
+  min-width: 300px;
+  max-width: 400px;
+}
+
+@media (max-width: 600px) {
+  .custom-alert {
+    min-width: 90%;
+    max-width: none;
+  }
+}
+
+.custom-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(41, 0, 61);
+  color: rgb(255, 255, 255);
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  font-family: sans-serif;
+  font-size: 0.9em;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.custom-alert.show {
+  opacity: 1;
+}

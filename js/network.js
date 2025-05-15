@@ -4,11 +4,12 @@ const messageBox = document.querySelector('#messageBox');
 
 var prevChannelName = "";
 
-const maxRetryCount = 50; // Adjust as needed
-const initialDelay = 1000; // Initial delay in milliseconds
-const backoffFactor = 2;   // Factor to increase delay by
+const maxRetryCount = 50;
 var showNetworkAlerts = true;
 var retryCount = 0;
+const backoffFactor = 2;
+const initialDelay = 10000;
+var retryDelay = 1000;
 
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -50,11 +51,14 @@ function attemptReconnect(retryCount = 0) {
       return;
     } else {
         retryCount += 1;
+    }    
+
+    if (retryDelay < 60000){
+        retryDelay = parseInt(initialDelay * retryCount);        
     }
-  
-    const delay = initialDelay * Math.pow(backoffFactor, retryCount);
-    console.log(`Attempting to reconnect in ${delay}...`);
-    currentChannelDisplay.innerHTML = `Connection refused, attempting to reconnect in ${delay / 1000} s...`;
+
+    console.log(`Attempting to reconnect in ${retryDelay}...`);
+    currentChannelDisplay.innerHTML = `Connection refused, attempting to reconnect in ${retryDelay / 1000} s...`;
   
     setTimeout(() => {
       firebase.database().ref(".info/connected").once("value", function(snap) {
@@ -62,15 +66,16 @@ function attemptReconnect(retryCount = 0) {
             console.log('Connected!');
             currentChannelDisplay.innerHTML = "Current Channel: " + currentChannelName;
             showNetworkAlerts = true;
+            retryCount = 0;
         } else {
             if ((showNetworkAlerts === true) && (retryCount > 2)) {
-                alert("Network Error: Connection to the server has been interrupted.  If you're using a VPN, try disabling it temporarily.  Otherwise, please check your internet connection and visit the Connection section in the Config tab to check status and reconnect.");        
+                showCustomAlert("Connection Error: The connection to the server was interrupted. If you are using a VPN, try turning it off temporarily. Otherwise, please check your internet connection and go to the 'Connection' section in the 'Config' tab to see the status and try reconnecting.");        
                 showNetworkAlerts = false;
             }
             attemptReconnect(retryCount);
         }
       });
-    }, delay);
+    }, retryDelay);
 }
 
 function setTokenSentToServer(sent) {
@@ -86,7 +91,7 @@ firebase.auth().signInAnonymously().catch(function(error) {
     var errorMessage = error.message;
 
     if (errorCode === 'auth/operation-not-allowed') {
-        alert('You must enable Anonymous auth in the Firebase //console.');
+        console.log('You must enable Anonymous auth in the Firebase //console.');
     } else {
         //console.error(error);
     }
@@ -140,8 +145,6 @@ function sendTokenToServer(currentToken) {
 }
 
 function subscribeToDb(dbChannelName) {
-    retryCount = 0;
-
     if (prevChannelName != "") {
         var prevDb = firebase.database().ref(prevChannelName);
         prevDb.off();
