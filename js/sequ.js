@@ -57,18 +57,81 @@ function sampleTrigsToSeq() {
 
 function setSeqRateSlider() {
     document.getElementById("seqRateTextField").value = parseFloat(document.getElementById("seqRateSlider").value);
+    applySeqRate();
 }
 
 
 function setSeqRateText() {
     document.getElementById("seqRateSlider").value = parseFloat(document.getElementById("seqRateTextField").value);
+    applySeqRate();
+}
+
+// Updates the live readout next to the Alternate (maxlerMulti) slider.
+function updateMultiLabel() {
+    var v = parseFloat(document.getElementById("maxlerMulti").value);
+    document.getElementById("maxlerMultiValue").textContent = v.toFixed(1);
+}
+
+// +/- steppers for the Alternate slider: nudge by delta, clamp to the slider's
+// range, and keep 0.1 precision (avoids floating-point drift).
+function stepMulti(delta) {
+    var el = document.getElementById("maxlerMulti");
+    var min = parseFloat(el.min);
+    var max = parseFloat(el.max);
+    var v = parseFloat(el.value) + delta;
+    v = Math.min(max, Math.max(min, v));
+    el.value = Math.round(v * 10) / 10;
+    updateMultiLabel();
+}
+
+// Step interval in ms for the current BPM. Each step is an 8th note, so
+// 120 BPM => 250 ms/step. Guards against zero/blank input.
+function seqStepInterval() {
+    var bpm = parseFloat(document.getElementById("seqRateSlider").value);
+    if (!bpm || bpm < 1) bpm = 1;
+    return 30000 / bpm;
+}
+
+// Schedules the next step at the current BPM and records when this step began,
+// so a mid-step BPM change can be re-applied immediately.
+function scheduleNextStep() {
+    seqStepStart = performance.now();
+    clearTimeout(seqTimeout);
+    seqTimeout = setTimeout(iterateSeq, seqStepInterval());
+}
+
+// Re-applies the BPM mid-playback: reschedules the pending step for the new
+// interval minus the time already elapsed in the current step, so tempo
+// changes take effect right away instead of on the next step.
+function applySeqRate() {
+    if (!playSeq) return;
+    var remaining = seqStepInterval() - (performance.now() - seqStepStart);
+    if (remaining < 0) remaining = 0;
+    clearTimeout(seqTimeout);
+    seqTimeout = setTimeout(iterateSeq, remaining);
 }
 
 
 function iterateSeq() {
     var curSeqChars = document.getElementById("maxlerZone").value;
 
+    // The sequence can be edited mid-play. Clamp the index if it was shortened,
+    // and if there's no character to play (e.g. the field was cleared) skip this
+    // step but keep the clock running, so playback resumes when keys return.
+    if (seqIndex >= curSeqChars.length) {
+        seqIndex = 0;
+    }
+
     let seqChar = curSeqChars.split('')[seqIndex];
+
+    if (seqChar === undefined) {
+        document.getElementById("curSeqCharH").innerHTML = "?";
+        if (playSeq) {
+            scheduleNextStep();
+        }
+        seqIndexMaster += 1;
+        return;
+    }
 
     // Display current char
     document.getElementById("curSeqCharH").innerHTML = seqChar;
@@ -128,7 +191,7 @@ function iterateSeq() {
     }
 
     if (playSeq) {
-        setTimeout(iterateSeq, 1000 - parseFloat(document.getElementById("seqRateSlider").value));
+        scheduleNextStep();
     }
 
     seqIndexMaster += 1;
@@ -139,10 +202,12 @@ function togglePlaySeq(){
     playSeq = !playSeq;
 
     if (playSeq) {
-        setTimeout(iterateSeq, 500);
+        seqStepStart = performance.now();
+        clearTimeout(seqTimeout);
+        seqTimeout = setTimeout(iterateSeq, 500);
         document.getElementById("playSeq").innerHTML = "Stop";
     } else {
-        // Cancel timer
+        clearTimeout(seqTimeout);
         seqIndex = 0;
         document.getElementById("playSeq").innerHTML = "Start";
         fibonaIndex = 0;

@@ -37,10 +37,20 @@ firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 var connectedRef = firebase.database().ref(".info/connected");
 
+function setConnectionStatus(status) {
+    const dot = document.getElementById('connectionIndicator');
+    if (!dot) return;
+    dot.classList.remove('connected', 'disconnected');
+    dot.classList.add(status);
+}
+
 connectedRef.on("value", function(snap) {
     if (snap.val() === false) {
         console.log('Connection lost!');
+        setConnectionStatus('disconnected');
         attemptReconnect(retryCount);
+    } else {
+        setConnectionStatus('connected');
     }
 });
 
@@ -64,11 +74,12 @@ function attemptReconnect(retryCount = 0) {
       firebase.database().ref(".info/connected").once("value", function(snap) {
         if (snap.val() === true) {
             console.log('Connected!');
+            setConnectionStatus('connected');
             currentChannelDisplay.innerHTML = "Current Channel: " + currentChannelName;
             showNetworkAlerts = true;
             retryCount = 0;
         } else {
-            if ((showNetworkAlerts === true) && (retryCount > 2)) {
+            if ((showNetworkAlerts === true) && (retryCount > 1)) {
                 showCustomAlert("Connection Error: The connection to the server was interrupted. If you are using a VPN, try turning it off temporarily. Otherwise, please check your internet connection and go to the 'Connection' section in the 'Config' tab to see the status and try reconnecting.");        
                 showNetworkAlerts = false;
             }
@@ -154,8 +165,12 @@ function subscribeToDb(dbChannelName) {
     currentChannelDisplay.innerHTML = "Current Channel: " + dbChannelName;
 
     newDbChannel.on('child_changed', function (data) {
+        if (data.key !== "playedKey") return;
         if (receiveCommandsCheckbox.checked === true) {
-            playKey(data.val(), true, false);
+            var val = data.val();
+            // New form is { k: key, n: nonce }; tolerate the old plain-string form.
+            var key = (val && typeof val === "object") ? val.k : val;
+            playKey(key, true, false);
         }
     });
 

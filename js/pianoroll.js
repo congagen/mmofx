@@ -2,7 +2,7 @@ const numberOfKeys = 127;
 const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const pianoViewport = document.getElementById('pianoViewport');
 const pianoContainer = document.getElementById('pianoContainer');
-const keyHeightSlider = document.getElementById('keyHeight'); // Reference to the height slider
+const keyHeightSlider = document.getElementById('keyHeight');
 
 // const scrollUpButton = document.getElementById('scrollUpButton');
 // const scrollDownButton = document.getElementById('scrollDownButton');
@@ -51,12 +51,24 @@ function generatePianoKeys() {
         const key = document.createElement('div');
         key.classList.add('key');
         key.dataset.note = noteName;
-        key.dataset.index = i;
+        // Zero-pad so every note index is at least 2 chars. playKey() routes
+        // single-char values to pad playback, so unpadded notes 0–9 would
+        // wrongly trigger pads instead of pitched/MIDI playback.
+        key.dataset.index = String(i).padStart(2, '0');
         key.style.height = `${keyHeight}px`; // Set initial height
         if (isBlackKey(noteName)) {
             key.classList.add('black-key');
         } else {
             key.classList.add('white-key');
+            // Octave marker on each C so players can orient. The label is
+            // pointer-events:none / unselectable (see CSS) so it never interferes
+            // with key hit-testing, swipes, or text selection.
+            if (noteName.charAt(0) === 'C') {
+                const label = document.createElement('span');
+                label.className = 'key-label';
+                label.textContent = noteName;
+                key.appendChild(label);
+            }
         }
         pianoContainer.appendChild(key);
     }
@@ -214,6 +226,54 @@ function scrollPianoRoll(direction) {
     }
 }
 
+// Notes sounded by each pointer during a drag gesture (local mode). Dragging
+// across keys accumulates notes; they all sustain until the gesture ends and
+// are released together on pointer up, rather than cancelling as you move.
+let pianoGestureNotes = new Map(); // pointerId -> Set(noteIndex)
+
+// Live readout for the Release slider.
+function updateReleaseLabel() {
+    if (pianoReleaseSlider) {
+        document.getElementById("pianoReleaseValue").textContent =
+            parseFloat(pianoReleaseSlider.value).toFixed(1);
+    }
+}
+
+function pianoLocalNoteOn(pointerId, noteIndex, keyEl) {
+    let set = pianoGestureNotes.get(pointerId);
+    if (!set) { set = new Set(); pianoGestureNotes.set(pointerId, set); }
+    if (set.has(noteIndex)) return; // this pointer is already on this note
+    // Restart, never stack: if the note is already sounding (held by another
+    // finger, or still releasing), stop the existing voice before re-triggering
+    // so a re-press re-articulates instead of layering. No-op for one-shots.
+    stopPitchedNote(noteIndex);
+    set.add(noteIndex);
+    if (keyEl) keyEl.classList.add('active');
+    // Notes sustain at full while held/dragged; the release is applied on
+    // pointer-up (pianoLocalRelease), not here.
+    playKey(noteIndex, false, false, holdPitchedCheckbox.checked);
+}
+
+function pianoLocalRelease(pointerId) {
+    const set = pianoGestureNotes.get(pointerId);
+    if (!set) return;
+    // Notes sustain at full while dragging; the release happens here on pointer
+    // up. With "Note Off on Release" on, stop immediately; with it off, fade out
+    // over the Release time (0 = ring until Reset/re-trigger).
+    const latch = pianoNoteOffCheckbox && !pianoNoteOffCheckbox.checked;
+    const releaseSec = pianoReleaseSlider ? parseFloat(pianoReleaseSlider.value) : 0;
+    set.forEach(function (noteIndex) {
+        if (latch) {
+            releasePitchedNote(noteIndex, releaseSec);
+        } else {
+            stopPitchedNote(noteIndex);
+        }
+        const k = document.querySelector(`.key[data-index="${noteIndex}"]`);
+        if (k) k.classList.remove('active');
+    });
+    pianoGestureNotes.delete(pointerId);
+}
+
 function onKeyDown(event) {
     const key = event.target.closest('.key');
     if (key) {
@@ -221,14 +281,13 @@ function onKeyDown(event) {
         const pointerId = event.pointerId;
         if (!activeTouches.has(pointerId)) {
             activeTouches.set(pointerId, noteIndex);
-            key.classList.add('active');
-            console.log(`Note On (Down): ${key.dataset.note}, Pointer ID: ${pointerId}`);
             lastSwipedNoteIndex = noteIndex;
-            
+
             if (enableTransmissionCheckbox.checked === true) {
+                key.classList.add('active');
                 playNetworkCmd(noteIndex);
-            } else {             
-                playKey(noteIndex);
+            } else {
+                pianoLocalNoteOn(pointerId, noteIndex, key);
             }
 
         }
@@ -246,14 +305,33 @@ function onKeyDown(event) {
 }
 
 
-function onMouseUp(event) {    
-    isSwiping = false;
-    const activeKeys = document.querySelectorAll('.key.active');
-    activeKeys.forEach(key => {
-        key.classList.remove('active');
-    });
-    activeTouches.clear();
-    lastSwipedNoteIndex = null;
+function onMouseUp(event) {
+    const pointerId = event.pointerId;
+
+    if (enableTransmissionCheckbox.checked === true) {
+        // Network mode: clear the single follow-highlight for this pointer.
+        const noteIndex = activeTouches.get(pointerId);
+        if (noteIndex !== undefined) {
+            const key = document.querySelector(`.key[data-index="${noteIndex}"]`);
+            if (key) key.classList.remove('active');
+        }
+    } else {
+        // Local mode: now that the gesture has ended, release every note it
+        // sounded (per pointer, so lifting one finger doesn't cut others).
+        pianoLocalRelease(pointerId);
+    }
+
+    activeTouches.delete(pointerId);
+
+    // Stop swiping only once no pointers remain down.
+    if (activeTouches.size === 0) {
+        isSwiping = false;
+        lastSwipedNoteIndex = null;
+        // Safety net: the pressed highlight is always cleared on release.
+        document.querySelectorAll('.key.active').forEach(function (k) {
+            k.classList.remove('active');
+        });
+    }
 }
 
 document.addEventListener('pointermove', (event) => {
@@ -267,36 +345,34 @@ document.addEventListener('pointermove', (event) => {
 
             if (!activeTouches.has(pointerId) || activeTouches.get(pointerId) !== noteIndex) {
                 const lastKeyIndex = activeTouches.get(pointerId);
-                if (lastKeyIndex !== undefined) {
-                    const lastKey = document.querySelector(`.key[data-index="${lastKeyIndex}"]`);
-                    if (lastKey) {
-                        lastKey.classList.remove('active');
-                    }
-                }
-                targetKey.classList.add('active');
                 activeTouches.set(pointerId, noteIndex);
                 lastSwipedNoteIndex = noteIndex;
 
-                console.log("pointermove");
-                
                 if (enableTransmissionCheckbox.checked === true) {
+                    // Network mode: a single highlight follows the pointer.
+                    if (lastKeyIndex !== undefined) {
+                        const lastKey = document.querySelector(`.key[data-index="${lastKeyIndex}"]`);
+                        if (lastKey) lastKey.classList.remove('active');
+                    }
+                    targetKey.classList.add('active');
                     playNetworkCmd(noteIndex);
-                } else {             
-                    playKey(noteIndex);
+                } else {
+                    // Local mode: accumulate — dragging over a key adds it and
+                    // sustains it until the gesture ends (no release here).
+                    pianoLocalNoteOn(pointerId, noteIndex, targetKey);
                 }
-
             }
         } else {
             const noteIndex = 64;
             const pointerId = event.pointerId;
-    
+
             if (!activeTouches.has(pointerId) || activeTouches.get(pointerId) !== noteIndex) {
                 const lastKeyIndex = activeTouches.get(pointerId);
-                if (lastKeyIndex !== undefined) {
+                // Network mode follows the pointer, so clear its highlight when
+                // it leaves the keys. Local mode keeps held notes sounding.
+                if (enableTransmissionCheckbox.checked === true && lastKeyIndex !== undefined) {
                     const lastKey = document.querySelector(`.key[data-index="${lastKeyIndex}"]`);
-                    if (lastKey) {
-                        lastKey.classList.remove('active');
-                    }
+                    if (lastKey) lastKey.classList.remove('active');
                 }
                 activeTouches.set(pointerId, noteIndex);
                 lastSwipedNoteIndex = noteIndex;
@@ -329,6 +405,13 @@ pianoContainer.addEventListener('pointerdown', (event) => {
 });
 
 document.addEventListener('pointerup', onMouseUp);
+document.addEventListener('pointercancel', onMouseUp);
+
+// Suppress the long-press context menu / callout on the piano so a held key
+// doesn't pop a dropdown on touch devices.
+pianoContainer.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+});
 
 function scrollToNote(noteName) {
     const allKeys = pianoContainer.querySelectorAll('.key');

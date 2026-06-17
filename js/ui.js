@@ -11,64 +11,68 @@ function addSampleListRow(sampleId, sampleUrl) {
     let sItem = currentSamples[sampleId];
 
     var sampleTableContainer = $("#sampleTableContainer");
-    var titleRow     = $("<div style='width:100% !important;' class='row py-2 top-sample-row' id='sam_row_a" + sampleId + "'> <div class='col' style='width:100% !important;'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div> </div>");
-    var trigKeysRow  = $("<div class='row py-2 mid-sample-row'> <div class='col'> <div class='input-group mb-3'> <div class='input-group-prepend'><span class='input-group-text' id='basic-addon1'>@</span> </div>  <input aria-describedby='basic-addon1' class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "> </div> </div> </div>");
-    var samActionRow = $("<div class='row py-2 btm-sample-row' id='sam_row_b" + sampleId + "'> </div>");
 
-    // -----------------------------------------------------------------------------------------------------------------
+    var sampleCard = $("<div class='sample-card' id='sam_row_" + sampleId + "'></div>");
 
-    let nameField = $("<div class='col'> <input class='form-control' id='sNameField" + sampleId + "' type='text' value='" + sItem[0] + "' readonly> </div>");
+    var header = $("<div class='sample-card-header'><span class='sample-name' title=\"" + sItem[0] + "\">" + sItem[0] + "</span></div>");
 
-    // -----------------------------------------------------------------------------------------------------------------
+    var body = $("<div class='sample-card-body'></div>");
 
-    var itmB = "<div class='col'> <div class='input-group'>";
-    itmB += "<div class='input-group-prepend'><span class='input-group-text' id='basic-addon1'>Keys:</span> </div>";
-    itmB += "<input aria-describedby='basic-addon1' class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "></div></div>";
+    var keysGroup = $(
+        "<div class='input-group sample-keys-group'>" +
+            "<span class='input-group-text'>Keys</span>" +
+            "<input aria-label='Play keys' class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + ">" +
+        "</div>"
+    );
 
-    //var itmB = "<div class='col'><input class='form-control' id='" + sampleId.toString() + "' type='text' value=" + sItem[2].toLowerCase() + "></div></div>";
-
-    var trgKeysInput = $(itmB);
-    var trigInp = trgKeysInput.find( "input" );
-
+    var trigInp = keysGroup.find("input");
     trigInp.change(function () {
-        var inputId = $(trigInp).attr('id').toString();
-        //console.log(inputId);
+        var inputId = $(this).attr('id').toString();
         let trgKeyInputField = document.getElementById(inputId.toString());
         currentSamples[inputId][2] = trgKeyInputField.value.toString();
     });
 
-    // -----------------------------------------------------------------------------------------------------------------
-
-    let itmC = "<div class='col-xs-1 col-auto'> <input class='btn btn-light' type='button' value = 'Preview'> </div>";
-
-    var btnPreview = $(itmC);
-    var prevBtn = btnPreview.find( "input" );
-    prevBtn.click(function () {
+    var previewBtn = $("<button type='button' class='sample-btn sample-preview-btn' aria-label='Preview'>&#9658;</button>");
+    previewBtn.click(function () {
         previewSample(sampleId);
     });
 
-    // -----------------------------------------------------------------------------------------------------------------
-
-    let itmD  = "<div class='col-xs-1 col-auto'> <input class='btn btn-light' type='button' value='X'> </div>";
-
-    var btnRemove = $(itmD);
-    var remoBtn = btnRemove.find( "input" );
-    remoBtn.click(function () {
-        delete currentSamples[sampleId.toString()];
-        titleRow.remove();
-        samActionRow.remove();
+    // Pitch: when on, this sample responds to MIDI notes (Keys piano, network,
+    // local MIDI In) with simple varispeed pitching. Stored in currentSamples[3].
+    var pitchGroup = $(
+        "<div class='form-check sample-pitch-check'>" +
+            "<input type='checkbox' class='form-check-input' id='pitch_" + sampleId + "'>" +
+            "<label class='form-check-label' for='pitch_" + sampleId + "'>Pitch</label>" +
+        "</div>"
+    );
+    var pitchInp = pitchGroup.find("input");
+    pitchInp.prop("checked", !!sItem[3]);
+    pitchInp.change(function () {
+        currentSamples[sampleId][3] = this.checked;
     });
 
-    // -----------------------------------------------------------------------------------------------------------------
+    var removeBtn = $("<button type='button' class='sample-btn sample-remove-btn' aria-label='Remove'>&#10005;</button>");
+    removeBtn.click(function () {
+        const id = sampleId.toString();
+        const s = currentSamples[id];
+        // Stop any voices still playing this sample (preview uses the row id as
+        // its URL; pad/pitched playback uses s[1]) before removing it.
+        if (s) {
+            stopSampleVoices(id, s[1]);
+        }
+        delete currentSamples[id];
+        sampleCard.remove();
+    });
 
-    //$(sampleRow).append(nameField);
-    $(samActionRow).append(trgKeysInput);
-    $(samActionRow).append(btnPreview);
-    $(samActionRow).append(btnRemove);
+    body.append(previewBtn);
+    body.append(keysGroup);
+    body.append(pitchGroup);
+    body.append(removeBtn);
 
-    $(sampleTableContainer).append(titleRow);
-    //$(sampleTableContainer).append(trigKeysRow);
-    $(sampleTableContainer).append(samActionRow);
+    sampleCard.append(header);
+    sampleCard.append(body);
+
+    sampleTableContainer.append(sampleCard);
 }
 
 function readFile(file) {
@@ -78,21 +82,16 @@ function readFile(file) {
     fr.readAsText(file);
 })}
 
-receiveCommandsCheckbox.addEventListener('change', (event) => {
-  if (event.currentTarget.checked) {
-    enableTransmissionCheckbox.checked = false;
-  } else {
-    enableTransmissionCheckbox.checked = true;
-  }
-  updateChannel();
-})
+function setHostClientMode(isClient) {
+  receiveCommandsCheckbox.checked = !isClient;
+  enableTransmissionCheckbox.checked = isClient;
+  hostClientSwitch.checked = isClient;
+  document.getElementById('hostModeLabel').classList.toggle('active', !isClient);
+  document.getElementById('clientModeLabel').classList.toggle('active', isClient);
+}
 
-enableTransmissionCheckbox.addEventListener('change', (event) => {
-  if (event.currentTarget.checked) {
-    receiveCommandsCheckbox.checked = false;
-  } else {
-    receiveCommandsCheckbox.checked = true;
-  }
+hostClientSwitch.addEventListener('change', (event) => {
+  setHostClientMode(event.currentTarget.checked);
   updateChannel();
 })
 
@@ -120,8 +119,29 @@ async function addSamplesLsDisk(){
     }
 }
 
-function shareSamples() {
-    let sampleMap = "1:a";
+// Copies a human-readable sample map to the clipboard, one line per sample:
+//   Sample Name: a, s, d
+// File extensions are stripped and assigned keys are de-duplicated.
+function copySampleMapToKeyboard() {
+    const lines = [];
+
+    for (const k of Object.keys(currentSamples)) {
+        const sample = currentSamples[k];
+        const name = sample[0].replace(/\.[^/.]+$/, "");          // strip extension
+        const keys = [...new Set((sample[2] || "").toString().split(""))].join(", ");
+        lines.push(name + ": " + (keys || "(unassigned)"));
+    }
+
+    const copyText = lines.join("\n");
+
+    navigator.clipboard.writeText(copyText).then(function () {
+        showCustomAlert("Sample map copied to clipboard");
+    });
+}
+
+// Saves the current key map as a downloadable JSON file.
+// Shape: { key: [fileName, ...] }, the same format loadSampleMap() reads back.
+function saveSampleMap() {
     var keyMap = {};
 
     for (var i = 0; i < Object.keys(currentSamples).length; i++) {
@@ -130,8 +150,8 @@ function shareSamples() {
         let sampleName = currentSamples[k][0];
         let sampleKeys = currentSamples[k][2];
 
-        for (let i = 0; i < sampleKeys.length; i++) {
-            let tChar = sampleKeys[i];
+        for (let j = 0; j < sampleKeys.length; j++) {
+            let tChar = sampleKeys[j];
 
            if (Object.keys(keyMap).includes(tChar)) {
                 keyMap[tChar].push(sampleName);
@@ -143,16 +163,74 @@ function shareSamples() {
         }
     }
 
-    //alert(Object.keys(currentSamples).toString());
-    //console.log(JSON.stringify(keyMap));
+    const json = JSON.stringify(keyMap, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "mmofx-keymap.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
 
-    let copyText = JSON.stringify(keyMap, null, 2);
-    //navigator.clipboard.writeText(copyText);
+// Applies a saved keymap (JSON text) to the currently-loaded samples by exact
+// file-name match. The keymap is { key: [fileName, ...] }; we invert it to
+// { fileName: "keys" }. For duplicate file names, the first loaded sample wins
+// (avoids assigning the same key to multiple copies, which would double-trigger).
+function applySampleKeymap(text) {
+    let keyMap;
+    try {
+        keyMap = JSON.parse(text);
+    } catch (e) {
+        showCustomAlert("Could not read keymap (invalid JSON).");
+        return;
+    }
+    if (!keyMap || typeof keyMap !== "object") {
+        showCustomAlert("Could not read keymap.");
+        return;
+    }
 
-    navigator.clipboard.writeText(copyText).then(function(x) {
-      showCustomAlert("Keymap copied to clipboard");
+    // Invert into { fileName: "keys" }, aggregating every character mapped to a
+    // given file name (order preserved, duplicates removed).
+    const nameToKeys = {};
+    for (const [char, names] of Object.entries(keyMap)) {
+        if (!Array.isArray(names)) continue;
+        for (const name of names) {
+            if (nameToKeys[name] == null) nameToKeys[name] = "";
+            if (!nameToKeys[name].includes(char)) nameToKeys[name] += char;
+        }
+    }
+
+    const assignedNames = new Set();
+    let matched = 0;
+    for (const id of Object.keys(currentSamples)) {
+        const fName = currentSamples[id][0];
+        if (assignedNames.has(fName)) continue; // first loaded copy wins
+        if (nameToKeys[fName] != null) {
+            currentSamples[id][2] = nameToKeys[fName];
+            const field = document.getElementById(id);
+            if (field) field.value = nameToKeys[fName];
+            assignedNames.add(fName);
+            matched += 1;
+        }
+    }
+
+    showCustomAlert(matched > 0
+        ? "Loaded keys for " + matched + " sample" + (matched === 1 ? "" : "s") + "."
+        : "No matching sample file names found.");
+}
+
+// Opportunistic counterpart to saveSampleMap(): loads a saved .json keymap
+// file from disk and applies it to the currently-loaded samples.
+function loadSampleMap() {
+    selectFile("application/json,.json", false).then((file) => {
+        if (!file) return;
+        file.text()
+            .then(applySampleKeymap)
+            .catch(() => showCustomAlert("Could not read the selected file."));
     });
-
 }
 
 function initTrgKeys() {
@@ -172,32 +250,36 @@ function initTrgKeys() {
 }
 
 function clearSamples() {
+    stopAllSamples();
+    decodedBufferCache = {};
     for (const [key, value] of Object.entries(currentSamples)) {
         delete currentSamples[key];
-        document.getElementById("sam_row_a"+key).remove();
-        document.getElementById("sam_row_b"+key).remove();
+        document.getElementById("sam_row_"+key).remove();
     }
 }
 
 function playNetworkCmd(cmdText) {
     console.log("playNetworkCmd: " + cmdText.toString());
 
+    // Carry an incrementing nonce so the playedKey value changes on every press
+    // (even repeats of the same key). That makes the host's child_changed fire
+    // reliably once per press, so no clear-write is needed and nothing gets
+    // coalesced away.
+    netCmdNonce += 1;
+
     let dbData = {
         "session_id": currentSessionId,
-        "playedKey": cmdText.toString()
+        "playedKey": { "k": cmdText.toString(), "n": netCmdNonce }
     };
 
-    let clearData = {
-        "session_id": currentSessionId,
-        "playedKey": " "
-    };
-
-    let rsp = writeToDB(currentChannelName, dbData);
-    writeToDB(currentChannelName, clearData);
+    return writeToDB(currentChannelName, dbData);
 }
 
 async function sharePadsUrl() {
-    let channelUrl = "https://yphnago.com/xusione/xusionet/mmofx/index.html?channel=" + currentChannelName + "&mode=padClient";
+    let channelUrl = "https://mmofx.xusione.com/index.html?channel=" + currentChannelName + "&mode=padClient";
+    if (showChannelNameCheckbox.checked === true) {
+        channelUrl += "&showChannel=1";
+    }
     updateChannel();
 
     try {
@@ -208,7 +290,10 @@ async function sharePadsUrl() {
 }
 
 async function sharePianoUrl() {
-    let channelUrl = "https://yphnago.com/xusione/xusionet/mmofx/index.html?channel=" + currentChannelName + "&mode=pianoClient";
+    let channelUrl = "https://mmofx.xusione.com/index.html?channel=" + currentChannelName + "&mode=pianoClient";
+    if (showChannelNameCheckbox.checked === true) {
+        channelUrl += "&showChannel=1";
+    }
     updateChannel();
 
     try {
@@ -223,10 +308,10 @@ function addKeyPad(keyId) {
     padCount += 1;
 
     // <div class="col-xs-2">
-    var padCol = $('<div class="col-sm-1 px-1 py-1" style="width:20%;"></div>');
-    let card_a = '<div class="card" style="width:100%; height:100%;" id="' + "playBtn" + keyId + '">';
+    var padCol = $('<div class="keyPad-col px-2 py-2"></div>');
+    let card_a = '<div class="card" style="width:100%; height:100%; touch-action: manipulation;" id="' + "playBtn" + keyId + '">';
     let card_b = '<div class="card-block"> <div id="' + 'pInput_' + keyId.toString() + '" class="card-title"></div>';
-    let card_c = '<div class="keyPad" style="width:100%; height:100%; overflow: auto !important">';
+    let card_c = '<div class="keyPad" style="width:100%; height:100%; overflow: hidden;">';
     //let card_d = '<input type="text" class="form-control text-center keyPadInput" placeholder="' + keyId + '"></input>'
     let card_d = '<p class="text-center keyPadInput noselect">' + keyId + '</p>'
     let card_e = '</div></div>';
@@ -235,12 +320,19 @@ function addKeyPad(keyId) {
     keyPanel.appendTo(padCol);
     padCol.appendTo('#keyPadPanel');
 
-    keyPanel.mousedown(function () {
-        ////console.log("Mouse Down");
-        //console.log(keyId);
+    // Pointer events (not mousedown) so rapid taps on touch devices fire
+    // reliably — the browser's tap heuristics swallow synthesized mousedowns on
+    // fast repeat taps. preventDefault suppresses the compatibility mouse events
+    // and double-tap zoom. Matches the piano, which never drops presses.
+    keyPanel.on('pointerdown', function (e) {
+        e.preventDefault();
+
+        // Brief visual flash so every tap is visibly registered, even rapid ones.
+        var card = this;
+        card.classList.add('pad-active');
+        setTimeout(function () { card.classList.remove('pad-active'); }, 110);
 
         if (enableTransmissionCheckbox.checked === true) {
-            //console.log("Sending: " + keyId.toString());
             playNetworkCmd(keyId);
         } else {
             playKey(keyId, false, false);
@@ -261,6 +353,23 @@ function addKeyPad(keyId) {
         //console.log(samplerCheckboxId);
     });
 
+}
+
+function highlightPad(keyId) {
+    let pad = document.getElementById("playBtn" + keyId);
+    if (!pad) return;
+
+    // Random hue, skipping the yellow band (~40-70deg)
+    let hue = Math.floor(Math.random() * (360 - 30));
+    if (hue >= 40) hue += 30;
+
+    pad.style.setProperty("--pad-flash-color", "hsl(" + hue + ", 90%, 60%)");
+    pad.classList.add("pad-received");
+
+    clearTimeout(pad.dataset.highlightTimeout);
+    pad.dataset.highlightTimeout = setTimeout(function () {
+        pad.classList.remove("pad-received");
+    }, 200);
 }
 
 function toggleEditMode(isEnabled) {
@@ -319,6 +428,8 @@ function initUI() {
 
     initKeyMap();
 
+    enablePreviewCheckbox.checked = false;
+
     midiOutChannelSlider.value = 0
     midiNotDurationSlider.value = 500;
     masterAmp_slider.value = 50;
@@ -329,6 +440,88 @@ function initUI() {
     osc_a_vol_knob.value = 20;
     osc_b_vol_knob.value = 10;
     osc_c_vol_knob.value = 10;
+
+    // Restore saved host settings last, so they override the defaults above.
+    loadHostSettings();
+}
+
+// --- Host settings persistence -------------------------------------------
+
+// Shared-link guests must never restore or save host settings; their state is
+// dictated by the URL and the forced-off rules in session.js / initUI.
+function isGuestSession() {
+    return typeof url_vars !== 'undefined' &&
+        (url_vars["mode"] === "padClient" || url_vars["mode"] === "pianoClient");
+}
+
+function saveHostSettings() {
+    if (isGuestSession()) return;
+    try {
+        const settings = {
+            channelName: currentChannelName,
+            isClient: hostClientSwitch.checked,
+            volume: masterAmp_slider.value,
+            randomize: randomizePlaybackCheckbox.checked,
+            keyboardInput: enablePreviewCheckbox.checked,
+            holdPitched: holdPitchedCheckbox.checked,
+            pitchPolyphony: pitchPolyphonyCheckbox.checked,
+            pitchRelease: pianoReleaseSlider.value,
+            noteOffOnRelease: pianoNoteOffCheckbox.checked,
+            midiInEnabled: enableMidiInCheckbox.checked,
+            midiOutEnabled: enableMidiOutCheckbox.checked,
+            midiInChannel: midiInChannelSlider.value,
+            midiOutChannel: midiOutChannelSlider.value,
+            noteDuration: midiNotDurationSlider.value
+        };
+        localStorage.setItem(HOST_SETTINGS_KEY, JSON.stringify(settings));
+    } catch (e) {
+        console.warn('Could not save host settings:', e);
+    }
+}
+
+function loadHostSettings() {
+    if (isGuestSession()) return;
+    let settings;
+    try {
+        settings = JSON.parse(localStorage.getItem(HOST_SETTINGS_KEY) || '{}');
+    } catch (e) {
+        return;
+    }
+    if (!settings || typeof settings !== 'object') return;
+
+    // channelName is restored earlier in params.js, before the boot subscribe.
+    // Host/Client mode: restore only when the URL doesn't pin a mode (URL wins).
+    if (settings.isClient != null &&
+        !(typeof url_vars !== 'undefined' && "mode" in url_vars)) {
+        setHostClientMode(settings.isClient);
+    }
+    if (settings.volume != null) masterAmp_slider.value = settings.volume;
+    if (settings.randomize != null) randomizePlaybackCheckbox.checked = settings.randomize;
+    // Overrides the deliberate force-off in initUI; safe because we set an
+    // explicit stored value rather than relying on browser form restoration.
+    if (settings.keyboardInput != null) enablePreviewCheckbox.checked = settings.keyboardInput;
+    if (settings.holdPitched != null) holdPitchedCheckbox.checked = settings.holdPitched;
+    if (settings.pitchPolyphony != null) pitchPolyphonyCheckbox.checked = settings.pitchPolyphony;
+    if (settings.noteOffOnRelease != null) pianoNoteOffCheckbox.checked = settings.noteOffOnRelease;
+    if (settings.pitchRelease != null) {
+        pianoReleaseSlider.value = settings.pitchRelease;
+        pianoReleaseSlider.dispatchEvent(new Event('input')); // refresh the readout
+    }
+    if (settings.midiInEnabled != null) enableMidiInCheckbox.checked = settings.midiInEnabled;
+    if (settings.midiOutEnabled != null) enableMidiOutCheckbox.checked = settings.midiOutEnabled;
+    // Dispatch 'input' so the existing handlers update labels / currentChannel.
+    if (settings.midiInChannel != null) {
+        midiInChannelSlider.value = settings.midiInChannel;
+        midiInChannelSlider.dispatchEvent(new Event('input'));
+    }
+    if (settings.midiOutChannel != null) {
+        midiOutChannelSlider.value = settings.midiOutChannel;
+        midiOutChannelSlider.dispatchEvent(new Event('input'));
+    }
+    if (settings.noteDuration != null) {
+        midiNotDurationSlider.value = settings.noteDuration;
+        midiNotDurationSlider.dispatchEvent(new Event('input'));
+    }
 }
 
 duration_knob.oninput = function () {
@@ -342,8 +535,10 @@ function updateChannel(){
 
     if (channelNameInputBox.value != "") {
         currentChannelName = channelNameInputBox.value.replaceAll(" ", "_").replaceAll("%", "_");
+        channelNameInputBox.value = currentChannelName;
         console.log(currentChannelName);
         subscribeToDb(currentChannelName);
+        saveHostSettings();
         //console.log("Switching to channel: " + currentChannelName);
     }
 }
@@ -366,6 +561,50 @@ midiNotDurationSlider.addEventListener("input", (event) => {
     midiNotDurationLabel.textContent = "Duration: " + event.target.value;
 });
 
+// --- Sequencer Hold: momentary (active only while pressed) ---
+// Drives the hidden #stallSeq checkbox that iterateSeq() reads, so the
+// sequencer tick logic is unchanged. Hold is released on every possible exit
+// path, so it can never latch on if a pointerup is missed (finger slides off,
+// pointercancel, lost capture, tab switch, app backgrounded).
+(function initSeqHold() {
+    const btn = document.getElementById("stallSeqBtn");
+    const state = document.getElementById("stallSeq");
+    if (!btn || !state) return;
+
+    function setHold(on) {
+        state.checked = on;
+        btn.classList.toggle("active", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    const release = () => setHold(false);
+
+    btn.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        // Keep receiving the pointerup even if the finger slides off the button.
+        try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+        setHold(true);
+    });
+
+    btn.addEventListener("pointerup", release);
+    btn.addEventListener("pointercancel", release);
+    btn.addEventListener("lostpointercapture", release);
+    btn.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    // Safety nets: never leave Hold stuck on if focus or visibility is lost.
+    window.addEventListener("blur", release);
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) release();
+    });
+})();
+
+// Persist host settings whenever one of these controls is changed.
+[masterAmp_slider, randomizePlaybackCheckbox, enablePreviewCheckbox,
+ holdPitchedCheckbox, pitchPolyphonyCheckbox, pianoReleaseSlider, pianoNoteOffCheckbox,
+ enableMidiInCheckbox, enableMidiOutCheckbox,
+ midiInChannelSlider, midiOutChannelSlider, midiNotDurationSlider].forEach((el) => {
+    el.addEventListener("change", saveHostSettings);
+});
+
 document.addEventListener("DOMContentLoaded", initUI, false);
 
 window.addEventListener('keydown', function(evt) {
@@ -376,16 +615,7 @@ window.addEventListener('keydown', function(evt) {
     }
 
     if (enableTransmissionCheckbox.checked === true) {
-        //console.log("Send");
-        let data = {};
-
-        let dbData = {
-            "session_id": currentSessionId,
-            "playedKey": evt.key.toString()
-        };
-
-        let rsp = writeToDB(currentChannelName, dbData);
-        //console.log(rsp);
+        playNetworkCmd(evt.key.toString());
     }
 
 });

@@ -1,14 +1,52 @@
 html, body {
     font-family: "Courier", "Courier New", monospace;
-    background-color: rgb(10, 10, 30);
+    font-weight: 700 !important;
     max-width: 100%;
     outline:0 !important;
     border: none !important;
     outline: none !important;
 }
 
-.row {
-    width:100%;
+/* Dark fallback on the root only — it sits below the gradient pseudo-element.
+   body must stay transparent, or its own background would paint over the
+   negative-z pseudo and hide the gradient. */
+html {
+    background-color: rgb(10, 10, 30);
+}
+
+body {
+    background-color: transparent;
+}
+
+/* Gradient lives on a fixed, full-viewport pseudo-element so it always fills
+   100% of the visible screen height regardless of content length, and avoids
+   the iOS Safari background-attachment: fixed sizing bugs. inset: 0 anchors it
+   to the real viewport edges; z-index: -1 keeps it behind all content. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: linear-gradient(to bottom, #aa00ff 0%, #009dff 50%, #00be7f 100%);
+}
+
+.nav-link {
+    font-weight: 700 !important;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.tab-content {
+    flex: 1 0 auto;
+}
+
+html {
+    overflow: -moz-scrollbars-vertical; 
+    overflow-y: scroll;
 }
 
 button, .btn {
@@ -21,8 +59,42 @@ button, .btn {
   touch-action: none;
 }
 
+#keyPadPanel {
+    padding-top: 20px !important;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.connection-dot {
+    display: none;
+    width: 10px;
+    height: 10px;
+    margin-left: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.connection-dot.connected {
+    background: rgba(40, 200, 120, 0.9);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35), 0 0 6px rgba(40, 200, 120, 0.7);
+}
+
+.connection-dot.disconnected {
+    background: rgba(220, 60, 60, 0.9);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35), 0 0 6px rgba(220, 60, 60, 0.7);
+    animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
 li {
-  color: white !important;
+  color: rgba(0, 0, 0, 0.8) !important;
 }
 
 button:focus { outline: 0; }
@@ -36,11 +108,11 @@ h4, h5, h6, h7, label {
     border: none !important;
     outline: none !important;
 
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(0, 0, 0, 0.75);
 }
 
 p {
-    color: rgba(190, 190, 190, 1) !important;
+    color: rgba(14, 14, 14, 0.95) !important;
     font-size: 17px;
 }
 
@@ -53,51 +125,425 @@ p {
     user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
-.top-sample-row {
-    background-color: rgba(255, 255, 255, 0.2);
-    margin-top: 20px;
-    margin-left: 0px;
-    margin-right: 0px !important;
-    /* border-top-right-radius: 5px;
-    border-top-left-radius: 5px; */
+.sample-card,
+.settings-card {
+    margin-bottom: 30px !important;
+    margin-left: 30px !important;
+    margin-right: 30px !important;
     max-width: 500px;
+    margin: 0 auto 16px auto;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* The shared rule's fixed 30px side margins (with !important) defeat the
+   margin: 0 auto centering. Sample cards sit in a full-width container, so
+   force auto side margins to centre them. */
+.sample-card {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.sample-card-header,
+.settings-card-header {
+    padding: 10px 14px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.settings-card-header {
+    color: rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    font-weight: 800;
+    text-align: center;
+}
+
+.settings-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px 0 40px 0;
+}
+
+/* @media (max-width: 575.98px) {
+    .settings-container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+} */
+
+.settings-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+}
+
+.settings-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-left: 0;
+    min-height: auto;
+    margin: 0;
+}
+
+.settings-check .form-check-input {
+    float: none;
+    margin: 0;
+}
+
+.settings-check .form-check-label {
+    margin-left: 0 !important;
+}
+
+.settings-status {
+    margin: 0;
+    font-size: 0.85em;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.mode-switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.mode-switch-label {
+    color: rgba(0, 0, 0, 0.45);
+    font-weight: 700;
+    transition: color 0.15s ease;
+}
+
+.mode-switch-label.active {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: background 0.2s ease;
+}
+
+.switch-slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(220, 220, 230, 0.9));
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.switch input:checked + .switch-slider::before {
+    transform: translateX(20px);
+}
+
+.settings-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.settings-actions {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 16px 0;
+}
+
+.settings-group {
+    width: 100%;
+    text-align: center;
+}
+
+.settings-label {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(0, 0, 0, 0.75);
+}
+
+#midiInputSelect,
+#midiOutputSelect {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.device-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.device-row .form-check-label {
+    margin: 0 !important;
+    flex: 1 1 auto;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(0, 0, 0, 0.75);
+    font-size: 0.9em;
+}
+
+.device-row .form-check-input {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.device-list-empty {
+    margin: 0;
+    font-size: 0.85em;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+.settings-hint {
+    margin: 0;
+    font-size: 0.8em;
+    text-align: center;
+    color: rgba(60, 60, 60, 0.85) !important;
+}
+
+.sample-name {
+    display: block;
+    color: rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    font-size: 0.95rem;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sample-card-body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+}
+
+.sample-keys-group {
+    flex: 1 1 auto;
+    align-items: center;
+}
+
+.sample-keys-group .form-control,
+.sample-keys-group .input-group-text {
+    height: 42px;
+    display: flex;
+    align-items: center;
+}
+
+.sample-pitch-check {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    min-height: auto;
+    white-space: nowrap;
+}
+
+.sample-pitch-check .form-check-input {
+    margin: 0;
+    float: none;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.sample-pitch-check .form-check-label {
+    font-size: 0.85rem;
+    color: rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+    margin-left: 0 !important; /* override the global .form-check-label margin; spacing comes from the flex gap */
+}
+
+/* Sequencer text/number inputs are block-level with fixed widths and sit inside
+   sub-wrappers, so flex centering on the column doesn't reach them. Auto margins
+   center them, replacing the old <center> (text-align: -webkit-center) behaviour. */
+#seq_tab .form-control {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Inline label beside a field (e.g. Tempo: [120]). */
+.field-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.field-row .settings-label {
+    margin-bottom: 0;
+}
+
+/* Slider flanked by +/- steppers (e.g. the Alternate control). */
+.stepper-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.stepper-row .slider {
+    flex: 1 1 auto;
+    width: auto;
+}
+
+.stepper-btn {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    font-size: 1.25rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Sequencer current-step readout above the cards. */
+.seq-current {
+    text-align: center;
+    margin: 8px 0 4px;
+}
+
+.seq-current-label {
+    display: block;
+    font-size: 0.8em;
+    color: rgba(0, 0, 0, 0.55);
+}
+
+.seq-current-char {
+    margin: 0;
+    font-size: 2.5rem;
+    color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* App footer: pushed well down so it stays out of short/empty views (e.g. the
+   guest pad/piano view) and only appears once you scroll past the content. */
+.app-footer {
+    margin-top: 40vh;
+    padding: 40px 16px 60px;
+    text-align: center;
+}
+
+.app-footer-links {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.app-footer-links a {
+    color: rgba(0, 0, 0, 0.55);
+    text-decoration: none;
+}
+
+.app-footer-links a:hover {
+    color: rgba(0, 0, 0, 0.8);
+    text-decoration: underline;
+}
+
+.app-footer-sep {
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.sample-btn {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 1rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        0 2px 3px rgba(0, 0, 0, 0.15);
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+.sample-btn:active {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.2),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+    transform: translateY(1px) scale(0.96);
+}
+
+.sample-remove-btn {
+    color: rgba(190, 0, 0, 0.85);
 }
 
 #stop_all_samples_btn {
   width: 200px;
 }
 
-.nav-link:active, .nav-link:link, .nav-link:visited, .nav-link:hover, .nav-link:active {
-    color: rgba(255,255,255,0.65) !important;
-    background-color:  rgba(255, 255, 255, 0.0) !important;
-}
-
-.mid-sample-row {
-    background-color: rgba(255, 255, 255, 0.1);
-
-    margin-left:10px;
-    margin-right:10px;
-}
-
 .form-check-label {
   margin-left: 10px !important; /* Adjust the value as needed */
 }
 
-.btm-sample-row {
-    max-width: 500px;
-    background-color: rgba(255, 255, 255, 0.1);
-    margin-left: 0px;
-    margin-right: 0px;
-    /* border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px; */
+.form-check-input {
+    accent-color: rgba(160, 120, 255, 0.85);
+    cursor: pointer;
 }
 
 #keyTable{
-    color: lime;
+    color: rgba(0, 120, 0, 0.85);
 }
 
 #sampleTableContainer{
-    color: rgba(180, 180, 180, 1);
+    color: rgba(40, 40, 40, 0.85);
 }
 
 .qr-code {
@@ -122,12 +568,74 @@ p {
     /*color: purple;*/
 }
 
+.btn-light {
+    color: rgba(0, 0, 0, 0.85);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        0 3px 5px rgba(0, 0, 0, 0.15);
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+.btn-light:hover,
+.btn-light:focus {
+    color: rgba(0, 0, 0, 0.85);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        0 3px 5px rgba(0, 0, 0, 0.15);
+}
+
+.btn-light:active,
+.btn-light.active {
+    color: rgba(0, 0, 0, 0.85);
+    background: rgba(255, 255, 255, 0.28);
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.2),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+    transform: translateY(1px) scale(0.98);
+}
+
 
 .form-control {
-    outline:0;
-    /* background-color: rgba(180, 180, 180, 0.1);
-    background: rgba(180, 180, 180, 0.1); */
-    color: black;
+    outline: 0;
+    color: rgba(0, 0, 0, 0.95);
+    background-color: rgba(0, 0, 0, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.form-control::placeholder {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.form-control:focus {
+    color: rgba(0, 0, 0, 0.85);
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(160, 120, 255, 0.6);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(160, 120, 255, 0.25);
+}
+
+.input-group-text {
+    color: rgba(0, 0, 0, 0.75);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+}
+
+.phone-pad-input {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 .input {
@@ -144,11 +652,12 @@ p {
 }
 
 .keyPad {
-    color: white;
+    color: rgba(0, 0, 0, 0.8);
 }
 
 .keyPadInput, .keyPadInput:focus, .keyPadInput:active {
-    color: white;
+    color: rgba(0, 0, 0, 0.8) !important;
+    /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6), 0 -1px 0 rgba(255, 255, 255, 0.08); */
 
     background-color: clear !important;
     background: transparent !important;
@@ -158,45 +667,85 @@ p {
     outline-style: none !important;
 }
 
+.keyPad-col {
+    width: 25%; /* 4 pads per row on narrow/phone screens */
+}
+
+@media (min-width: 768px) {
+    .keyPad-col {
+        width: 12.5%; /* 8 pads per row on tablets and up */
+    }
+}
+
+/* Make every pad element claim taps cleanly on touch: manipulation disables the
+   double-tap-zoom/delay, and applying it to the inner elements (not just the
+   card) prevents a scrollable descendant from re-enabling pan and swallowing
+   rapid taps. */
+.keyPad-col .card,
+.keyPad-col .keyPad,
+.keyPad-col .keyPadInput {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.keyPad-col .card {
+    transition: transform 0.04s ease, filter 0.08s ease;
+}
+
+.keyPad-col .card.pad-active {
+    transform: scale(0.95);
+    filter: brightness(1.25);
+}
+
 .card-block {
-    border-radius: 5px;
-    background-color: rgba(100, 0, 255, 0);
-    outline: 0;
+    outline: 0 !important;
     border: none !important;
     -moz-outline-style: none !important;
     outline-style: none !important;
-}
-
-.card {
-    outline:0 !important;
-    border: none !important;
-    outline: none !important;
-    font-size: 25px;
-    outline:0;
-    border-radius: 5px;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-
-.card-title {
-    color: white;
-}
-
-.card:active, .card:focus {
-    outline:0 !important;
-    border: none !important;
-    outline: none !important;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.75);
-}
-
-.card-block {
-    outline:0 !important;
-    border: none !important;
-    outline: none !important;
     border-radius: 5px;
     color: rgba(255, 255, 255, 0.01);
     background-color: rgba(255, 255, 255, 0.01);
+}
+
+.card {
+    outline: 0 !important;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    font-size: 25px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.15),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.15);
+    aspect-ratio: 1 / 1;
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+.card.pad-received {
+    background: linear-gradient(145deg, var(--pad-flash-color, rgba(0, 200, 255, 0.85)), rgba(255, 255, 255, 0.15)) !important;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.15),
+        0 0 16px var(--pad-flash-color, rgba(0, 200, 255, 0.9));
+    transition: background 0.05s ease, box-shadow 0.05s ease;
+}
+
+.card-title {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.card:active, .card:focus {
+    outline: 0 !important;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.25),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+    transform: translateY(1px) scale(0.98);
 }
 
 .slidecontainer {
@@ -205,27 +754,69 @@ p {
   text-align: center !important;
 }
 
-/* The slider itself */
+/* The slider itself.
+   The element is a tall, transparent, finger-friendly touch target; the
+   visible 6px bar is drawn on the track pseudo-element. touch-action: none
+   keeps a drag on the thumb from being hijacked into a page scroll on iOS. */
 .slider {
+  -webkit-appearance: none;
+  appearance: none;
   width: 100%;
+  height: 38px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
+  margin-top: -8px;
   border-radius: 50%;
-  background: rgba(0,0,50,1);
+  background: linear-gradient(145deg, rgba(170, 140, 255, 0.95), rgba(90, 60, 180, 0.95));
+  box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+      0 2px 4px rgba(0, 0, 0, 0.4);
   cursor: pointer;
+  transition: transform 0.05s ease;
 }
 
 .slider::-moz-range-thumb {
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
+  border: none;
   border-radius: 50%;
-  background: rgba(0,0,50,0.75);
+  background: linear-gradient(145deg, rgba(170, 140, 255, 0.95), rgba(90, 60, 180, 0.95));
+  box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+      0 2px 4px rgba(0, 0, 0, 0.4);
   cursor: pointer;
+  transition: transform 0.05s ease;
+}
+
+.slider:active::-webkit-slider-thumb,
+.slider:active::-moz-range-thumb {
+  transform: scale(0.92);
 }
 
 .attack_knob {
@@ -278,26 +869,61 @@ a.button {
   /* Other styling like padding, margin, colors, etc. */
 }
 
-.nav-tabs .nav-link.active { /* Styles for the active tab */
-    /* Add bottom border (underline) */
-    /* border-bottom: 3px solid rgba(50, 50, 50, 1); */
-
-    /* Or use a different underline style: */
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-decoration-color: rgba(120, 120, 120, 1);
+.tab {
+    color: rgba(0, 0, 0, 0.75);
 }
 
-/* .nav-tabs .nav-link:hover {
-    border-bottom: 2px solid rgba(120, 120, 120, 1);
-} */
+.pill-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    list-style: none;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 10px auto;
+    padding: 6px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, 0.12),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.2);
+}
 
-.tab {
-    color: white;
-    margin-top: 0px;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-bottom: 30px;
+.pill-nav .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    color: rgba(0, 0, 0, 0.8) !important;
+    background-color: transparent !important;
+    border-radius: 10px;
+    padding: 8px 18px;
+    text-decoration: none !important;
+    transition: background 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.05s ease;
+}
+
+.pill-nav .nav-link:hover,
+.pill-nav .nav-link:focus {
+    color: rgba(0, 0, 0, 0.85) !important;
+    background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.pill-nav .nav-link.active {
+    color: rgba(0, 0, 0, 0.85) !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.pill-nav .nav-link.active:hover,
+.pill-nav .nav-link.active:focus {
+    background-color: rgba(255, 255, 255, 0.38) !important;
+}
+
+.pill-nav .nav-link:active {
+    transform: translateY(1px) scale(0.97);
 }
 
 @-webkit-keyframes colorchange {
@@ -373,8 +999,7 @@ a.button {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgb(41, 0, 61);
-  color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255, 0.75);
   border: 1px solid #ccc;
   padding: 20px;
   border-radius: 5px;

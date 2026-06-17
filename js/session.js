@@ -37,8 +37,7 @@ if (Object.keys(url_vars).length > 0) {
 
         if (url_vars["mode"] === "padClient" || url_vars["mode"] === "pianoClient") {
 
-            document.getElementById("receiveCommandsCheckbox").checked = false;
-            document.getElementById("enableTransmissionCheckbox").checked = true;
+            setHostClientMode(true);
             document.getElementById("enableMidiOutCheckbox").checked = false;
 
             let topLogo = document.getElementById("topLogo");
@@ -47,12 +46,14 @@ if (Object.keys(url_vars).length > 0) {
             let nav_a = document.getElementById("topNav");
             nav_a.style = "display: none !important";    
 
-            let guestInstruct = document.getElementById("guestInstruct");
-            guestInstruct.style = "display: block !important";
+            if (url_vars["showChannel"] === "1") {
+                let guestInstruct = document.getElementById("guestInstruct");
+                guestInstruct.style = "display: block !important";
 
-            let guestInstructText = document.getElementById("guestInstructText");      
-            guestInstructText.innerHTML = currentChannelName;            
-            guestInstructText.classList.add("d-flex", "justify-content-center", "ps-4", "pe-4");
+                let guestInfoText = document.getElementById("guestInfoText");
+                guestInfoText.innerHTML = currentChannelName;
+                guestInfoText.classList.add("d-flex", "justify-content-center", "ps-4", "pe-4");
+            }
 
             let nav_b = document.getElementById("subNav");
             nav_b.style = "display: none !important";
@@ -73,8 +74,7 @@ if (Object.keys(url_vars).length > 0) {
         }
 
         if (url_vars["mode"] === "host") {
-            document.getElementById("receiveCommandsCheckbox").checked = true;
-            document.getElementById("enableTransmissionCheckbox").checked = false;
+            setHostClientMode(false);
         }
     }
 }

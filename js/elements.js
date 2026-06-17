@@ -10,6 +10,12 @@ var setChannelNameButton = document.getElementById("setChannelNameButton");
 var enableTransmissionCheckbox = document.getElementById("enableTransmissionCheckbox");
 var receiveCommandsCheckbox = document.getElementById("receiveCommandsCheckbox");
 var randomizePlaybackCheckbox = document.getElementById("randomizePlaybackCheckbox");
+var holdPitchedCheckbox = document.getElementById("holdPitchedCheckbox");
+var pianoNoteOffCheckbox = document.getElementById("pianoNoteOffCheckbox");
+var pianoReleaseSlider = document.getElementById("pianoReleaseSlider");
+var pitchPolyphonyCheckbox = document.getElementById("pitchPolyphonyCheckbox");
+var hostClientSwitch = document.getElementById("hostClientSwitch");
+var showChannelNameCheckbox = document.getElementById("showChannelNameCheckbox");
 
 var currentChannelDisplay = document.getElementById("currentChannelDisplay");
 var synthMasterAmp   = document.getElementById("synthMasterAmp");
