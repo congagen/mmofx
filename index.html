@@ -6,13 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <link rel="canonical" href="https://mmofx.xusione.com/">
+    <link rel="icon" href="icons/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon_180x180.png">
 
     <!-- HTML Meta Tags -->
-    <title>MMOFX! - XUSIONE.COM</title>
+    <title>MMOFX!</title>
 
     <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="https://mmofx.xusione.com/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="MMOFX!">
 
@@ -23,16 +23,19 @@
     <script src="js/libs/firebase-auth-compat.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/styles.css?v=30">
-    <link rel="stylesheet" type="text/css" href="css/pianoroll.css?v=30">
+    <link rel="stylesheet" type="text/css" href="css/styles.css?v=52">
+    <link rel="stylesheet" type="text/css" href="css/pianoroll.css?v=52">
 </head>
 
 <body>
+    <!-- Connection status bar: hidden when connected, slides in on trouble.
+         Visible to guests too (lives outside the hidden topNav). -->
+    <div id="connectionBar" class="connection-bar" role="status" aria-live="polite"></div>
+
     <div style="background-color: rgb(255, 255, 255, 0)" id="topMenuSection">
         <div class="d-flex align-items-center justify-content-center">
             <!-- <img class="mb-4 mt-5" src="img/logo.png" alt="MMOFX!" width="280" height="65" id="topLogo" style="opacity: 70%; mix-blend-mode: multiply;"> -->
-             <img class="mb-3 mt-5" src="img/logo.png?v=30" alt="MMOFX!" width="190" height="70" id="topLogo" style="opacity: 70%;">
-            <span id="connectionIndicator" class="connection-dot" title="Connection status"></span>
+             <img class="" src="img/logo.png?v=52" alt="MMOFX!" width="210" height="120" id="topLogo" style="opacity: 75%; margin-top: 25px; margin-bottom: 20px;">
         </div>
 
         <div id="guestInstruct" style="display: none;" class="pb-2">
@@ -76,27 +79,12 @@
 
                         <div class="form-check settings-check">
                             <input type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
-                            <label class="form-check-label" for="enablePreviewCheckbox">Device Keyboard</label>
+                            <label class="form-check-label" for="enablePreviewCheckbox">Device Keyboards</label>
                         </div>
 
                         <div class="form-check settings-check">
                             <input type="checkbox" class="form-check-input" id="pitchPolyphonyCheckbox" checked>
-                            <label class="form-check-label" for="pitchPolyphonyCheckbox">Polyphony</label>
-                        </div>
-
-                        <div class="form-check settings-check">
-                            <input type="checkbox" class="form-check-input" id="holdPitchedCheckbox">
-                            <label class="form-check-label" for="holdPitchedCheckbox">Hold Pitched Notes</label>
-                        </div>
-
-                        <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-                            <input type="range" id="pianoReleaseSlider" min="0" max="8" step="0.1" value="2" class="slider" style="width: 100%; max-width: 320px;" oninput="updateReleaseLabel()">
-                            <label for="pianoReleaseSlider" class="settings-label" style="margin-bottom: 0;">Fade Duration: <span id="pianoReleaseValue">2.0</span>s</label>
-                        </div>
-
-                        <div class="form-check settings-check" style="display: none;">
-                            <input type="checkbox" checked class="form-check-input" id="enablePolyphonyCheckbox">
-                            <label class="form-check-label" for="enablePolyphonyCheckbox">Sample Polyphony</label>
+                            <label class="form-check-label" for="pitchPolyphonyCheckbox">Sample Polyphony</label>
                         </div>
 
                         <button id="stop_all_samples_btn" class="btn btn-light" onclick="stopAllSamples()">Reset</button>
@@ -104,7 +92,24 @@
                 </div>
 
                 <div class="settings-card">
-                    <div class="settings-card-header" id="connectionHeader">Connection</div>
+                    <div class="settings-card-header">Notes</div>
+                    <div class="settings-card-body">
+                        <p class="settings-hint">Applies to the Keys tab and MIDI input.</p>
+
+                        <div class="form-check settings-check">
+                            <input type="checkbox" class="form-check-input" id="holdPitchedCheckbox">
+                            <label class="form-check-label" for="holdPitchedCheckbox">Hold Notes</label>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                            <input type="range" id="pianoReleaseSlider" min="0" max="8" step="0.1" value="2" class="slider" style="width: 100%; max-width: 320px;" oninput="updateReleaseLabel()">
+                            <label for="pianoReleaseSlider" class="settings-label" style="margin-bottom: 0;">Fade Duration: <span id="pianoReleaseValue">2.0</span>s</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <div class="settings-card-header" id="connectionHeader">Connection <span class="connection-dot" title="Connection status"></span></div>
                     <div class="settings-card-body">
                         <div class="mode-switch">
                             <span id="hostModeLabel" class="mode-switch-label active">Host</span>
@@ -396,13 +401,12 @@
                                 <label class="settings-label" for="maxlerMulti">Variation: <span id="maxlerMultiValue">1.0</span></label>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
                 <div id="control_tab" class="tab-pane show active">
                     <div class="mt-4 mb-4">
-                        <input type="text" id="" class="form-control phone-pad-input" placeholder="Phone Pad"/>
+                        <input type="text" id="" class="form-control phone-pad-input" placeholder="Keyboard Input"/>
 
                         <div class="container">
                             <div class="row" id="keyPadPanel"></div>
@@ -410,7 +414,7 @@
                     </div>
                 </div>
 
-                <div id="piano_tab" class="tab-pane" style="width: 100% !important; height: 100vh !important;">
+                <div id="piano_tab" class="tab-pane" style="width: 100% !important;">
                     <div id="controlCenter" style="display: flex; flex-direction: column; align-items: center; padding: 10px;">
                         <div class="mt-3" id="pianoScaleSliderElement" style="width: 50%;">
                             <div class="col-12">
@@ -423,7 +427,7 @@
 
                         <div class="form-check settings-check mt-3">
                             <input type="checkbox" class="form-check-input" id="pianoNoteOffCheckbox" checked>
-                            <label class="form-check-label" for="pianoNoteOffCheckbox">Note Off on Release</label>
+                            <label class="form-check-label" for="pianoNoteOffCheckbox" id="pianoNoteOffCheckboxClentLabel">Note Off on Release</label>
                         </div>
                     </div>
                     
@@ -619,35 +623,21 @@
         </div>
     </div>
 
-    <footer class="app-footer">
-        <nav class="app-footer-links">
-            <a href="https://xusione.com/pages/resources/articles/mmofx-guide.html" target="_blank" rel="noopener">Guide</a>
-            <span class="app-footer-sep">·</span>
-            <!-- <a href="https://www.xusione.com/subpages/privacy.html" target="_blank" rel="noopener">Privacy</a>
-            <span class="app-footer-sep">·</span> -->
-            <a href="https://www.xusione.com/subpages/terms.html" target="_blank" rel="noopener">Terms</a>
-            <span class="app-footer-sep">·</span>
-            <a href="https://www.xusione.com" target="_blank" rel="noopener">© XUSIONE</a>
-        </nav>
-    </footer>
-
-    <script type="text/javascript" src="js/alerts.js?v=30"></script>
-    <script type="text/javascript" src="js/elements.js?v=30"></script>
-    <script type="text/javascript" src="js/params.js?v=30"></script>
-    <script type="text/javascript" src="js/network.js?v=30"></script>
-    <script type="text/javascript" src="js/ui.js?v=30"></script>
-    <script type="text/javascript" src="js/session.js?v=30"></script>
-    <script type="text/javascript" src="js/iosAudio.js?v=30"></script>
-    <script type="text/javascript" src="js/audio.js?v=30"></script>
-    <script type="text/javascript" src="js/sequ.js?v=30"></script>
-    <script type="text/javascript" src="js/pianoroll.js?v=30"></script>
+    <script type="text/javascript" src="js/alerts.js?v=52"></script>
+    <script type="text/javascript" src="js/elements.js?v=52"></script>
+    <script type="text/javascript" src="js/params.js?v=52"></script>
+    <script type="text/javascript" src="js/network.js?v=52"></script>
+    <script type="text/javascript" src="js/ui.js?v=52"></script>
+    <script type="text/javascript" src="js/session.js?v=52"></script>
+    <script type="text/javascript" src="js/iosAudio.js?v=52"></script>
+    <script type="text/javascript" src="js/audio.js?v=52"></script>
+    <script type="text/javascript" src="js/sequ.js?v=52"></script>
+    <script type="text/javascript" src="js/pianoroll.js?v=52"></script>
 
     <script>
         function htmlEncode(value) {
             return $('<div/>').text(value).html();
         }
-
-        let chUrl = "https://mmofx.xusione.com/index.html?channel=" + currentChannelName.value;       
 
         window.scrollTo(0, 0);
     </script>

@@ -38,19 +38,51 @@ var database = firebase.database();
 var connectedRef = firebase.database().ref(".info/connected");
 
 function setConnectionStatus(status) {
-    const dot = document.getElementById('connectionIndicator');
-    if (!dot) return;
-    dot.classList.remove('connected', 'disconnected');
-    dot.classList.add(status);
+    document.querySelectorAll('.connection-dot').forEach(function (dot) {
+        dot.classList.remove('connected', 'disconnected');
+        dot.classList.add(status);
+    });
 }
+
+// Top status bar: shown only when there's a problem, visible to everyone.
+function showConnectionBar(message, isError) {
+    const bar = document.getElementById('connectionBar');
+    if (!bar) return;
+    bar.textContent = message;
+    bar.classList.toggle('connection-bar--error', !!isError);
+    bar.classList.add('show');
+}
+
+function hideConnectionBar() {
+    const bar = document.getElementById('connectionBar');
+    if (bar) bar.classList.remove('show');
+}
+
+// Grace period before the bar surfaces a dropout. iOS Safari throttles/suspends
+// background connections, so `.info/connected` flips false/true constantly and
+// Firebase auto-reconnects within a second or two. Only show the bar if the
+// connection stays down past this window, so those transient blips never flash.
+var CONNECTION_BAR_GRACE_MS = 2500;
+var connectionBarTimer = null;
 
 connectedRef.on("value", function(snap) {
     if (snap.val() === false) {
         console.log('Connection lost!');
         setConnectionStatus('disconnected');
+        if (connectionBarTimer === null) {
+            connectionBarTimer = setTimeout(function () {
+                connectionBarTimer = null;
+                showConnectionBar('Connection lost. Reconnecting...', false);
+            }, CONNECTION_BAR_GRACE_MS);
+        }
         attemptReconnect(retryCount);
     } else {
         setConnectionStatus('connected');
+        if (connectionBarTimer !== null) {
+            clearTimeout(connectionBarTimer);
+            connectionBarTimer = null;
+        }
+        hideConnectionBar();
     }
 });
 
@@ -58,10 +90,11 @@ function attemptReconnect(retryCount = 0) {
     if (retryCount >= maxRetryCount) {
       console.error('Max retry count exceeded. Unable to reconnect.');
       currentChannelDisplay.innerHTML = `Connection refused. If you're using a VPN, try disabling it. Otherwise, please check your internet connection`;
+      showConnectionBar('Offline. Check your connection or disable any VPN.', true);
       return;
     } else {
         retryCount += 1;
-    }    
+    }
 
     if (retryDelay < 60000){
         retryDelay = parseInt(initialDelay * retryCount);        
@@ -69,12 +102,17 @@ function attemptReconnect(retryCount = 0) {
 
     console.log(`Attempting to reconnect in ${retryDelay}...`);
     currentChannelDisplay.innerHTML = `Connection refused, attempting to reconnect in ${retryDelay / 1000} s...`;
-  
+
     setTimeout(() => {
       firebase.database().ref(".info/connected").once("value", function(snap) {
         if (snap.val() === true) {
             console.log('Connected!');
             setConnectionStatus('connected');
+            if (connectionBarTimer !== null) {
+                clearTimeout(connectionBarTimer);
+                connectionBarTimer = null;
+            }
+            hideConnectionBar();
             currentChannelDisplay.innerHTML = "Current Channel: " + currentChannelName;
             showNetworkAlerts = true;
             retryCount = 0;

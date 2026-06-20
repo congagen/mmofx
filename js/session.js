@@ -44,7 +44,13 @@ if (Object.keys(url_vars).length > 0) {
             topLogo.style = "display: none !important";
 
             let nav_a = document.getElementById("topNav");
-            nav_a.style = "display: none !important";    
+            nav_a.style = "display: none !important";
+
+            let pianoNoteOffCheckbox_Client = document.getElementById("pianoNoteOffCheckbox");
+            pianoNoteOffCheckbox_Client.style = "display: none !important";    
+
+            let pianoNoteOffCheckboxLabel_Client = document.getElementById("pianoNoteOffCheckboxClentLabel");
+            pianoNoteOffCheckboxLabel_Client.style = "display: none !important";    
 
             if (url_vars["showChannel"] === "1") {
                 let guestInstruct = document.getElementById("guestInstruct");

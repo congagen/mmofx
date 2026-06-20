@@ -112,7 +112,7 @@ function getDecodedBuffer(sampleFilePath) {
 function playBuffer(sampleFilePath, playbackRate = 1, gainMul = 1, forcePoly = false, loop = false, onVoice = null, releaseSec = 0) {
     var bufContext = window.audioContext;
 
-    if (!enablePolyphonyCheckbox.checked && !forcePoly) {
+    if (enablePolyphonyCheckbox && !enablePolyphonyCheckbox.checked && !forcePoly) {
         if (sampleFilePath in currentBufferSources) {
             try { currentBufferSources[sampleFilePath].stop(0); } catch (e) {}
         }
@@ -162,6 +162,15 @@ function playBuffer(sampleFilePath, playbackRate = 1, gainMul = 1, forcePoly = f
 // Plays every pitch-enabled sample at the pitch for the given MIDI note,
 // scaled by velocity. Driven by the Keys piano, network notes, and local MIDI.
 // When hold is true, voices loop and are tracked for note-off (stopPitchedNote).
+// On-screen pad/key input always sounds locally, independently of whether it's
+// also transmitted. Clients rarely have samples or MIDI configured, so local
+// playback is usually silent anyway; always allowing it keeps behaviour simple
+// and predictable for new users rather than hiding sound behind a toggle. (Kept
+// as a function so the policy lives in one place and is easy to revisit.)
+function shouldPlayLocalInput() {
+    return true;
+}
+
 function playPitchedSamples(midiNote, velocity, hold, releaseSec) {
     const note = parseInt(midiNote);
     if (isNaN(note)) return;
@@ -170,17 +179,29 @@ function playPitchedSamples(midiNote, velocity, hold, releaseSec) {
     const rate = Math.pow(2, (note - PITCH_ROOT_NOTE) / 12);
     const rel = releaseSec || 0;
 
-    // Monophonic mode: stop everything currently sounding (pads and pitched) so
-    // only this note rings (last-note priority, global). This note's own voices
-    // are created below, so they survive.
+    // Monophonic mode (Sample Polyphony off): stop everything currently sounding
+    // (pads and pitched) so only this note rings (last-note priority, global).
+    // This note's own voices are created below, so they survive. Sample Polyphony
+    // is the master poly/mono switch and applies regardless of Hold: with it on,
+    // held drags accumulate into chords; with it off, even held drags are mono
+    // and only the most recent note sounds.
     if (pitchPolyphonyCheckbox && !pitchPolyphonyCheckbox.checked) {
         stopAllSamples();
     }
 
     if (hold) heldPitchedNotes.add(note);
 
-    for (const id of Object.keys(currentSamples)) {
-        if (!currentSamples[id][3]) continue;
+    // Pitch-enabled samples for this note. Normally they all layer; with
+    // Randomize Samples on, pick a single random one each trigger so repeated
+    // notes vary instead of always sounding the same stack.
+    let pitchedIds = Object.keys(currentSamples).filter(function (id) {
+        return currentSamples[id][3];
+    });
+    if (randomizePlaybackCheckbox && randomizePlaybackCheckbox.checked && pitchedIds.length > 0) {
+        pitchedIds = [pitchedIds[Math.floor(Math.random() * pitchedIds.length)]];
+    }
+
+    for (const id of pitchedIds) {
         if (hold) {
             playBuffer(currentSamples[id][1], rate, gainMul, true, true, function (source) {
                 // If the note-off already arrived (decode race), don't leave it looping.
@@ -205,7 +226,11 @@ function playPitchedSamples(midiNote, velocity, hold, releaseSec) {
             }, rel);
         } else {
             playBuffer(currentSamples[id][1], rate, gainMul, true, false, function (source) {
-                // Track so Monophonic mode can cut it; drop it once it ends.
+                // Track so Monophonic mode can cut it, and tag with the note so
+                // "Note Off on Release" can silence it on key-up even though
+                // Hold is off (one-shots aren't in activePitchedVoices). Drop it
+                // once it ends.
+                source._pitchNote = note;
                 oneShotPitchedVoices.push(source);
                 const prevOnEnded = source.onended;
                 source.onended = function () {
@@ -247,6 +272,20 @@ function stopPitchedNote(midiNote) {
         }
         delete activePitchedVoices[note];
     }
+    // Also cut any one-shot voices for this note (Hold off). Without this,
+    // "Note Off on Release" had no effect unless Hold was enabled, since
+    // one-shots live outside activePitchedVoices. onended splices them out.
+    for (let i = oneShotPitchedVoices.length - 1; i >= 0; i--) {
+        const source = oneShotPitchedVoices[i];
+        if (source._pitchNote !== note) continue;
+        if (source.releaseGain) {
+            try {
+                source.releaseGain.gain.cancelScheduledValues(0);
+                source.releaseGain.gain.value = 0;
+            } catch (e) {}
+        }
+        try { source.stop(0); } catch (e) {}
+    }
 }
 
 // Releases a held note with a fade-out (on key-up, piano latch mode). The voice
@@ -257,12 +296,18 @@ function stopPitchedNote(midiNote) {
 function releasePitchedNote(midiNote, releaseSec) {
     const note = parseInt(midiNote);
     if (isNaN(note)) return;
-    heldPitchedNotes.delete(note);
+    // releaseSec <= 0 means "ring until Reset/re-trigger". Leave the note in
+    // heldPitchedNotes so any still-decoding voices register and ring too,
+    // instead of being killed by the decode-race guard — otherwise, on a fast
+    // drag, notes whose buffer hadn't finished decoding when you lifted would
+    // silently drop (only "some notes stick"). The note is cleared later by
+    // stopPitchedNote (re-trigger/note-off) or stopAllPitchedNotes (Reset/panic).
     if (!releaseSec || releaseSec <= 0) return;
-    const voices = activePitchedVoices[note];
-    if (!voices) return;
+    // Fading to a stop: now drop it from the guard so in-flight decodes don't
+    // re-arm a note we're deliberately ending.
+    heldPitchedNotes.delete(note);
     const t = window.audioContext.currentTime;
-    for (const source of voices) {
+    const fade = function (source) {
         if (source.releaseGain) {
             try {
                 source.releaseGain.gain.cancelScheduledValues(t);
@@ -271,7 +316,28 @@ function releasePitchedNote(midiNote, releaseSec) {
             } catch (e) {}
         }
         try { source.stop(t + releaseSec); } catch (e) {}
+    };
+    const voices = activePitchedVoices[note];
+    if (voices) {
+        for (const source of voices) fade(source);
     }
+    // Fade matching one-shots too (Hold off), so key-up honours the Release
+    // time instead of being a no-op. releaseSec <= 0 already returned above,
+    // leaving one-shots to ring out naturally.
+    for (const source of oneShotPitchedVoices) {
+        if (source._pitchNote === note) fade(source);
+    }
+}
+
+// Release a note honouring the Fade Duration: fade out over the set time, or
+// stop immediately when it's 0. Used for MIDI note-offs so the release envelope
+// applies to MIDI input the same as the Keys tab's latch release. (Unlike the
+// Keys "ring forever" latch, a MIDI note-off with Fade 0 must cut cleanly, so we
+// route 0 to stopPitchedNote rather than releasePitchedNote's ring path.)
+function releasePitchedNoteWithFade(midiNote) {
+    const fade = pianoReleaseSlider ? parseFloat(pianoReleaseSlider.value) : 0;
+    if (fade > 0) releasePitchedNote(midiNote, fade);
+    else stopPitchedNote(midiNote);
 }
 
 // Panic: stops all held pitched voices and clears tracking. Used when MIDI In is
@@ -687,8 +753,8 @@ function onMIDIMessage(event) {
         case 8: // Note Off
             messageText = `Note Off: ${note} (Velocity: ${velocity}) Channel: ${channel + 1}`;
             // Always release held pitched voices, even if MIDI In was just
-            // disabled, so a note can never get stuck on.
-            stopPitchedNote(note);
+            // disabled, so a note can never get stuck on. Honours Fade Duration.
+            releasePitchedNoteWithFade(note);
             break;
         case 9: // Note On
             messageText = `Note On: ${note} (Velocity: ${velocity}) Channel: ${channel + 1}`;
@@ -706,7 +772,7 @@ function onMIDIMessage(event) {
                 if (velocity > 0) {
                     playPitchedSamples(note, velocity, holdPitchedCheckbox.checked);
                 } else {
-                    stopPitchedNote(note);
+                    releasePitchedNoteWithFade(note); // velocity-0 note-on = note-off
                 }
             }
 

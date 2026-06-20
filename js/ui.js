@@ -140,30 +140,31 @@ function copySampleMapToKeyboard() {
 }
 
 // Saves the current key map as a downloadable JSON file.
-// Shape: { key: [fileName, ...] }, the same format loadSampleMap() reads back.
+// Shape: { keys: { key: [fileName, ...] }, pitch: [fileName, ...] }.
+// loadSampleMap() reads it back; older bare key-map files still load (keys only).
 function saveSampleMap() {
-    var keyMap = {};
+    const keyMap = {};
+    const pitch = [];
 
-    for (var i = 0; i < Object.keys(currentSamples).length; i++) {
-        let k = Object.keys(currentSamples)[i];
-
-        let sampleName = currentSamples[k][0];
-        let sampleKeys = currentSamples[k][2];
+    for (const k of Object.keys(currentSamples)) {
+        const sampleName = currentSamples[k][0];
+        const sampleKeys = currentSamples[k][2].toString();
 
         for (let j = 0; j < sampleKeys.length; j++) {
-            let tChar = sampleKeys[j];
-
-           if (Object.keys(keyMap).includes(tChar)) {
+            const tChar = sampleKeys[j];
+            if (keyMap[tChar]) {
                 keyMap[tChar].push(sampleName);
-           } else {
-                keyMap[tChar] = [];
-                keyMap[tChar].push(sampleName);
-           }
+            } else {
+                keyMap[tChar] = [sampleName];
+            }
+        }
 
+        if (currentSamples[k][3] && !pitch.includes(sampleName)) {
+            pitch.push(sampleName);
         }
     }
 
-    const json = JSON.stringify(keyMap, null, 2);
+    const json = JSON.stringify({ keys: keyMap, pitch: pitch }, null, 2);
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -175,22 +176,29 @@ function saveSampleMap() {
     URL.revokeObjectURL(url);
 }
 
-// Applies a saved keymap (JSON text) to the currently-loaded samples by exact
-// file-name match. The keymap is { key: [fileName, ...] }; we invert it to
-// { fileName: "keys" }. For duplicate file names, the first loaded sample wins
-// (avoids assigning the same key to multiple copies, which would double-trigger).
+// Applies a saved sample map (JSON text) to the currently-loaded samples by
+// exact file-name match. New maps are { keys: { key: [fileName, ...] },
+// pitch: [fileName, ...] }; older bare key-map files still load (keys only, no
+// pitch). For duplicate file names, the first loaded sample wins. Samples not
+// described by the map are left untouched.
 function applySampleKeymap(text) {
-    let keyMap;
+    let parsed;
     try {
-        keyMap = JSON.parse(text);
+        parsed = JSON.parse(text);
     } catch (e) {
         showCustomAlert("Could not read keymap (invalid JSON).");
         return;
     }
-    if (!keyMap || typeof keyMap !== "object") {
+    if (!parsed || typeof parsed !== "object") {
         showCustomAlert("Could not read keymap.");
         return;
     }
+
+    // New (wrapped) format nests the key map under "keys" and adds a "pitch"
+    // list. A bare key map (old format) is used as-is, with no pitch info.
+    const isWrapped = parsed.keys && typeof parsed.keys === "object" && !Array.isArray(parsed.keys);
+    const keyMap = isWrapped ? parsed.keys : parsed;
+    const pitchSet = new Set(isWrapped && Array.isArray(parsed.pitch) ? parsed.pitch : []);
 
     // Invert into { fileName: "keys" }, aggregating every character mapped to a
     // given file name (order preserved, duplicates removed).
@@ -208,17 +216,29 @@ function applySampleKeymap(text) {
     for (const id of Object.keys(currentSamples)) {
         const fName = currentSamples[id][0];
         if (assignedNames.has(fName)) continue; // first loaded copy wins
-        if (nameToKeys[fName] != null) {
+
+        const hasKeys = nameToKeys[fName] != null;
+        if (!hasKeys && !pitchSet.has(fName)) continue; // not in this map
+
+        if (hasKeys) {
             currentSamples[id][2] = nameToKeys[fName];
             const field = document.getElementById(id);
             if (field) field.value = nameToKeys[fName];
-            assignedNames.add(fName);
-            matched += 1;
         }
+        // Pitch only travels with the wrapped format.
+        if (isWrapped) {
+            const pitched = pitchSet.has(fName);
+            currentSamples[id][3] = pitched;
+            const pitchEl = document.getElementById("pitch_" + id);
+            if (pitchEl) pitchEl.checked = pitched;
+        }
+
+        assignedNames.add(fName);
+        matched += 1;
     }
 
     showCustomAlert(matched > 0
-        ? "Loaded keys for " + matched + " sample" + (matched === 1 ? "" : "s") + "."
+        ? "Loaded settings for " + matched + " sample" + (matched === 1 ? "" : "s") + "."
         : "No matching sample file names found.");
 }
 
@@ -332,9 +352,13 @@ function addKeyPad(keyId) {
         card.classList.add('pad-active');
         setTimeout(function () { card.classList.remove('pad-active'); }, 110);
 
+        // Transmit and sound locally independently: a client (transmitting)
+        // can also monitor its own pads when preview is on. See
+        // shouldPlayLocalInput().
         if (enableTransmissionCheckbox.checked === true) {
             playNetworkCmd(keyId);
-        } else {
+        }
+        if (shouldPlayLocalInput()) {
             playKey(keyId, false, false);
         }
 
