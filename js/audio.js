@@ -469,13 +469,15 @@ function selectFile (contentType, multiple){
         input.multiple = multiple;
         input.accept = contentType;
 
-        input.onchange = _ => {
+        input.style.position = 'fixed';
+        input.style.left = '-9999px';
+        document.body.appendChild(input);
+
+        input.addEventListener('change', () => {
             let files = Array.from(input.files);
-            if (multiple)
-                resolve(files);
-            else
-                resolve(files[0]);
-        };
+            input.remove();
+            resolve(multiple ? files : files[0]);
+        }, { once: true });
 
         input.click();
     });
