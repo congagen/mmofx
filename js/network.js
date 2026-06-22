@@ -22,16 +22,59 @@ currentUserId = uuidv4();
 currentSessionToken = uuidv4();
 currentSessionId = uuidv4();
 
-let firebaseConfig = {
-    apiKey: "AIzaSyDx3-4RSc8fpkQcL2O_DsDSZ29qJ_JoRx8",
-    authDomain: "xtation-2.firebaseapp.com",
-    databaseURL: "https://xtation-2.firebaseio.com",
-    projectId: "xtation-2",
-    storageBucket: "xtation-2.appspot.com",
-    messagingSenderId: "450882156281",
-    appId: "1:450882156281:web:fbf4488538e97fb7181428",
-    measurementId: "G-2Y4RXY6X3N"
-};
+// A shared link can carry the host's custom backend (the `fb` param, set by the
+// share buttons) so guests reach the same Firebase — localStorage doesn't travel
+// with the link. We unpack the three fields MMOFX needs and derive authDomain
+// from projectId. Used for this session only (not persisted), so a guest's device
+// isn't left pointed at someone else's backend after they leave.
+function backendFromShareUrl() {
+    try {
+        const fb = new URLSearchParams(location.search).get('fb');
+        if (!fb) return null;
+        let b64 = fb.replace(/-/g, '+').replace(/_/g, '/');
+        while (b64.length % 4) b64 += '=';                 // restore padding for atob
+        const parts = atob(b64).split("|");
+        if (parts.length < 3 || !parts[0] || !parts[2]) return null;
+        return {
+            apiKey: parts[0],
+            projectId: parts[1],
+            databaseURL: parts[2],
+            authDomain: parts[1] + ".firebaseapp.com"
+        };
+    } catch (e) {
+        return null;
+    }
+}
+
+// Backend config resolution, highest priority first:
+//   1. A shared link's `fb` param (guests joining a custom-backend host).
+//   2. A backend saved in-app (Connection → Server), stored in localStorage.
+//   3. firebase-config.js (window.MMOFX_FIREBASE_CONFIG), the deployment default.
+//   4. The bundled fallback below, in case that file is missing.
+// Firebase can only initializeApp once per load, so the in-app form saves here
+// and reloads rather than swapping live.
+let firebaseConfig = backendFromShareUrl();
+try {
+    if (!firebaseConfig) {
+        const savedFirebaseConfig = localStorage.getItem('mmofx_firebase_config');
+        if (savedFirebaseConfig) firebaseConfig = JSON.parse(savedFirebaseConfig);
+    }
+} catch (e) {
+    console.warn('Ignoring invalid saved Firebase config:', e);
+    firebaseConfig = null;
+}
+if (!firebaseConfig) {
+    firebaseConfig = window.MMOFX_FIREBASE_CONFIG || {
+        apiKey: "AIzaSyDx3-4RSc8fpkQcL2O_DsDSZ29qJ_JoRx8",
+        authDomain: "xtation-2.firebaseapp.com",
+        databaseURL: "https://xtation-2.firebaseio.com",
+        projectId: "xtation-2",
+        storageBucket: "xtation-2.appspot.com",
+        messagingSenderId: "450882156281",
+        appId: "1:450882156281:web:fbf4488538e97fb7181428",
+        measurementId: "G-2Y4RXY6X3N"
+    };
+}
 
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
@@ -65,10 +108,30 @@ function hideConnectionBar() {
 var CONNECTION_BAR_GRACE_MS = 2500;
 var connectionBarTimer = null;
 
+// `.info/connected` always fires false first on boot — the socket isn't up yet
+// — which is NOT a dropout. Until the first successful connect we treat that as
+// an ongoing handshake: a longer, calmer "Connecting..." grace and no reconnect
+// loop, so a slow mobile/auth handshake never masquerades as "Connection lost".
+var hasConnectedOnce = false;
+var INITIAL_CONNECT_GRACE_MS = 6000;
+
 connectedRef.on("value", function(snap) {
     if (snap.val() === false) {
-        console.log('Connection lost!');
         setConnectionStatus('disconnected');
+
+        if (!hasConnectedOnce) {
+            // Initial handshake still in progress — don't alarm, don't retry.
+            console.log('Connecting...');
+            if (connectionBarTimer === null) {
+                connectionBarTimer = setTimeout(function () {
+                    connectionBarTimer = null;
+                    showConnectionBar('Connecting...', false);
+                }, INITIAL_CONNECT_GRACE_MS);
+            }
+            return;
+        }
+
+        console.log('Connection lost!');
         if (connectionBarTimer === null) {
             connectionBarTimer = setTimeout(function () {
                 connectionBarTimer = null;
@@ -77,6 +140,7 @@ connectedRef.on("value", function(snap) {
         }
         attemptReconnect(retryCount);
     } else {
+        hasConnectedOnce = true;
         setConnectionStatus('connected');
         if (connectionBarTimer !== null) {
             clearTimeout(connectionBarTimer);

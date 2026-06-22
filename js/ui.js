@@ -101,6 +101,13 @@ async function addSamplesLsDisk(){
     ////console.log(files);
     ////console.log(URL.createObjectURL(files[0]));
 
+    // Import in alphabetical (natural) order so the sample list is predictable
+    // regardless of how the OS picker returns the selection. Case-insensitive,
+    // and numeric-aware so e.g. kick2 sorts before kick10.
+    files.sort(function (a, b) {
+        return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+    });
+
     for (var i=0; i < files.length; i++) {
         ////console.log(files[i]);
         var fileName = files[i].name.toString();
@@ -116,6 +123,32 @@ async function addSamplesLsDisk(){
             currentSamples[sKey] = [fName, sUrl, fName[0].toLowerCase()];
             addSampleListRow(sKey, sUrl);
         }
+    }
+}
+
+// Bulk-toggles the per-sample Pitch flag: if any sample is non-pitched, turn
+// them all on; if every one is already on, turn them all off. Drives the same
+// currentSamples[id][3] + per-row checkbox the manual toggles use. Heads up —
+// with Sample Polyphony on, a pitched note layers every pitch-enabled sample, so
+// "all on" is best paired with Randomize Samples (one random pitched sample per
+// note).
+function toggleAllPitch() {
+    const ids = Object.keys(currentSamples);
+    if (ids.length === 0) return;
+    const enable = ids.some(function (id) { return !currentSamples[id][3]; });
+    for (const id of ids) {
+        currentSamples[id][3] = enable;
+        const cb = document.getElementById('pitch_' + id);
+        if (cb) cb.checked = enable;
+    }
+
+    // Heads-up only when it actually gets loud: we just pitched several samples,
+    // Sample Polyphony is on, and Randomize is off, so every note layers them
+    // all. Skips the warning when randomize is on or polyphony is off.
+    const polyOn = pitchPolyphonyCheckbox && pitchPolyphonyCheckbox.checked;
+    const randomOff = randomizePlaybackCheckbox && !randomizePlaybackCheckbox.checked;
+    if (enable && ids.length > 2 && polyOn && randomOff) {
+        showCustomAlert("All samples are now pitched. With Sample Polyphony on and Randomize off, every note plays them all at once, so playing as-is can get loud. Turn on Randomize Samples (Config → Audio) for one random sample per note.");
     }
 }
 
@@ -295,11 +328,38 @@ function playNetworkCmd(cmdText) {
     return writeToDB(currentChannelName, dbData);
 }
 
+// Base URL for share links: this deployment's own page, so a guest who opens the
+// link loads the same app — and therefore the same firebase-config.js / backend —
+// as the host. Using the current origin (instead of a hardcoded domain) means
+// self-hosted instances generate correct links automatically.
+function shareBaseUrl() {
+    return window.location.origin + window.location.pathname;
+}
+
+// URL-safe base64 (no padding) for packing the backend pointer into share links.
+function b64urlEncode(s) {
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// When a custom backend is set via the Server box, shared links must carry it so
+// guests reach the same Firebase (localStorage doesn't travel with the link). We
+// pack only the fields MMOFX needs — apiKey, projectId, databaseURL — pipe-
+// delimited and base64url'd to keep the URL short enough to QR-encode; authDomain
+// is derived from projectId on the receiving end. Returns "" on the default
+// backend, so default-backend links stay clean.
+function backendShareParam() {
+    let cfg;
+    try { cfg = JSON.parse(localStorage.getItem('mmofx_firebase_config')); } catch (e) { return ""; }
+    if (!cfg || !cfg.apiKey || !cfg.projectId || !cfg.databaseURL) return "";
+    return "&fb=" + b64urlEncode([cfg.apiKey, cfg.projectId, cfg.databaseURL].join("|"));
+}
+
 async function sharePadsUrl() {
-    let channelUrl = "https://mmofx.xusione.com/index.html?channel=" + currentChannelName + "&mode=padClient";
+    let channelUrl = shareBaseUrl() + "?channel=" + currentChannelName + "&mode=padClient";
     if (showChannelNameCheckbox.checked === true) {
         channelUrl += "&showChannel=1";
     }
+    channelUrl += backendShareParam();
     updateChannel();
 
     try {
@@ -310,10 +370,11 @@ async function sharePadsUrl() {
 }
 
 async function sharePianoUrl() {
-    let channelUrl = "https://mmofx.xusione.com/index.html?channel=" + currentChannelName + "&mode=pianoClient";
+    let channelUrl = shareBaseUrl() + "?channel=" + currentChannelName + "&mode=pianoClient";
     if (showChannelNameCheckbox.checked === true) {
         channelUrl += "&showChannel=1";
     }
+    channelUrl += backendShareParam();
     updateChannel();
 
     try {
@@ -558,7 +619,9 @@ function updateChannel(){
     //console.log("New Channel: " + currentChannelName);
 
     if (channelNameInputBox.value != "") {
-        currentChannelName = channelNameInputBox.value.replaceAll(" ", "_").replaceAll("%", "_");
+        // Cap the channel name so share links (which carry the channel, and the
+        // backend pointer when custom) stay short enough to QR-encode reliably.
+        currentChannelName = channelNameInputBox.value.replaceAll(" ", "_").replaceAll("%", "_").slice(0, 40);
         channelNameInputBox.value = currentChannelName;
         console.log(currentChannelName);
         subscribeToDb(currentChannelName);
@@ -571,6 +634,82 @@ setChannelNameButton.addEventListener("click", updateChannel);
 
 sharePadsChannelUrlButton.addEventListener("click", sharePadsUrl);
 sharePianoChannelUrlButton.addEventListener("click", sharePianoUrl);
+
+// ── Server: point MMOFX at your own Firebase backend (Connection → Server) ──────
+const FIREBASE_CONFIG_KEY = 'mmofx_firebase_config';
+
+// Accepts either valid JSON or the JS object literal the Firebase console hands
+// you (unquoted keys, a `const firebaseConfig =` prefix, trailing semicolon/comma).
+// Returns the parsed config object, or null if it can't be understood. No eval.
+function parseFirebaseConfig(text) {
+    if (!text) return null;
+    let t = text.trim()
+        .replace(/^\s*(?:const|let|var)\s+[\w$]+\s*=\s*/, "")  // drop `const x =`
+        .replace(/;\s*$/, "");                                  // drop trailing ;
+    try {
+        return JSON.parse(t);
+    } catch (e) {
+        try {
+            const jsonish = t
+                .replace(/([{,]\s*)([A-Za-z_$][\w$]*)\s*:/g, '$1"$2":') // quote keys
+                .replace(/,(\s*[}\]])/g, '$1');                          // drop trailing commas
+            return JSON.parse(jsonish);
+        } catch (e2) {
+            return null;
+        }
+    }
+}
+
+(function initServerConfigUI() {
+    const input = document.getElementById('firebaseConfigInput');
+    const saveBtn = document.getElementById('firebaseConfigSave');
+    const resetBtn = document.getElementById('firebaseConfigReset');
+    const statusEl = document.getElementById('firebaseBackendStatus');
+    if (!input || !saveBtn || !resetBtn) return;
+
+    // Read defensively: some browsers (e.g. Brave with shields up) throw on
+    // localStorage access. This IIFE runs before initUI is registered, so an
+    // unguarded throw here would halt ui.js and the pads would never get built.
+    let saved = null;
+    try { saved = localStorage.getItem(FIREBASE_CONFIG_KEY); } catch (e) {}
+    if (saved) input.value = saved;
+
+    if (statusEl) {
+        // Only surface the backend when it's a custom one (confirmation you're on
+        // your own server). On the default shared backend this stays blank, so
+        // casual users aren't shown backend jargon above Current Channel.
+        let project = '';
+        try {
+            if (saved) project = (JSON.parse(saved).projectId || '?');
+        } catch (e) {}
+        statusEl.textContent = project ? ('Server: ' + project) : '';
+    }
+
+    saveBtn.addEventListener('click', function () {
+        const cfg = parseFirebaseConfig(input.value);
+        if (!cfg || !cfg.apiKey || !cfg.databaseURL || !cfg.projectId) {
+            showCustomAlert("That doesn't look like a valid Firebase config. Paste the config object from your Firebase project settings — it needs at least apiKey, databaseURL, and projectId.");
+            return;
+        }
+        if (!confirm("Switch to backend \"" + cfg.projectId + "\"? This reloads the app and clears any loaded samples.")) return;
+        try {
+            localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(cfg));
+        } catch (e) {
+            showCustomAlert("Couldn't save the backend — this browser is blocking local storage (check privacy/shield settings).");
+            return;
+        }
+        showCustomAlert("Backend saved. Reloading to connect to \"" + cfg.projectId + "\"…");
+        setTimeout(function () { location.reload(); }, 700);
+    });
+
+    resetBtn.addEventListener('click', function () {
+        if (!confirm("Revert to the default backend? This reloads the app and clears any loaded samples.")) return;
+        try { localStorage.removeItem(FIREBASE_CONFIG_KEY); } catch (e) {}
+        input.value = "";
+        showCustomAlert("Reverted to the default backend. Reloading…");
+        setTimeout(function () { location.reload(); }, 700);
+    });
+})();
 
 midiInChannelSlider.addEventListener("input", (event) => {
     currentChannel = parseInt(midiInChannelSlider.value);

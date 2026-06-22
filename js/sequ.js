@@ -141,7 +141,12 @@ function iterateSeq() {
         playNetworkCmd(seqChar);
     } else {
         ////console.log("Playing: " + seqChar.toString());
+        // While Hold freezes this step, latch the randomized sample so the same
+        // sound repeats each tick. The flag is set only around this call, so
+        // other playKey callers keep randomizing normally.
+        useRandomLatch = document.getElementById("stallSeq").checked;
         playKey(seqChar, false, false);
+        useRandomLatch = false;
     }
 
     ////console.log(parseInt(document.getElementById("maxlerZone").value));
@@ -195,6 +200,27 @@ function iterateSeq() {
     }
 
     seqIndexMaster += 1;
+}
+
+
+// Manual single-step: move the cursor one position (dir = -1 / +1, wrapping) and
+// play that step, mirroring iterateSeq's display/transmit/play logic. Lets you
+// scrub the sequence by hand; works whether or not playback is running.
+function stepSeq(dir) {
+    var curSeqChars = document.getElementById("maxlerZone").value;
+    if (curSeqChars.length === 0) return;
+
+    seqIndex = (seqIndex + dir + curSeqChars.length) % curSeqChars.length;
+
+    let seqChar = curSeqChars.split('')[seqIndex];
+    document.getElementById("curSeqCharH").innerHTML = (seqChar === undefined) ? "?" : seqChar;
+    if (seqChar === undefined) return;
+
+    if (enableTransmissionCheckbox.checked == true) {
+        playNetworkCmd(seqChar);
+    } else {
+        playKey(seqChar, false, false);
+    }
 }
 
 

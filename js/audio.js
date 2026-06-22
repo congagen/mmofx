@@ -23,6 +23,14 @@ var currentBufferSources = {};
 var decodedBufferCache = {};
 var voiceCounter = 0;
 
+// Randomize-Samples latch for the sequencer's Hold (freeze). While the
+// sequencer holds a step, useRandomLatch is set around its playKey call so the
+// same randomly-chosen sample replays each tick instead of re-rolling — Hold
+// freezes the sound, not just the step. Scoped to the sequencer call only, so
+// pads/keyboard/network playback keep picking fresh random samples.
+var randomSampleLatch = null;
+var useRandomLatch = false;
+
 // Held pitched voices, when "Hold Pitched Notes" is on: note number -> [sources]
 // that loop until the matching note-off. heldPitchedNotes guards the decode race
 // (a note-off can arrive before a voice finishes decoding).
@@ -393,17 +401,34 @@ function playKey(sampleKey, isRemote, randomize, hold, releaseSec) {
             stopAllSamples();
         }
 
+        // Pad voices are forced-poly (a fresh voice per press) so repeated taps
+        // of the same key overlap instead of evicting each other under the bare
+        // URL voice key — which felt like the previous note getting cut, most
+        // noticeably with Randomize on (it can re-pick the same sample). When
+        // Sample Polyphony is off, the stopAllSamples() above already makes it
+        // monophonic, so this only affects the polyphonic case.
         let sampleUrls = getSamplesFromTxt(sampleKey);
         if (randomizePlaybackCheckbox.checked === true) {
+            // Pick a random loaded sample. Guard the empty case (no samples
+            // loaded yet, or after Clear) so a press just no-ops instead of
+            // throwing; Math.floor over the full length also lets the last
+            // sample be chosen (the old (length - 1) never reached it).
             var curKeys = Object.keys(currentSamples);
-    
-            let sKey = curKeys[parseInt(Math.random() * (curKeys.length - 1) + 0)];
-            let sam = currentSamples[sKey];
-            let sUrl = sam[1];
-            playBuffer(sUrl);
+            if (curKeys.length > 0) {
+                // Reuse the latched sample while the sequencer holds a step;
+                // otherwise pick fresh. Math.floor over the full length lets the
+                // last sample be chosen. Always record the choice so the next
+                // Hold freezes on whatever was last sounding.
+                let id = (useRandomLatch && randomSampleLatch && currentSamples[randomSampleLatch])
+                    ? randomSampleLatch
+                    : curKeys[Math.floor(Math.random() * curKeys.length)];
+                randomSampleLatch = id;
+                let sam = currentSamples[id];
+                if (sam) playBuffer(sam[1], 1, 1, true);
+            }
         } else {
-            for (var i=0; i < sampleUrls.length; i++) {                        
-                playBuffer(sampleUrls[i]);
+            for (var i=0; i < sampleUrls.length; i++) {
+                playBuffer(sampleUrls[i], 1, 1, true);
             }
         }
         
