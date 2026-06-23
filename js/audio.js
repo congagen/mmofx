@@ -179,7 +179,7 @@ function shouldPlayLocalInput() {
     return true;
 }
 
-function playPitchedSamples(midiNote, velocity, hold, releaseSec) {
+function playPitchedSamples(midiNote, velocity, hold, releaseSec, randomize) {
     const note = parseInt(midiNote);
     if (isNaN(note)) return;
     const vel = (velocity == null) ? 127 : velocity;
@@ -205,7 +205,7 @@ function playPitchedSamples(midiNote, velocity, hold, releaseSec) {
     let pitchedIds = Object.keys(currentSamples).filter(function (id) {
         return currentSamples[id][3];
     });
-    if (randomizePlaybackCheckbox && randomizePlaybackCheckbox.checked && pitchedIds.length > 0) {
+    if (((randomize === true) || (randomizePlaybackCheckbox && randomizePlaybackCheckbox.checked)) && pitchedIds.length > 0) {
         pitchedIds = [pitchedIds[Math.floor(Math.random() * pitchedIds.length)]];
     }
 
@@ -372,6 +372,11 @@ function characterToNote(character) {
 function playKey(sampleKey, isRemote, randomize, hold, releaseSec) {
     console.log("playKey: " + sampleKey);
 
+    // Randomize if the caller asks explicitly (networked input passes the
+    // host-or-sender intent) or the host's own toggle is on. Local callers pass
+    // false and so just follow the checkbox, exactly as before.
+    var rnd = (randomize === true) || (randomizePlaybackCheckbox && randomizePlaybackCheckbox.checked);
+
     if (sampleKey.length > 1) {
         // MIDI
         console.log("MIDI KEY: " + sampleKey);
@@ -379,7 +384,7 @@ function playKey(sampleKey, isRemote, randomize, hold, releaseSec) {
         // Pitch-enabled samples play locally at the note's pitch (velocity isn't
         // carried by this path, so full level). hold (from the on-screen piano)
         // sustains/loops the voice; releaseSec auto-fades it (piano latch mode).
-        playPitchedSamples(sampleKey, 127, hold, releaseSec);
+        playPitchedSamples(sampleKey, 127, hold, releaseSec, rnd);
 
         if (enableMidiInCheckbox.checked === false) {
             if (enableMidiOutCheckbox.checked === true && receiveCommandsCheckbox.checked === true) {
@@ -408,7 +413,7 @@ function playKey(sampleKey, isRemote, randomize, hold, releaseSec) {
         // Sample Polyphony is off, the stopAllSamples() above already makes it
         // monophonic, so this only affects the polyphonic case.
         let sampleUrls = getSamplesFromTxt(sampleKey);
-        if (randomizePlaybackCheckbox.checked === true) {
+        if (rnd) {
             // Pick a random loaded sample. Guard the empty case (no samples
             // loaded yet, or after Clear) so a press just no-ops instead of
             // throwing; Math.floor over the full length also lets the last

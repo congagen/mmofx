@@ -270,9 +270,27 @@ function subscribeToDb(dbChannelName) {
         if (data.key !== "playedKey") return;
         if (receiveCommandsCheckbox.checked === true) {
             var val = data.val();
-            // New form is { k: key, n: nonce }; tolerate the old plain-string form.
-            var key = (val && typeof val === "object") ? val.k : val;
-            playKey(key, true, false);
+            // New form is { k, n, r, h }; tolerate the old plain-string form.
+            var isObj = (val && typeof val === "object");
+            var key = isObj ? val.k : val;
+            var rmtRandom = isObj ? !!val.r : false;
+            var rmtHold = isObj ? !!val.h : false;
+
+            // Randomize if either the host or the sender wants it.
+            var doRandom = rmtRandom || (randomizePlaybackCheckbox && randomizePlaybackCheckbox.checked);
+
+            // Hold for networked piano: there's no note-off over the network, so
+            // we never loop indefinitely. Instead, when Hold is on we let the
+            // note ring out over the host's Fade Duration (loop + auto-fade).
+            // With Fade at 0 it falls back to a plain one-shot that plays to its
+            // natural end. Pads ignore these args. Sample Polyphony stays global.
+            var doHold = false, releaseSec = 0;
+            if (rmtHold || (holdPitchedCheckbox && holdPitchedCheckbox.checked)) {
+                releaseSec = parseFloat(pianoReleaseSlider && pianoReleaseSlider.value) || 0;
+                doHold = releaseSec > 0;
+            }
+
+            playKey(key, true, doRandom, doHold, releaseSec);
         }
     });
 

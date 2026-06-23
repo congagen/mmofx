@@ -320,9 +320,17 @@ function playNetworkCmd(cmdText) {
     // coalesced away.
     netCmdNonce += 1;
 
+    // Carry the sender's Randomize/Hold intent (r/h) alongside the key so the
+    // host can honour it even if its own toggles differ. The receiver ORs these
+    // with its own settings, so randomize/hold works if either side enables it.
     let dbData = {
         "session_id": currentSessionId,
-        "playedKey": { "k": cmdText.toString(), "n": netCmdNonce }
+        "playedKey": {
+            "k": cmdText.toString(),
+            "n": netCmdNonce,
+            "r": !!(randomizePlaybackCheckbox && randomizePlaybackCheckbox.checked),
+            "h": !!(holdPitchedCheckbox && holdPitchedCheckbox.checked)
+        }
     };
 
     return writeToDB(currentChannelName, dbData);

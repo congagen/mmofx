@@ -41,7 +41,7 @@ if (Object.keys(url_vars).length > 0) {
             document.getElementById("enableMidiOutCheckbox").checked = false;
 
             let topLogo = document.getElementById("topLogo");
-            topLogo.style = "display: none !important";
+            topLogo.style = "margin-bottom: 0px !important; margin-top: 25px";            
 
             let nav_a = document.getElementById("topNav");
             nav_a.style = "display: none !important";
@@ -53,8 +53,10 @@ if (Object.keys(url_vars).length > 0) {
             pianoNoteOffCheckboxLabel_Client.style = "display: none !important";    
 
             if (url_vars["showChannel"] === "1") {
+                topLogo.style = "display: none !important; margin-bottom: 0px";
+
                 let guestInstruct = document.getElementById("guestInstruct");
-                guestInstruct.style = "display: block !important";
+                guestInstruct.style = "display: block !important; margin-bottom: -15px !important; margin-top: 15px !important;";
 
                 let guestInfoText = document.getElementById("guestInfoText");
                 guestInfoText.innerHTML = currentChannelName;
