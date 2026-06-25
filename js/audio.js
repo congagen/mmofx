@@ -127,6 +127,11 @@ function playBuffer(sampleFilePath, playbackRate = 1, gainMul = 1, forcePoly = f
     }
 
     getDecodedBuffer(sampleFilePath).then(function (buffer) {
+        // Skip empty/zero-length buffers (a truncated or failed-decode sample).
+        // Starting and scheduling a stop on these just emits a click and churns
+        // voice bookkeeping, so a press should simply no-op instead.
+        if (!buffer || buffer.length === 0 || buffer.duration === 0) return;
+
         var source = bufContext.createBufferSource();
         var gainNode = bufContext.createGain();
         source.buffer = buffer;
@@ -469,23 +474,6 @@ function getSamplesFromTxt(samKey) {
     }
 
     return sToPlay;
-}
-
-function initDefSamples(){
-    //console.log("initDefSamples");
-
-    var f = new File([""], "xus.wav");
-    var files = [f];
-
-    for (var i=0; i < files.length; i++) {
-        let fName = files[i].name.toString();
-        var sKey = URL.createObjectURL(files[i]).toString();
-        let sUrl = URL.createObjectURL(files[i]);
-        let trgKeys = fName[0].toLowerCase();
-
-        currentSamples[sKey] = [fName, sUrl, fName[0].toLowerCase()];
-        AddSampleListRow(sKey);
-    }
 }
 
 function clearSamplesList() {
