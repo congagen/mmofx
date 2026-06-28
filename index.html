@@ -6,14 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+    <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icons/favicon.png" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/icon_180x180.png">
 
     <!-- HTML Meta Tags -->
     <title>MMOFX!</title>
-    <meta name="keywords" content="SFX, Sampler, Instrument, MIDI">
 
     <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://mmofx.xusione.com/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="MMOFX!">
 
@@ -24,8 +25,8 @@
     <script src="js/libs/firebase-auth-compat.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/styles.css?v=67">
-    <link rel="stylesheet" type="text/css" href="css/pianoroll.css?v=67">
+    <link rel="stylesheet" type="text/css" href="css/styles.css?v=70">
+    <link rel="stylesheet" type="text/css" href="css/pianoroll.css?v=70">
 </head>
 
 <body>
@@ -36,7 +37,7 @@
     <div style="background-color: rgb(255, 255, 255, 0)" id="topMenuSection">
         <div class="d-flex align-items-center justify-content-center">
             <!-- <img class="mb-4 mt-5" src="img/logo.png" alt="MMOFX!" width="280" height="65" id="topLogo" style="opacity: 70%; mix-blend-mode: multiply;"> -->
-             <img class="" src="img/logo.png?v=67" alt="MMOFX!" width="210" height="120" id="topLogo" style="opacity: 90%; margin-top: 25px; margin-bottom: 20px;">
+             <img class="" src="img/logo.png?v=70" alt="MMOFX!" width="210" height="120" id="topLogo" style="opacity: 90%; margin-top: 25px; margin-bottom: 20px;">
         </div>
 
         <div id="guestInstruct" style="display: none;" class="pb-2">
@@ -215,6 +216,11 @@
                         </div>
 
                         <!-- <p class="settings-hint">"Share Pads" sends a touch-pad layout, "Share Piano" sends a piano keyboard layout.</p> -->
+
+                        <p class="settings-hint" style="margin-top: 10px;">Build your own control panel, pre-set to this channel and backend. See the <a href="https://xusione.com/pages/resources/articles/mmofx-guide.html#config-custom-clients" target="_blank" rel="noopener">guide</a>.</p>
+                        <div class="settings-btn-group">
+                            <button class="btn btn-light" type="button" id="downloadClientButton">Download Client</button>
+                        </div>
                     </div>
                 </div>
 
@@ -344,6 +350,8 @@
 
                 <div id="seq_tab" class="tab-pane">
                     <div class="settings-container">
+
+                
 
                         <div class="settings-card">
                             <div class="settings-card-header">Sequence</div>
@@ -649,23 +657,19 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="js/alerts.js?v=67"></script>
-    <script type="text/javascript" src="js/elements.js?v=67"></script>
-    <script type="text/javascript" src="js/params.js?v=67"></script>
-    <script type="text/javascript" src="js/firebase-config.js?v=67"></script>
-    <script type="text/javascript" src="js/network.js?v=67"></script>
-    <script type="text/javascript" src="js/ui.js?v=67"></script>
-    <script type="text/javascript" src="js/session.js?v=67"></script>
-    <script type="text/javascript" src="js/iosAudio.js?v=67"></script>
-    <script type="text/javascript" src="js/audio.js?v=67"></script>
-    <script type="text/javascript" src="js/sequ.js?v=67"></script>
-    <script type="text/javascript" src="js/pianoroll.js?v=67"></script>
+    <script type="text/javascript" src="js/alerts.js?v=70"></script>
+    <script type="text/javascript" src="js/elements.js?v=70"></script>
+    <script type="text/javascript" src="js/params.js?v=70"></script>
+    <script type="text/javascript" src="js/firebase-config.js?v=70"></script>
+    <script type="text/javascript" src="js/network.js?v=70"></script>
+    <script type="text/javascript" src="js/ui.js?v=70"></script>
+    <script type="text/javascript" src="js/session.js?v=70"></script>
+    <script type="text/javascript" src="js/iosAudio.js?v=70"></script>
+    <script type="text/javascript" src="js/audio.js?v=70"></script>
+    <script type="text/javascript" src="js/sequ.js?v=70"></script>
+    <script type="text/javascript" src="js/pianoroll.js?v=70"></script>
 
     <script>
-        function htmlEncode(value) {
-            return $('<div/>').text(value).html();
-        }
-
         window.scrollTo(0, 0);
     </script>
 

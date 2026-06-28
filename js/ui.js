@@ -392,6 +392,53 @@ async function sharePianoUrl() {
     }
 }
 
+// Generate a standalone custom-client HTML file pre-wired to this host's
+// channel + backend. Fetches custom-client-template.html and replaces only the
+// delimited backend/channel markers, so all other template defaults (panels,
+// pads, etc.) are preserved for the user to edit. Pure client-side Blob
+// download — no server involved.
+async function downloadClientTemplate() {
+    let html;
+    try {
+        const resp = await fetch("custom-client-template.html");
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        html = await resp.text();
+    } catch (e) {
+        showCustomAlert("Couldn't load the client template. Make sure custom-client-template.html is deployed alongside the app.");
+        return;
+    }
+
+    // The host's resolved backend (apiKey/projectId/databaseURL/authDomain),
+    // falling back to whatever the template already ships with if unavailable.
+    var backend = (typeof firebaseConfig !== "undefined" && firebaseConfig) ? {
+        apiKey: firebaseConfig.apiKey,
+        projectId: firebaseConfig.projectId,
+        databaseURL: firebaseConfig.databaseURL,
+        authDomain: firebaseConfig.authDomain || (firebaseConfig.projectId + ".firebaseapp.com")
+    } : null;
+
+    if (backend) {
+        html = html.replace(
+            /\/\*__BACKEND__\*\/[\s\S]*?\/\*__END_BACKEND__\*\//,
+            "/*__BACKEND__*/" + JSON.stringify(backend, null, 4) + "/*__END_BACKEND__*/"
+        );
+    }
+    html = html.replace(
+        /\/\*__CHANNEL__\*\/[\s\S]*?\/\*__END_CHANNEL__\*\//,
+        "/*__CHANNEL__*/" + JSON.stringify(currentChannelName) + "/*__END_CHANNEL__*/"
+    );
+
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "mmofx-client-" + (currentChannelName || "panel") + ".html";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+}
+
 function addKeyPad(keyId) {
     let keyItem = currentKeyboard[keyId];
     padCount += 1;
@@ -642,6 +689,11 @@ setChannelNameButton.addEventListener("click", updateChannel);
 
 sharePadsChannelUrlButton.addEventListener("click", sharePadsUrl);
 sharePianoChannelUrlButton.addEventListener("click", sharePianoUrl);
+
+(function () {
+    var btn = document.getElementById("downloadClientButton");
+    if (btn) btn.addEventListener("click", downloadClientTemplate);
+})();
 
 // ── Server: point MMOFX at your own Firebase backend (Connection → Server) ──────
 const FIREBASE_CONFIG_KEY = 'mmofx_firebase_config';
