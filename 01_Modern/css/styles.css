@@ -1,0 +1,2558 @@
+html, body {
+    font-family: "Courier", "Courier New", monospace;
+    font-weight: 700 !important;
+    max-width: 100%;
+    outline:0 !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Dark fallback on the root only — it sits below the gradient pseudo-element.
+   body must stay transparent, or its own background would paint over the
+   negative-z pseudo and hide the gradient. */
+html {
+    background-color: rgb(10, 10, 30);
+}
+
+body {
+    background-color: transparent;
+}
+
+/* Gradient lives on a fixed, full-viewport pseudo-element so it always fills
+   100% of the visible screen height regardless of content length, and avoids
+   the iOS Safari background-attachment: fixed sizing bugs. inset: 0 anchors it
+   to the real viewport edges; z-index: -1 keeps it behind all content. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    /* background-image: linear-gradient(to bottom, #aa00ff 0%, #009dff 50%, #00be7f 100%); */
+    background-image: linear-gradient(135deg, #aa00ff 0%, #009dff 50%, #00be7f 100%);
+}
+
+.nav-link {
+    font-weight: 700 !important;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.tab-content {
+    flex: 1 0 auto;
+}
+
+/* Global content width. The app is phone-first and uses minimal horizontal
+   space, so on wider screens we cap the main structural columns and center
+   them rather than letting content sprawl. One token keeps it consistent;
+   margin auto centers each flex child on the cross (horizontal) axis. */
+:root {
+    --app-max-width: 420px; /* ≈ iPhone 14 logical viewport width */
+
+    /* Two monospace voices: Courier is the DISPLAY face (brand, card
+       headers, pads — the typewriter identity), but it renders thin and
+       jagged at small sizes on non-retina screens, so small UI text uses a
+       well-hinted mono stack instead (Menlo on macOS, Consolas on Windows —
+       both designed for small-size screen rendering). */
+    --font-display: "Courier", "Courier New", monospace;
+    --font-ui: "Menlo", "Consolas", "SF Mono", "Liberation Mono", "Courier New", monospace;
+}
+
+#topMenuSection,
+body > .tab-content,
+.app-footer {
+    width: 100%;
+    max-width: var(--app-max-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+html {
+    overflow: -moz-scrollbars-vertical; 
+    overflow-y: scroll;
+}
+
+button, .btn {
+  touch-action: manipulation !important;
+  touch-action: none;
+}
+
+.disable-dbl-tap-zoom {
+  touch-action: manipulation;
+  touch-action: none;
+}
+
+#keyPadPanel {
+    padding-top: 20px !important;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Connection status bar: fixed at the very top, hidden until there's trouble.
+   pointer-events: none so it never blocks a tap (important for guests' pads). */
+.connection-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+    padding: 6px 12px;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(38, 0, 34, 0.96);
+    transform: translateY(-100%);
+    transition: transform 0.25s ease;
+    pointer-events: none;
+}
+
+.connection-bar.show {
+    transform: translateY(0);
+}
+
+.connection-bar.connection-bar--error {
+    background: rgba(200, 50, 50, 0.97);
+}
+
+.connection-dot {
+    display: none;
+    width: 10px;
+    height: 10px;
+    margin-left: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Show the dot only once a connection status is known. */
+.connection-dot.connected,
+.connection-dot.disconnected {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.connection-dot.connected {
+    background: rgba(40, 200, 120, 0.9);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35), 0 0 6px rgba(40, 200, 120, 0.7);
+}
+
+.connection-dot.disconnected {
+    background: rgba(220, 60, 60, 0.9);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35), 0 0 6px rgba(220, 60, 60, 0.7);
+    animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+li {
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+button:focus { outline: 0; }
+
+h4, h5, h6, h7, label {
+    font-family: "Courier", "Courier New", monospace;
+    text-align: center;
+    align-items: center;
+
+    outline:0 !important;
+    border: none !important;
+    outline: none !important;
+
+    color: rgba(0, 0, 0, 0.75);
+}
+
+p {
+    color: rgba(14, 14, 14, 0.95) !important;
+    font-size: 17px;
+}
+
+.noselect {
+    -webkit-touch-callout: none !important; /* iOS Safari */
+    -webkit-user-select: none !important; /* Safari */
+    -khtml-user-select: none !important; /* Konqueror HTML */
+    -moz-user-select: none !important; /* Old versions of Firefox */
+    -ms-user-select: none !important; /* Internet Explorer/Edge */
+    user-select: none !important; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
+.sample-card,
+.settings-card {
+    margin-bottom: 30px !important;
+    margin-left: 30px !important;
+    margin-right: 30px !important;
+    max-width: 500px;
+    margin: 0 auto 16px auto;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* The shared rule's fixed 30px side margins (with !important) defeat the
+   margin: 0 auto centering. Sample cards sit in a full-width container, so
+   force auto side margins to centre them. */
+.sample-card {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.sample-card-header,
+.settings-card-header {
+    padding: 10px 14px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.settings-card-header {
+    color: rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    font-weight: 800;
+    text-align: center;
+}
+
+.settings-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px 0 40px 0;
+}
+
+/* @media (max-width: 575.98px) {
+    .settings-container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+} */
+
+.settings-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+}
+
+.settings-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-left: 0;
+    min-height: auto;
+    margin: 0;
+}
+
+/* Sub-sections inside the merged MIDI card (Input / Output). */
+.midi-subhead {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+.midi-divider {
+    width: 100%;
+    margin: 6px 0;
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.settings-check .form-check-input {
+    float: none;
+    margin: 0;
+}
+
+.settings-check .form-check-label {
+    margin-left: 0 !important;
+}
+
+.settings-status {
+    margin: 0;
+    font-size: 0.85em;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+/* Host | Client segmented control (Connection card). Replaces the old toggle
+   switch, which was ambiguous about which side meant what and disappeared
+   against the dark dashboard. Both options are always visible; the active one
+   is lifted. Dark-dashboard overrides live in the dark section below. */
+.mode-seg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.mode-seg-caption {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+.mode-seg-btns {
+    display: inline-flex;
+    padding: 3px;
+    gap: 3px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.mode-seg-btn {
+    margin: 0;
+    border: 0;
+    background: transparent;
+    padding: 6px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mode-seg-btn:hover { color: rgba(0, 0, 0, 0.8); }
+
+.mode-seg-btn.active {
+    background: #fff;
+    color: rgba(0, 0, 0, 0.85);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.settings-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Dropdown menu items shouldn't inherit the app's global button margin
+   (pianoroll.css sets button { margin-bottom: 5px }), which leaves a loose gap
+   between items. */
+.dropdown-item { margin-bottom: 0; }
+
+.settings-actions {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 16px 0;
+}
+
+.settings-group {
+    width: 100%;
+    text-align: center;
+}
+
+.settings-label {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(0, 0, 0, 0.75);
+}
+
+#midiInputSelect,
+#midiOutputSelect {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.device-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.device-row .form-check-label {
+    margin: 0 !important;
+    flex: 1 1 auto;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(0, 0, 0, 0.75);
+    font-size: 0.9em;
+}
+
+.device-row .form-check-input {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.device-list-empty {
+    margin: 0;
+    font-size: 0.85em;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+.settings-hint {
+    margin: 0;
+    font-size: 0.8em;
+    text-align: center;
+    color: rgba(60, 60, 60, 0.85) !important;
+}
+
+/* Collapsible "Server" (own Firebase backend) block inside the Connection card. */
+.server-config {
+    width: 100%;
+    margin-top: 6px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* The summary reads as a real fold button: full-width row with a chevron
+   that points down when closed and flips up when open. */
+.server-config summary {
+    cursor: pointer;
+    font-weight: 800;
+    color: rgba(0, 0, 0, 0.75);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.25);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.server-config summary:hover { background: rgba(255, 255, 255, 0.4); }
+
+.server-config summary::after {
+    content: "";
+    flex: none;
+    width: 8px;
+    height: 8px;
+    margin-top: -4px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);   /* chevron pointing down (closed) */
+    transition: transform 0.15s ease;
+}
+
+.server-config[open] summary::after {
+    margin-top: 3px;
+    transform: rotate(225deg);  /* chevron pointing up (open) */
+}
+
+.server-config summary::-webkit-details-marker { display: none; }
+
+/* Consistent vertical rhythm inside the open panel (matches the 16px other
+   sections use), replacing ad-hoc <br>s and inline margins. Children hidden
+   while the panel is collapsed don't render it. */
+.server-config > * + * { margin-top: 16px; }
+
+/* Give the hints a clear line of their own, top and bottom. */
+.server-config .settings-hint { margin: 20px 0; }
+
+.server-config textarea {
+    width: 100%;
+    resize: vertical;
+}
+
+/* The backend status is blank on the default server; collapse it so it doesn't
+   leave a stray gap above Current Channel. */
+#firebaseBackendStatus:empty { display: none; }
+
+/* Header row: name (ellipsized) left, remove ✕ right. */
+.sample-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.sample-name {
+    display: block;
+    min-width: 0;
+    color: rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    font-size: 0.95rem;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sample-card-body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+}
+
+.sample-keys-group {
+    flex: 1 1 auto;
+    align-items: center;
+}
+
+.sample-keys-group .form-control,
+.sample-keys-group .input-group-text {
+    height: 42px;
+    display: flex;
+    align-items: center;
+}
+
+.sample-pitch-check {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    min-height: auto;
+    white-space: nowrap;
+}
+
+.sample-pitch-check .form-check-input {
+    margin: 0;
+    float: none;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.sample-pitch-check .form-check-label {
+    font-size: 0.85rem;
+    color: rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+    margin-left: 0 !important; /* override the global .form-check-label margin; spacing comes from the flex gap */
+}
+
+/* Sequencer text/number inputs are block-level with fixed widths and sit inside
+   sub-wrappers, so flex centering on the column doesn't reach them. Auto margins
+   center them, replacing the old <center> (text-align: -webkit-center) behaviour. */
+#seq_tab .form-control {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Inline label beside a field (e.g. Tempo: [120]). */
+.field-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.field-row .settings-label {
+    margin-bottom: 0;
+}
+
+/* Slider flanked by +/- steppers (e.g. the Alternate control). */
+.stepper-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.stepper-row .slider {
+    flex: 1 1 auto;
+    width: auto;
+}
+
+.stepper-btn {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    font-size: 1.25rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Sequencer current-step readout above the cards. */
+.seq-current {
+    text-align: center;
+    margin: 8px 0 4px;
+}
+
+.seq-current-label {
+    display: block;
+    font-size: 0.8em;
+    color: rgba(0, 0, 0, 0.55);
+}
+
+.seq-current-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+}
+
+.seq-current-char {
+    margin: 0;
+    font-size: 2.5rem;
+    color: rgba(0, 0, 0, 0.75) !important;
+    min-width: 1.4em;
+}
+
+/* Manual step arrows flanking the current-step char. */
+.seq-step-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    border-radius: 50%;
+}
+
+/* App footer: pushed well down so it stays out of short/empty views (e.g. the
+   guest pad/piano view) and only appears once you scroll past the content. */
+.app-footer {
+    margin-top: 40vh;
+    padding: 40px 16px 60px;
+    text-align: center;
+}
+
+.app-footer-links {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.app-footer-links a {
+    color: rgba(0, 0, 0, 0.55);
+    text-decoration: none;
+}
+
+.app-footer-links a:hover {
+    color: rgba(0, 0, 0, 0.8);
+    text-decoration: underline;
+}
+
+.app-footer-sep {
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.sample-btn {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 1rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        0 2px 3px rgba(0, 0, 0, 0.15);
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+.sample-btn:active {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.2),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+    transform: translateY(1px) scale(0.96);
+}
+
+.sample-remove-btn {
+    color: rgba(190, 0, 0, 0.85);
+}
+
+#stop_all_samples_btn {
+  width: 200px;
+}
+
+.form-check-label {
+  margin-left: 10px !important; /* Adjust the value as needed */
+}
+
+.form-check-input {
+    accent-color: rgba(160, 120, 255, 0.85);
+    cursor: pointer;
+}
+
+#keyTable{
+    color: rgba(0, 120, 0, 0.85);
+}
+
+#sampleTableContainer{
+    color: rgba(40, 40, 40, 0.85);
+}
+
+.qr-code {
+  max-width: 200px;
+  margin: 10px;
+}
+
+.keys-btn{
+    /* outline:0 !important;
+    border: none !important;
+    outline: none !important; */
+
+    background-color: rgba(180, 180, 180, 0);
+    background: rgba(180, 180, 180, 0);
+
+}
+
+.btn {
+    /* outline:0 !important;
+    border: none !important;
+    outline: none !important; */
+    /*color: purple;*/
+}
+
+.btn-light {
+    color: rgba(0, 0, 0, 0.85);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        0 3px 5px rgba(0, 0, 0, 0.15);
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+.btn-light:hover,
+.btn-light:focus {
+    color: rgba(0, 0, 0, 0.85);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+        0 3px 5px rgba(0, 0, 0, 0.15);
+}
+
+.btn-light:active,
+.btn-light.active {
+    color: rgba(0, 0, 0, 0.85);
+    background: rgba(255, 255, 255, 0.28);
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.2),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+    transform: translateY(1px) scale(0.98);
+}
+
+
+.form-control {
+    outline: 0;
+    color: rgba(0, 0, 0, 0.95);
+    background-color: rgba(0, 0, 0, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.form-control::placeholder {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.form-control:focus {
+    color: rgba(0, 0, 0, 0.85);
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(160, 120, 255, 0.6);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(160, 120, 255, 0.25);
+}
+
+.input-group-text {
+    color: rgba(0, 0, 0, 0.75);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+}
+
+.phone-pad-input {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.input {
+    outline:0 !important;
+    border: none !important;
+    outline: none !important;
+    background-color: clear !important;
+    background: transparent !important;
+    color: clear !important;
+}
+
+.scroll-container {
+  scroll-padding: 0 0 0 0;
+}
+
+.keyPad {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.keyPadInput, .keyPadInput:focus, .keyPadInput:active {
+    color: rgba(0, 0, 0, 0.8) !important;
+    /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6), 0 -1px 0 rgba(255, 255, 255, 0.08); */
+
+    background-color: clear !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    -moz-outline-style: none !important;
+    outline-style: none !important;
+}
+
+.keyPad-col {
+    /* 4 pads per row everywhere. The app column is capped at --app-max-width
+       (phone width) on all screens, so the old min-width:768px → 8-per-row
+       override keyed off viewport width and broke the grid on desktop. */
+    width: 25%;
+}
+
+/* Make every pad element claim taps cleanly on touch: manipulation disables the
+   double-tap-zoom/delay, and applying it to the inner elements (not just the
+   card) prevents a scrollable descendant from re-enabling pan and swallowing
+   rapid taps. */
+.keyPad-col .card,
+.keyPad-col .keyPad,
+.keyPad-col .keyPadInput {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.keyPad-col .card {
+    transition: transform 0.04s ease, filter 0.08s ease;
+}
+
+.keyPad-col .card.pad-active {
+    transform: scale(0.95);
+    filter: brightness(1.25);
+}
+
+.card-block {
+    outline: 0 !important;
+    border: none !important;
+    -moz-outline-style: none !important;
+    outline-style: none !important;
+    border-radius: 5px;
+    color: rgba(255, 255, 255, 0.01);
+    background-color: rgba(255, 255, 255, 0.01);
+}
+
+.card {
+    outline: 0 !important;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    font-size: 25px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.15),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.15);
+    aspect-ratio: 1 / 1;
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+.card.pad-received {
+    background: linear-gradient(145deg, var(--pad-flash-color, rgba(0, 200, 255, 0.85)), rgba(255, 255, 255, 0.15)) !important;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.15),
+        0 0 16px var(--pad-flash-color, rgba(0, 200, 255, 0.9));
+    transition: background 0.05s ease, box-shadow 0.05s ease;
+}
+
+.card-title {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.card:active, .card:focus {
+    outline: 0 !important;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.25),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+    transform: translateY(1px) scale(0.98);
+}
+
+.slidecontainer {
+  /* width: 300px; */
+  align-items: center !important;
+  text-align: center !important;
+}
+
+/* The slider itself.
+   The element is a tall, transparent, finger-friendly touch target; the
+   visible 6px bar is drawn on the track pseudo-element. touch-action: none
+   keeps a drag on the thumb from being hijacked into a page scroll on iOS. */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 38px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(170, 140, 255, 0.95), rgba(90, 60, 180, 0.95));
+  box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+      0 2px 4px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.05s ease;
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(170, 140, 255, 0.95), rgba(90, 60, 180, 0.95));
+  box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+      0 2px 4px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.05s ease;
+}
+
+.slider:active::-webkit-slider-thumb,
+.slider:active::-moz-range-thumb {
+  transform: scale(0.92);
+}
+
+.attack_knob {
+    color: black;
+}
+
+a.button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+    font-size: 15px;
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0);
+}
+
+.button {
+    outline:0 !important;
+    border: none !important;
+    outline: none !important;
+
+    color: black;
+    background-color: rgba(255,255,255, 1);
+
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 15px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: 2px;
+
+    border: none;
+    /* border-radius: 5px; */
+    box-shadow: 0 1px black;
+}
+
+.button:hover {background-color: rgba(255,255,255,1)}
+
+.button:active {
+  background-color: rgba(255,255,255,1);
+  box-shadow: 0 0px black;
+}
+
+.navbar-light {
+  border: none;
+}
+
+.nav-tabs .nav-link { /* Styles for all tabs */
+  border: none; /* Remove default border */
+  /* Other styling like padding, margin, colors, etc. */
+}
+
+.tab {
+    color: rgba(0, 0, 0, 0.75);
+}
+
+.pill-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    list-style: none;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 10px auto;
+    padding: 6px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, 0.12),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.pill-nav .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    color: rgba(0, 0, 0, 0.8) !important;
+    background-color: transparent !important;
+    border-radius: 10px;
+    padding: 8px 18px;
+    text-decoration: none !important;
+    transition: background 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, transform 0.05s ease;
+}
+
+.pill-nav .nav-link:hover,
+.pill-nav .nav-link:focus {
+    color: rgba(0, 0, 0, 0.85) !important;
+    background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.pill-nav .nav-link.active {
+    color: rgba(0, 0, 0, 0.85) !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.pill-nav .nav-link.active:hover,
+.pill-nav .nav-link.active:focus {
+    background-color: rgba(255, 255, 255, 0.38) !important;
+}
+
+.pill-nav .nav-link:active {
+    transform: translateY(1px) scale(0.97);
+}
+
+@-webkit-keyframes colorchange {
+  0% {
+
+    color: blue;
+  }
+
+  10% {
+
+    color: #8e44ad;
+  }
+
+  20% {
+
+    color: #1abc9c;
+  }
+
+  30% {
+
+    color: #d35400;
+  }
+
+  40% {
+
+    color: blue;
+  }
+
+  50% {
+
+    color: #34495e;
+  }
+
+  60% {
+
+    color: blue;
+  }
+
+  70% {
+
+    color: #2980b9;
+  }
+  80% {
+
+    color: #ff2a00;
+  }
+
+  90% {
+
+    color: #2980b9;
+  }
+
+  100% {
+
+    color: pink;
+  }
+}
+
+/* Modal alert (showCustomAlert): dimmed backdrop with a centered card. */
+.custom-alert-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 10, 25, 0.45);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  animation: custom-alert-fade 0.18s ease-out;
+}
+
+.custom-alert {
+  width: min(92vw, 380px);
+  box-sizing: border-box;
+  padding: 22px 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  animation: custom-alert-pop 0.18s ease-out;
+}
+
+.custom-alert p {
+  margin: 0 0 18px;
+  color: rgba(15, 15, 25, 0.92);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
+.custom-alert .custom-alert-ok {
+  margin: 0;
+  min-width: 96px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: rgba(20, 20, 35, 0.92);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.custom-alert .custom-alert-ok:hover { background: rgba(20, 20, 35, 1); }
+
+@keyframes custom-alert-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes custom-alert-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ============================================================
+   WIDE-SCREEN DASHBOARD
+   Full-height, fixed-viewport desktop layout for the full app. The phone
+   layout is the default; this is an additive layer behind a breakpoint,
+   excluded for stripped guest panels (body.guest-panel).
+
+   Visible layout: [ Controls rail | Main ].
+     - Controls (left) = #studio_tab, showing ONE surface at a time (Pads /
+       Seq / Keys) via body[data-ctrl], with #ctrlTabs as its tab bar.
+     - Main (right) = #settings_tab: the overview KPI strip on top, then a
+       Gridstack board (initDashGrid in ui.js) holding the config cards and
+       the Samples card as widgets — drag by header, resize from the corner,
+       auto-compacted (no holes), layout saved to localStorage. On mobile the
+       board is never built and Samples is just the Config tab's last card.
+   ============================================================ */
+
+.dash-nav { display: none; }
+
+@media (min-width: 0px) {
+
+    /* Kill the page scroll; panels scroll internally instead. Root font-size
+       dialed to 14px for dashboard density — everything rem-based scales to
+       ~87.5%, the "zoom to 90%" feel, without touching the phone layout. */
+    html:has(body:not(.guest-panel)) { overflow: hidden; height: 100%; font-size: 14px; }
+
+    body:not(.guest-panel) {
+        --navh: 52px;
+        --msnav-h: 64px;     /* mobile bottom tab bar (landscape trims it below) */
+        --config-w: 360px;   /* Config (left) */
+        --controls-w: 420px; /* Controls (right) */
+        height: 100%;
+        overflow: hidden;
+    }
+
+    /* ---- Navbar ---- */
+    body:not(.guest-panel) .dash-nav {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-sizing: border-box;
+        /* Grow by the status-bar / notch inset (env) so the bar's contents clear
+           it in the installed standalone app; 0 in browsers and on desktop. The
+           side insets keep the logo/actions off the notch when landscape. Same
+           20px base inset as the overview strip / board widgets (14px container
+           padding + 6px gridstack margin), so it aligns with the content edges. */
+        height: calc(var(--navh) + env(safe-area-inset-top, 0px));
+        padding: env(safe-area-inset-top, 0px) calc(20px + env(safe-area-inset-right, 0px)) 0 calc(20px + env(safe-area-inset-left, 0px));
+        background: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .dash-brand { font-weight: 700; letter-spacing: 0.05em; color: rgba(0, 0, 0, 0.8); }
+    .dash-status { display: inline-flex; align-items: center; gap: 7px; font-size: 0.85em; color: rgba(0, 0, 0, 0.6); }
+    /* The navbar dot overrides the default hidden state of .connection-dot. */
+    body:not(.guest-panel) .dash-status .connection-dot { display: inline-block; margin: 0; }
+    .dash-actions { margin-left: auto; display: inline-flex; gap: 8px; }
+    .dash-toggle {
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        background: #f3f3f6;
+        border-radius: 8px;
+        padding: 6px 13px;
+        font-size: 0.85em;
+        color: rgba(0, 0, 0, 0.6);
+        margin: 0;
+    }
+    .dash-toggle.active { background: #e7e9ff; border-color: var(--dash-accent); color: rgba(0, 0, 0, 0.85); }
+
+    /* Hide the phone chrome the navbar replaces. */
+    body:not(.guest-panel) #topMenuSection,
+    body:not(.guest-panel) .app-footer,
+    body:not(.guest-panel) #studio_tab #subNav { display: none; }
+
+    /* ---- Main area fills the window below the navbar. (This was the
+       rail-era two-column grid; Controls is a board widget now, so the old
+       `grid-template-columns: var(--controls-w) 1fr` is GONE — it could
+       shrink the main area whenever the later display:block override lost a
+       cascade race, e.g. right after a layout reset.) ---- */
+    body:not(.guest-panel) > .tab-content {
+        max-width: none;
+        width: 100%;
+        margin: 0;
+        height: calc(100vh - var(--navh) - env(safe-area-inset-top, 0px));
+        display: block;
+        overflow: hidden;
+    }
+
+    body:not(.guest-panel) #settings_tab,
+    body:not(.guest-panel) #studio_tab {
+        opacity: 1;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+    }
+    body:not(.guest-panel) #settings_tab {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;      /* the grid scrolls, not the whole column */
+    }
+    body:not(.guest-panel) #studio_tab {
+        grid-column: 1;
+        grid-row: 1;
+        border-right: 1px solid var(--dash-border);
+        position: relative; /* anchors the width handlebar */
+    }
+
+    /* Width handlebar on the rail/main boundary (built by initRailResize). */
+    body:not(.guest-panel) #railResizeHandle {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: -5px;
+        width: 10px;
+        cursor: col-resize;
+        z-index: 5;
+        touch-action: none;
+    }
+    body:not(.guest-panel) #railResizeHandle::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        transform: translateX(-50%);
+        border-radius: 3px;
+        background: transparent;
+        transition: background 0.15s;
+    }
+    body:not(.guest-panel) #railResizeHandle:hover::after,
+    body:not(.guest-panel).rail-resizing #railResizeHandle::after { background: var(--dash-accent); }
+    body:not(.guest-panel).rail-resizing {
+        cursor: col-resize;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    /* ---- Controls rail (left): tab bar + one active surface ---- */
+    body:not(.guest-panel) #studio_tab {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+    body:not(.guest-panel) #studio_tab > .tab-content { display: contents; }
+
+    #ctrlTabs { display: none; }
+    body:not(.guest-panel) #ctrlTabs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        grid-row: 1;
+        padding: 8px 12px 6px;
+    }
+
+    body:not(.guest-panel) #control_tab,
+    body:not(.guest-panel) #seq_tab,
+    body:not(.guest-panel) #piano_tab {
+        display: none;
+        grid-row: 2;
+        min-width: 0;
+        min-height: 0;
+        overflow-y: auto;
+        scrollbar-gutter: stable both-edges; /* symmetric, no right-shift (see card-body) */
+    }
+    body:not(.guest-panel)[data-ctrl="pads"] #control_tab { display: block; }
+    body:not(.guest-panel)[data-ctrl="seq"]  #seq_tab     { display: block; }
+    body:not(.guest-panel)[data-ctrl="keys"] #piano_tab   { display: block; }
+    body:not(.guest-panel) #api_tab { display: none; }
+
+    /* ---- Main area: overview strip on top, then the Gridstack board (built
+       by initDashGrid in ui.js) — cards are widgets: drag by header, resize
+       from the corner, auto-compacted so the board packs without holes. ---- */
+    /* l/r = container padding (14) + gridstack widget margin (6), so the stat
+       cards align flush with the board widgets and the navbar's 20px inset. */
+    body:not(.guest-panel) #settings_tab > #dashOverview {
+        flex: none;
+        padding: 14px 20px 0;
+    }
+    body:not(.guest-panel) #settings_tab > .dash-col-head { display: none; }
+
+    body:not(.guest-panel) #settings_tab .settings-container {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-width: none;
+        /* The base .settings-container rule centers via `margin: 0 auto` —
+           auto side margins override flex-stretch, so with only absolutely-
+           positioned Gridstack children (zero content width) the container
+           shrink-wrapped to its padding (28px) and every widget's percentage
+           width resolved to 0 ("shrunk to dots"). Fill the column explicitly
+           (width: 100% makes the centering max-width below safe). */
+        width: 100%;
+        margin: 0;
+        display: block;
+        padding: 8px 14px 14px;
+        overflow-y: auto;
+    }
+
+    /* Activity panel: compact live feed of incoming commands. */
+    #activityFeed {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        font-size: 0.8rem;
+    }
+    #activityFeed li { padding: 5px 2px; border-bottom: 1px solid rgba(0, 0, 0, 0.08); }
+    #activityFeed:empty::after {
+        content: "Waiting for incoming commands…";
+        font-size: 0.8rem;
+        opacity: 0.6;
+    }
+
+    /* Widgets host the cards; the card fills its widget. */
+    body:not(.guest-panel) .grid-stack-item-content {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    body:not(.guest-panel) .grid-stack .settings-card {
+        margin: 0 !important;
+        max-width: none;
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Cards: header fixed (and the drag handle), body fills + scrolls. */
+    body:not(.guest-panel) #settings_tab .settings-card-header { flex: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+    body:not(.guest-panel) #settings_tab .settings-card-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        /* Reserve a matching gutter on BOTH sides so content stays symmetric
+           whether or not a (classic, space-taking) scrollbar is showing — no
+           right-shift when a panel overflows. No-op with macOS overlay bars. */
+        scrollbar-gutter: stable both-edges;
+        align-items: stretch;
+        justify-content: flex-start;
+    }
+    body:not(.guest-panel) #sampler_tab { opacity: 1; }
+
+    /* ---- Card-internals harmonization (dashboard form language) ----
+       The phone layout centers everything; on the dashboard the cards read
+       as a settings form instead: titles left, one control per row, labels
+       small/muted on the left, toggles pushed to the right edge, sliders
+       full-width beneath their label. Scoped to the dashboard so mobile
+       keeps its centered look. */
+    body:not(.guest-panel) .settings-card-header {
+        text-align: left;
+        padding: 11px 16px;
+    }
+    body:not(.guest-panel) .settings-card-body { gap: 14px; }
+
+    /* Action buttons stretch to the card width like every other control (the
+       body is align-items: stretch). #stop_all_samples_btn's fixed 200px would
+       otherwise pin it left while #scanButton went full-width — inconsistent.
+       The 200px stays on mobile, where the card centers instead. */
+    body:not(.guest-panel) #stop_all_samples_btn { width: 100%; }
+
+    /* Checkbox rows: box then label, centered. (Tried label-left/toggle-right
+       via space-between and grouped-left via flex-start — both looked off,
+       stretched or misaligned, because the panels are different widths.
+       Centered is width-independent and reads cleanly in every panel.) */
+    body:not(.guest-panel) .settings-check {
+        width: 100%;
+        justify-content: center;
+        gap: 9px;
+    }
+    body:not(.guest-panel) .settings-check .form-check-label { margin: 0; }
+
+    /* Sliders: label above (markup is slider-then-label, so reverse the
+       column), small and muted; the slider spans the full row beneath. */
+    body:not(.guest-panel) .slidecontainer {
+        width: 100%;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: stretch !important;
+        text-align: left !important;
+        gap: 2px;
+    }
+    body:not(.guest-panel) .slidecontainer .form-label,
+    body:not(.guest-panel) .slidecontainer .settings-label {
+        margin: 0;
+        font-size: 0.78rem;
+        color: rgba(18, 24, 40, 0.55);
+    }
+
+    /* Everything else left-aligned: labels, hints, device lists, buttons. */
+    body:not(.guest-panel) .settings-label,
+    body:not(.guest-panel) .settings-group,
+    body:not(.guest-panel) .settings-hint { text-align: left; }
+    body:not(.guest-panel) .settings-actions { justify-content: flex-start; }
+    /* Button groups fill the card width and share it evenly: a lone button
+       (Connect, Download Client) reads full-width like #scanButton, and
+       multi-button rows (Share Pads/Piano, seq transport) split into equal
+       segments. Keeps every card button on the same full-width language. */
+    body:not(.guest-panel) .settings-btn-group { width: 100%; justify-content: stretch; }
+    body:not(.guest-panel) .settings-btn-group > .btn { flex: 1 1 0; }
+    body:not(.guest-panel) #midiInputSelect,
+    body:not(.guest-panel) #midiOutputSelect { align-items: stretch; text-align: left; }
+
+    /* Label + input rows (e.g. Tempo): label left, control right. */
+    body:not(.guest-panel) .field-row {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    /* ---- Controls tab bar: aligned with the KPI strip, same surface chrome
+       as the stat cards so the two top rows read as one band. Extra right
+       padding clears the fold chevron riding the rail/main boundary. ---- */
+    body:not(.guest-panel) #ctrlTabs { padding: 14px 30px 0 12px; gap: 12px; }
+
+    /* Controls switcher: a constant dropdown (the three-tab row stays in the
+       DOM but hidden). Sized to match the stat cards so the rail's top row
+       and the KPI strip read as one cohesive band. */
+    #ctrlMenu { display: none; }
+    body:not(.guest-panel) #ctrlTabs .dash-toggle { display: none; }
+    body:not(.guest-panel) #ctrlTabs #ctrlMenu { display: block; flex: 1 1 auto; }
+    body:not(.guest-panel) #ctrlTabs #ctrlMenu .dash-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        min-height: 62px; /* ≈ stat-card height; tune together with .stat-card */
+        text-align: left;
+    }
+    body:not(.guest-panel) #ctrlTabs .dash-toggle {
+        flex: 1 1 0;
+        padding: 12px 10px;
+        background: var(--dash-surface);
+        border: 1px solid var(--dash-border);
+        border-radius: var(--dash-radius);
+        box-shadow: var(--dash-shadow);
+        font-weight: 600;
+        color: rgba(18, 24, 40, 0.5);
+    }
+    body:not(.guest-panel) #ctrlTabs .dash-toggle.active {
+        color: rgba(18, 24, 40, 0.9);
+        border-color: var(--dash-accent);
+        box-shadow: var(--dash-shadow), inset 0 -2px 0 var(--dash-accent);
+    }
+
+    /* ---- MIDI device lists: fixed-height list boxes that scroll, with a
+       visible frame + scrollbar so extra devices are clearly discoverable. ---- */
+    body:not(.guest-panel) #midiInputSelect,
+    body:not(.guest-panel) #midiOutputSelect {
+        width: 100%;
+        max-height: 110px;
+        overflow-y: auto;
+        border: 1px solid var(--dash-border);
+        border-radius: 8px;
+        padding: 6px 10px;
+        background: #fafbfd;
+        scrollbar-gutter: stable;
+    }
+
+    /* ---- Sample cards under width pressure: let the control row wrap and
+       keep the name/keys from forcing overflow. ---- */
+    body:not(.guest-panel) .sample-card-body { flex-wrap: wrap; }
+    body:not(.guest-panel) .sample-keys-group { min-width: 120px; }
+    body:not(.guest-panel) .sample-card .sample-name {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* ---- Fold the Controls rail (chevron on the boundary, or double-click
+       the handlebar). Folded: the rail column collapses to 0 and only the
+       chevron remains, riding the main area's left edge. ---- */
+    body:not(.guest-panel) #railFoldBtn {
+        position: absolute;
+        top: 16px;
+        right: -13px;
+        z-index: 6;
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        margin: 0;
+        border-radius: 50%;
+        background: var(--dash-surface);
+        border: 1px solid var(--dash-border);
+        box-shadow: var(--dash-shadow);
+        color: rgba(18, 24, 40, 0.6);
+        font-size: 0.75rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+    body:not(.guest-panel).fold-rail > .tab-content { grid-template-columns: 0 1fr; }
+    body:not(.guest-panel).fold-rail #studio_tab { border-right: none; }
+    body:not(.guest-panel).fold-rail #studio_tab > .tab-content,
+    body:not(.guest-panel).fold-rail #ctrlTabs,
+    body:not(.guest-panel).fold-rail #railResizeHandle { display: none; }
+
+    /* Sticky section titles (Controls / Samples / Config). */
+    .dash-col-head { display: none; }
+    body:not(.guest-panel) .dash-col-head {
+        display: block;
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        margin: 0;
+        padding: 12px 14px 9px;
+        background: var(--dash-bg);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: rgba(18, 24, 40, 0.45);
+    }
+    body:not(.guest-panel) .dash-col-head--inline {
+        position: static;
+        padding: 0;
+        border: none;
+        margin-right: auto;
+    }
+}
+
+/* ============================================================
+   DASHBOARD POLISH — multi-column samples, empty state, scrollbars
+   ============================================================ */
+
+/* Empty-state ghost cards for the Samples column. Hidden by default; the
+   dashboard shows them only while no samples are loaded (see media query). */
+#samplePlaceholder { display: none; }
+#samplePlaceholder .ghost-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr));
+    gap: 12px;
+}
+#samplePlaceholder .ghost-card {
+    height: 92px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px dashed rgba(0, 0, 0, 0.13);
+}
+#samplePlaceholder .ghost-hint {
+    margin: 20px 0 4px;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.42);
+    font-size: 0.85em;
+}
+
+@media (min-width: 0px) {
+    /* Samples fill the center as a responsive card grid, not a single column,
+       so wide monitors don't leave a bare gutter. */
+    body:not(.guest-panel) #sampleTableContainer {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr));
+        gap: 12px;
+        text-align: left;
+    }
+    body:not(.guest-panel) #sampleTableContainer .sample-card { margin: 0; width: auto; }
+
+    /* Ghost placeholder only while the list is empty. */
+    body:not(.guest-panel) #sampleTableContainer:empty + #samplePlaceholder { display: block; }
+
+    /* Refined scrollbars for the internally-scrolling panels. */
+    body:not(.guest-panel) { scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, 0.22) transparent; }
+    body:not(.guest-panel) *::-webkit-scrollbar { width: 10px; height: 10px; }
+    body:not(.guest-panel) *::-webkit-scrollbar-track { background: transparent; }
+    body:not(.guest-panel) *::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        border: 3px solid transparent;
+        background-clip: padding-box;
+    }
+    body:not(.guest-panel) *::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.34);
+        background-clip: padding-box;
+    }
+}
+
+/* ============================================================
+   DASHBOARD SURFACE SYSTEM
+   Gray canvas with solid white cards floating on it, separated by
+   gutters instead of hard divider lines. Overrides the phone-era
+   translucent "glass" card styling, which reads as flat white on the
+   dashboard's light background. Dashboard-scoped; mobile untouched.
+   ============================================================ */
+@media (min-width: 0px) {
+    body:not(.guest-panel) {
+        --dash-bg: #f3f4f7;
+        --dash-surface: #ffffff;
+        --dash-border: rgba(18, 24, 40, 0.10);
+        --dash-radius: 14px;
+        --dash-shadow: 0 1px 2px rgba(18, 24, 40, 0.04), 0 1px 3px rgba(18, 24, 40, 0.07);
+        background: var(--dash-bg);
+    }
+
+    /* Columns ride on the canvas: drop the hard separators, add padding so the
+       gray shows through as gutters between the white cards. */
+    body:not(.guest-panel) #settings_tab { border-right: none; padding: 0; }
+    body:not(.guest-panel) #sampler_tab { border-right: none; }
+    body:not(.guest-panel) #control_tab,
+    body:not(.guest-panel) #seq_tab,
+    body:not(.guest-panel) #piano_tab { padding: 14px; }
+    body:not(.guest-panel) .settings-container { max-width: none; padding: 0; }
+
+    /* Cards → solid white surfaces (override the translucent phone styling). */
+    body:not(.guest-panel) .settings-card,
+    body:not(.guest-panel) .sample-card {
+        margin: 0 0 12px !important;
+        max-width: none;
+        background: var(--dash-surface);
+        border: 1px solid var(--dash-border);
+        border-radius: var(--dash-radius);
+        box-shadow: var(--dash-shadow);
+    }
+    body:not(.guest-panel) #sampleTableContainer .sample-card { margin: 0 !important; }
+    body:not(.guest-panel) .settings-card-header,
+    body:not(.guest-panel) .sample-card-header {
+        background: #f8f9fb;
+        border-bottom: 1px solid var(--dash-border);
+        text-shadow: none;
+    }
+
+    /* Navbar + sticky section titles as clean bars on the canvas. */
+    body:not(.guest-panel) .dash-nav {
+        border-bottom: 1px solid var(--dash-border);
+        box-shadow: 0 1px 2px rgba(18, 24, 40, 0.05);
+    }
+    body:not(.guest-panel) .dash-col-head {
+        background: var(--dash-bg);
+        border-bottom: none;
+        color: rgba(18, 24, 40, 0.42);
+    }
+
+    /* Sharing now lives in the navbar Share dropdown; drop its Config card. */
+    body:not(.guest-panel) #sharingCard { display: none; }
+
+    /* ---- Navbar volume + mute ---- */
+    body:not(.guest-panel) .dash-actions { align-items: center; }
+    .dash-volume { display: inline-flex; align-items: center; gap: 8px; }
+    .dash-icon-btn {
+        border: 0;
+        background: transparent;
+        padding: 2px;
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1;
+        cursor: pointer;
+        color: var(--dash-muted);
+    }
+    .dash-icon-btn:hover { color: var(--dash-ink); }
+    .dash-icon-btn svg { display: block; }
+    #navVolSlider { width: 110px; accent-color: var(--dash-accent); }
+
+    /* ---- Overview KPI strip ---- */
+    body:not(.guest-panel) #dashOverview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        padding: 14px 0 4px;
+    }
+    .stat-card {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px 14px;
+        background: var(--dash-surface);
+        border: 1px solid var(--dash-border);
+        border-radius: var(--dash-radius);
+        box-shadow: var(--dash-shadow);
+    }
+    .stat-label {
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: rgba(18, 24, 40, 0.42);
+    }
+    .stat-value {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 1.32rem;
+        font-weight: 700;
+        color: rgba(18, 24, 40, 0.85);
+    }
+    .stat-unit { font-size: 0.72rem; font-weight: 500; color: rgba(18, 24, 40, 0.4); }
+    .stat-card .connection-dot { display: inline-block; width: 9px; height: 9px; margin: 0; }
+}
+
+/* Dashboard-only elements: hidden by default (mobile), shown by the dashboard
+   media query. These base hides MUST live outside the media query, or they
+   never take effect below the breakpoint and leak onto the phone layout. */
+#dashOverview,
+#ctrlTabs,
+.dash-col-head { display: none; }
+
+/* If the window is resized below the breakpoint after the Gridstack board was
+   built, neutralise its absolute positioning so the widgets degrade to plain
+   stacked cards (a reload restores the board when wide again). */
+@media (max-width: 1099.98px) {
+    .grid-stack { height: auto !important; }
+    .grid-stack-item {
+        position: static !important;
+        width: auto !important;
+        height: auto !important;
+        transform: none !important;
+        inset: auto !important;
+        min-height: 0 !important;
+    }
+    .grid-stack-item-content { position: static !important; }
+}
+
+/* ============================================================
+   DARK DASHBOARD (default) + SECTION ACCENTS
+   The surface system runs on --dash-* tokens, so redefining them here
+   flips every card/nav/strip; the rest overrides hardcoded light-theme
+   colors. Last in the file so it wins the cascade. Dashboard-only —
+   mobile keeps its light gradient look. Section accent palette avoids
+   yellow entirely (so yellow can never pair with a blue). ---- */
+@media (min-width: 0px) {
+    /* ================================================================
+       DASHBOARD COLOR TOKENS — EDIT HERE
+       Every dashboard color reads from these variables; nothing below
+       (or elsewhere) hardcodes them. Rules of the palette: no yellow
+       anywhere (so yellow can never sit next to a blue).
+       ================================================================ */
+    body:not(.guest-panel) {
+        /* Canvas & surfaces */
+        --dash-bg: #141418;         /* window canvas */
+        --dash-surface: #131518;    /* cards, navbar */
+        --dash-border: rgba(255, 255, 255, 0.09);
+        --dash-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.28);
+
+        /* Text */
+        --dash-ink: rgba(233, 236, 248, 0.92);   /* primary text */
+        --dash-muted: rgba(233, 236, 248, 0.55); /* labels, hints */
+
+        /* Interaction accent: active tabs, resize handle, volume slider */
+        --dash-accent: #6c7bff;
+
+        /* Section accents: card edge stripe + header tint */
+        --sec-audio: #9b8cff;       /* violet */
+        --sec-notes: #ff5392;       /* pink */
+        --sec-connection: #53d789;  /* green */
+        --sec-midi: #ec4c4c;        /* coral - kept well away from yellow */
+        --sec-samples: #ac57d9;     /* teal */
+        --sec-activity: #62b0e8;    /* sky (palette has no yellow, so blue is safe) */
+
+        color: var(--dash-ink);
+    }
+
+    /* Navbar */
+    body:not(.guest-panel) .dash-nav {
+        background: var(--dash-surface);
+        border-bottom-color: var(--dash-border);
+    }
+    body:not(.guest-panel) .dash-brand { color: var(--dash-ink); }
+    body:not(.guest-panel) .dash-status { color: var(--dash-muted); }
+    body:not(.guest-panel) .dash-toggle {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: var(--dash-border);
+        color: var(--dash-muted);
+    }
+    body:not(.guest-panel) .dash-toggle.active { color: var(--dash-ink); }
+    body:not(.guest-panel) .dash-icon-btn { color: var(--dash-muted); }
+    body:not(.guest-panel) .dash-icon-btn:hover { color: var(--dash-ink); }
+
+    /* Host | Client segmented control on dark */
+    body:not(.guest-panel) .mode-seg-caption { color: var(--dash-muted); }
+    body:not(.guest-panel) .mode-seg-btns {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--dash-border);
+    }
+    body:not(.guest-panel) .mode-seg-btn { color: var(--dash-muted); }
+    body:not(.guest-panel) .mode-seg-btn:hover { color: var(--dash-ink); }
+    body:not(.guest-panel) .mode-seg-btn.active {
+        background: var(--dash-accent);
+        color: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Card chrome + text */
+    body:not(.guest-panel) .settings-card-header,
+    body:not(.guest-panel) .sample-card-header {
+        background: rgba(255, 255, 255, 0.04);
+        border-bottom-color: var(--dash-border);
+        color: var(--dash-ink);
+    }
+    body:not(.guest-panel) .dash-col-head,
+    body:not(.guest-panel) .stat-label,
+    body:not(.guest-panel) .stat-unit,
+    body:not(.guest-panel) .midi-subhead,
+    body:not(.guest-panel) .settings-label,
+    body:not(.guest-panel) .form-label,
+    body:not(.guest-panel) .form-check-label,
+    body:not(.guest-panel) .slidecontainer .form-label,
+    body:not(.guest-panel) .slidecontainer .settings-label { color: var(--dash-muted); }
+    body:not(.guest-panel) .stat-value { color: var(--dash-ink); }
+    body:not(.guest-panel) .settings-hint { color: var(--dash-muted) !important; }
+    body:not(.guest-panel) #sampleTableContainer { color: var(--dash-ink); }
+    body:not(.guest-panel) .sample-name { color: var(--dash-ink); }
+    body:not(.guest-panel) #curSeqCharH { color: var(--dash-ink) !important; }
+    body:not(.guest-panel) .midi-divider { border-top-color: var(--dash-border); }
+    body:not(.guest-panel) .server-config { border-top-color: var(--dash-border); }
+    body:not(.guest-panel) .server-config summary {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.14);
+        color: var(--dash-ink);
+    }
+    body:not(.guest-panel) .server-config summary:hover { background: rgba(255, 255, 255, 0.12); }
+    body:not(.guest-panel) #railFoldBtn { color: var(--dash-muted); }
+
+    /* Bootstrap controls on dark */
+    body:not(.guest-panel) .form-control {
+        background: rgba(255, 255, 255, 0.07);
+        border-color: rgba(255, 255, 255, 0.14);
+        color: var(--dash-ink);
+    }
+    body:not(.guest-panel) .form-control::placeholder { color: rgba(233, 236, 248, 0.35); }
+    body:not(.guest-panel) .btn-light {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.14);
+        color: var(--dash-ink);
+    }
+    body:not(.guest-panel) .btn-light:hover { background: rgba(255, 255, 255, 0.14); color: var(--dash-ink); }
+    body:not(.guest-panel) .dropdown-menu {
+        background: var(--dash-surface);
+        border: 1px solid var(--dash-border);
+    }
+    body:not(.guest-panel) .dropdown-menu .dropdown-item { color: var(--dash-ink); }
+    body:not(.guest-panel) .dropdown-menu .dropdown-item:hover { background: rgba(255, 255, 255, 0.08); }
+    body:not(.guest-panel) .dropdown-divider { border-top-color: var(--dash-border); }
+    body:not(.guest-panel) .dropdown-menu .dropdown-header {
+        color: var(--dash-muted);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+    }
+    body:not(.guest-panel) .slider::-webkit-slider-runnable-track {
+        background: rgba(255, 255, 255, 0.22);
+        box-shadow: none;
+    }
+    body:not(.guest-panel) .slider::-moz-range-track {
+        background: rgba(255, 255, 255, 0.22);
+        box-shadow: none;
+    }
+
+    /* MIDI list boxes + ghost placeholders on dark */
+    body:not(.guest-panel) #midiInputSelect,
+    body:not(.guest-panel) #midiOutputSelect { background: rgba(255, 255, 255, 0.04); }
+    body:not(.guest-panel) #samplePlaceholder .ghost-card {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.14);
+    }
+    body:not(.guest-panel) #samplePlaceholder .ghost-hint { color: var(--dash-muted); }
+
+    /* Scrollbars on dark */
+    body:not(.guest-panel) { scrollbar-color: rgba(255, 255, 255, 0.25) transparent; }
+    body:not(.guest-panel) *::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.22);
+        background-clip: padding-box;
+    }
+    body:not(.guest-panel) *::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.35);
+        background-clip: padding-box;
+    }
+
+    /* Leftover dark-ink text on dark surfaces. The app's global p/li rules
+       carry !important, so the sweeping overrides here must too; the ID-based
+       #ctrlTabs rules need matching ID specificity to win. */
+    body:not(.guest-panel) p { color: var(--dash-ink) !important; }
+    body:not(.guest-panel) li { color: var(--dash-ink) !important; }
+    body:not(.guest-panel) h4,
+    body:not(.guest-panel) h5,
+    body:not(.guest-panel) h6,
+    body:not(.guest-panel) label { color: var(--dash-ink); }
+    body:not(.guest-panel) .settings-status { color: var(--dash-muted) !important; }
+    body:not(.guest-panel) #samplePlaceholder .ghost-hint { color: var(--dash-muted) !important; }
+    body:not(.guest-panel) .mode-switch-label { color: var(--dash-muted); }
+    body:not(.guest-panel) .mode-switch-label.active { color: var(--dash-ink); }
+    body:not(.guest-panel) .seq-current-label { color: var(--dash-muted); }
+    body:not(.guest-panel) #ctrlTabs .dash-toggle { color: var(--dash-muted); }
+    body:not(.guest-panel) #ctrlTabs .dash-toggle.active { color: var(--dash-ink); }
+    body:not(.guest-panel) .dash-toggle.active { background: rgba(255, 255, 255, 0.10); }
+
+    /* The alert modal is a white card in the phone theme; on the dark
+       dashboard the global ink sweep above would leave light text on white,
+       so theme the card dark to match the surfaces. */
+    body:not(.guest-panel) .custom-alert {
+        background: var(--dash-surface);
+        border: 1px solid var(--dash-border);
+    }
+    body:not(.guest-panel) .custom-alert p { color: var(--dash-ink) !important; }
+
+    /* Section accents: a stripe on the card's left edge + tinted header,
+       keyed by data-section (set by the board builder, drag-proof). */
+    body:not(.guest-panel) .settings-card[data-section] { border-left: 3px solid transparent; }
+    body:not(.guest-panel) .settings-card[data-section="audio"]       { border-left-color: var(--sec-audio); }
+    body:not(.guest-panel) .settings-card[data-section="notes"]       { border-left-color: var(--sec-notes); }
+    body:not(.guest-panel) .settings-card[data-section="connection"]  { border-left-color: var(--sec-connection); }
+    body:not(.guest-panel) .settings-card[data-section="midi"]        { border-left-color: var(--sec-midi); }
+    body:not(.guest-panel) .settings-card[data-section="sampler_tab"] { border-left-color: var(--sec-samples); }
+    body:not(.guest-panel) .settings-card[data-section="activityCard"] { border-left-color: var(--sec-activity); }
+    body:not(.guest-panel) .settings-card[data-section="audio"] .settings-card-header       { color: var(--sec-audio); }
+    body:not(.guest-panel) .settings-card[data-section="notes"] .settings-card-header       { color: var(--sec-notes); }
+    body:not(.guest-panel) .settings-card[data-section="connection"] .settings-card-header  { color: var(--sec-connection); }
+    body:not(.guest-panel) .settings-card[data-section="midi"] .settings-card-header        { color: var(--sec-midi); }
+    body:not(.guest-panel) .settings-card[data-section="sampler_tab"] .settings-card-header { color: var(--sec-samples); }
+    body:not(.guest-panel) .settings-card[data-section="activityCard"] .settings-card-header { color: var(--sec-activity); }
+    body:not(.guest-panel) #activityFeed li { border-bottom-color: var(--dash-border); }
+
+    /* ---- Sample cards: retire the glass-era chrome on the dark board ---- */
+    body:not(.guest-panel) .sample-card-header { padding: 8px 12px; }
+    body:not(.guest-panel) .sample-name {
+        text-shadow: none;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+    body:not(.guest-panel) .sample-card-body { padding: 10px 12px; gap: 8px; }
+    body:not(.guest-panel) .sample-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        border: 1px solid var(--dash-border);
+        background: rgba(255, 255, 255, 0.07);
+        color: var(--dash-ink);
+        font-size: 0.8rem;
+        box-shadow: none;
+    }
+    body:not(.guest-panel) .sample-btn:hover { background: rgba(255, 255, 255, 0.14); }
+    body:not(.guest-panel) .sample-btn:active {
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: none;
+    }
+    body:not(.guest-panel) .sample-remove-btn:hover {
+        background: rgba(236, 76, 76, 0.3);
+        border-color: rgba(236, 76, 76, 0.6);
+    }
+    /* Remove sits in the header bar: smaller, quiet until hovered. */
+    body:not(.guest-panel) .sample-card-header .sample-remove-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+        border-color: transparent;
+        background: transparent;
+        color: var(--dash-muted);
+    }
+    /* Keys grow to fill the row (capped so they don't sprawl), and Pitch
+       rides the right edge — no dead space on the right. nowrap because
+       Bootstrap input-groups wrap by default — the "Keys" prefix was stacking
+       on top of the input at most widths. */
+    body:not(.guest-panel) .sample-keys-group {
+        flex: 1 1 120px;
+        min-width: 90px;
+        max-width: 240px;
+        flex-wrap: nowrap;
+    }
+    body:not(.guest-panel) .sample-keys-group .form-control {
+        width: auto;
+        min-width: 0;
+        flex: 1 1 40px;
+    }
+    body:not(.guest-panel) .sample-pitch-check { margin-left: auto; }
+
+    /* Keyboard-input field above the pads: breathing room before the grid. */
+    body:not(.guest-panel) .phone-pad-input { margin-bottom: 12px; }
+    body:not(.guest-panel) .sample-keys-group .input-group-text {
+        height: 34px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: var(--dash-muted);
+        font-size: 0.75rem;
+    }
+    body:not(.guest-panel) .sample-keys-group .form-control {
+        height: 34px;
+        font-size: 0.85rem;
+    }
+    body:not(.guest-panel) .sample-pitch-check .form-check-label {
+        color: var(--dash-muted);
+        font-size: 0.8rem;
+    }
+
+    /* Checkboxes/switches themed for the dark surfaces (pitch toggles, all
+       Config checks): subtle unchecked, accent when on. */
+    body:not(.guest-panel) .form-check-input {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+    body:not(.guest-panel) .form-check-input:checked {
+        background-color: var(--dash-accent);
+        border-color: var(--dash-accent);
+    }
+
+    /* Inputs span the card like the sliders do, for one consistent control
+       width per card. No !important, so deliberately small inline-width
+       fields (e.g. the Tempo number box in its label row) keep their size. */
+    body:not(.guest-panel) .settings-card-body .form-control { width: 100%; max-width: none; }
+
+    /* Sample cards: uniform width and alignment. Neutralise the Bootstrap
+       .container chrome on the list wrapper (responsive max-width + side
+       padding made it misalign with the toolbar row) and drop the phone-era
+       500px card cap so every card spans its grid cell equally. */
+    body:not(.guest-panel) #sampleTableContainer {
+        max-width: none;
+        padding: 0;
+    }
+    body:not(.guest-panel) #sampleTableContainer .sample-card {
+        max-width: none;
+        width: 100%;
+    }
+
+    /* Pads: adaptive columns instead of the phone-era fixed 4-per-row.
+       Small minimum favours MORE pads over bigger ones; padding zeroed so the
+       grid aligns flush with the other panel content (the card body supplies
+       the shared 12px inset). */
+    body:not(.guest-panel) #keyPadPanel {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+        gap: 8px;
+        margin: 0; /* cancel Bootstrap .row's negative gutters */
+        padding: 0 !important;
+    }
+    /* The pads' wrapper is a Bootstrap .container (responsive max-width +
+       side padding) and the surface pass padded the pane too — both doubled
+       the inset. The card body's 12px is the single source of inset now. */
+    body:not(.guest-panel) #control_tab .container {
+        max-width: none;
+        padding: 0;
+    }
+    body:not(.guest-panel) #controlsCard #control_tab,
+    body:not(.guest-panel) #controlsCard #seq_tab,
+    body:not(.guest-panel) #controlsCard #piano_tab { padding: 0; }
+
+    /* Seq (and any Controls sub-tab) stacks MULTIPLE cards inside one board
+       widget; the .grid-stack `margin: 0 !important` reset above collapses the
+       gap so they sit bumper-to-bumper. Restore spacing only BETWEEN adjacent
+       nested cards — top-level board widgets keep their zero margin. */
+    body:not(.guest-panel) #controlsCard .settings-container .settings-card + .settings-card {
+        margin-top: 12px !important;
+    }
+
+    /* Connection bar slides in BELOW the navbar (never over the volume/Share
+       controls); the navbar stacks above it so the slide animation emerges
+       from underneath instead of crossing it. */
+    body:not(.guest-panel) .connection-bar { top: calc(var(--navh, 52px) + env(safe-area-inset-top, 0px)); }
+    body:not(.guest-panel) .dash-nav { position: relative; z-index: 2001; }
+
+    /* NOTE: scrollbar-gutter: stable both-edges was tried on the scrolling
+       panels and REVERTED — on systems with classic scrollbars it reserves
+       ~15px per side, visibly shrinking the container/overview and breaking
+       alignment with the navbar's fixed 20px insets. Everything aligns on
+       the plain shared 20px content edge instead. */
+    body:not(.guest-panel) .keyPad-col {
+        width: auto;
+        padding: 0 !important; /* the grid gap replaces px-2/py-2 */
+    }
+    body:not(.guest-panel) .keyPad-col .card { aspect-ratio: 1 / 1; }
+}
+
+/* ============================================================
+   CONTROLS AS A BOARD WIDGET
+   The old side rail is retired on the dashboard: initDashGrid wraps the
+   surface switcher + Pads/Seq/Keys panes into #controlsCard, a normal
+   Gridstack widget (drag, resize, collapse via the header button). Last
+   in the file so it overrides the rail-era layout rules. Mobile untouched
+   (the move only happens when the board builds).
+   ============================================================ */
+@media (min-width: 0px) {
+    /* Main area now owns the full width; the emptied rail disappears. */
+    body:not(.guest-panel) > .tab-content { display: block; }
+    body:not(.guest-panel) #studio_tab { display: none; }
+
+    /* Card internals: switcher row on top, the active surface fills the
+       rest and scrolls internally. */
+    body:not(.guest-panel) #controlsCard .settings-card-body { padding: 10px 12px 12px; gap: 10px; }
+    body:not(.guest-panel) #controlsCard #ctrlTabs { padding: 0; }
+    body:not(.guest-panel) #controlsCard #ctrlMenu .dash-toggle { min-height: 44px; }
+    body:not(.guest-panel) #controlsCard .tab-content { flex: 1 1 auto; min-height: 0; display: block; }
+    body:not(.guest-panel) #controlsCard #control_tab,
+    body:not(.guest-panel) #controlsCard #seq_tab,
+    body:not(.guest-panel) #controlsCard #piano_tab { height: 100%; }
+
+    /* Card headers on the board: title left, fold button right (the header
+       is also the drag handle; the button stops propagation in JS).
+       flex-start + auto-margin on the button — NOT space-between, which
+       strands middle children (e.g. Connection's status dot) in the centre. */
+    body:not(.guest-panel) .grid-stack .settings-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+    body:not(.guest-panel) .grid-stack .settings-card-header .card-fold-btn { margin-left: auto; }
+    .card-fold-btn {
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font-weight: 800;
+        font-size: 1rem;
+        line-height: 1;
+        padding: 0 4px;
+        margin: 0;
+        cursor: pointer;
+    }
+    /* Fold dock: minimized cards park here as labelled pills, in a strip
+       between the KPI row and the board. Hidden while empty. */
+    #foldDock { display: none; }
+    body:not(.guest-panel) #foldDock {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        overflow-x: auto;
+        min-width: 0;
+    }
+    body:not(.guest-panel) #foldDock:empty { display: none; }
+    .dock-pill {
+        background: var(--dash-surface, #fff);
+        border: 1px solid var(--dash-border, rgba(0, 0, 0, 0.15));
+        border-radius: 999px;
+        padding: 6px 14px;
+        margin: 0;
+        color: var(--dash-ink, rgba(0, 0, 0, 0.8));
+        font-size: 0.85em;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: var(--dash-shadow, none);
+    }
+    .dock-pill:hover { background: rgba(255, 255, 255, 0.12); }
+
+    /* Section accent (uses --sec-controls from the token block if defined,
+       falling back to the interaction accent). */
+    body:not(.guest-panel) .settings-card[data-section="controlsCard"] { border-left-color: var(--sec-controls, var(--dash-accent)); }
+    body:not(.guest-panel) .settings-card[data-section="controlsCard"] .settings-card-header { color: var(--sec-controls, var(--dash-accent)); }
+}
+
+/* Layout-switch toast: shown when the window crosses the dashboard/mobile
+   breakpoint mid-session (layout is decided at load; see ui.js). */
+#layoutSwitchBar {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: rgba(20, 22, 35, 0.95);
+    color: #fff;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+#layoutSwitchBar button {
+    border: 0;
+    border-radius: 7px;
+    padding: 6px 12px;
+    margin: 0;
+    background: #6c7bff;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Bottom section nav is mobile-only; hidden by default (desktop shows the board). */
+#mobileSectionNav { display: none; }
+
+/* ============================================================
+   MOBILE (unified) — the dashboard design, stacked, one section at a time.
+   Gridstack stays initialised but static; positioning is neutralised so
+   cards stack full-width, and the bottom nav filters to one section group.
+   Wins the cascade (last in file) for anything the min-width:0 dashboard
+   blocks also set. Guest panels keep their own stripped mobile layout.
+   ============================================================ */
+@media (max-width: 1099.98px) {
+    body:not(.guest-panel) { overflow: hidden; }
+
+    /* Neutralise Gridstack → full-width stacked cards. */
+    body:not(.guest-panel) .grid-stack { height: auto !important; }
+    body:not(.guest-panel) .grid-stack-item {
+        position: static !important;
+        width: auto !important;
+        height: auto !important;
+        transform: none !important;
+        inset: auto !important;
+        min-height: 0 !important;
+        margin-bottom: 12px;
+    }
+    body:not(.guest-panel) .grid-stack-item-content { position: static !important; }
+
+    /* Fill the space between navbar and bottom nav; active section scrolls. */
+    body:not(.guest-panel) > .tab-content {
+        height: calc(100vh - var(--navh, 52px) - env(safe-area-inset-top, 0px) - var(--msnav-h, 64px));
+        /* Keep cards clear of the side notch in landscape (0 in portrait). */
+        box-sizing: border-box;
+        padding-left: env(safe-area-inset-left, 0px);
+        padding-right: env(safe-area-inset-right, 0px);
+    }
+    /* Bottom padding clears the fixed section nav (--msnav-h) plus the iPhone
+       home-indicator safe area, so the last card isn't hidden under the bar. */
+    body:not(.guest-panel) #settings_tab .settings-container {
+        height: 100%;
+        overflow-y: auto;
+        padding: 12px 12px calc(var(--msnav-h, 64px) + 16px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Section filter: only the current group's cards show. */
+    body:not(.guest-panel).dash-mobile[data-msection] .grid-stack-item { display: none; }
+    body:not(.guest-panel).dash-mobile[data-msection="play"]    .grid-stack-item[data-mgroup="play"],
+    body:not(.guest-panel).dash-mobile[data-msection="samples"] .grid-stack-item[data-mgroup="samples"],
+    body:not(.guest-panel).dash-mobile[data-msection="monitor"] .grid-stack-item[data-mgroup="monitor"],
+    body:not(.guest-panel).dash-mobile[data-msection="setup"]   .grid-stack-item[data-mgroup="setup"] { display: block; }
+
+    /* Play: Controls takes the full height. */
+    body:not(.guest-panel).dash-mobile[data-msection="play"] .grid-stack-item[data-mgroup="play"],
+    body:not(.guest-panel).dash-mobile[data-msection="play"] #controlsCard { height: 100%; margin-bottom: 0; }
+
+    /* Bottom section nav. */
+    body:not(.guest-panel) #mobileSectionNav {
+        display: flex;
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        box-sizing: border-box;
+        /* Tappable button height (--msnav-h), plus the home-indicator inset
+           folded into the height (bg fills it); side insets keep the end tabs
+           off the notch in landscape. */
+        height: calc(var(--msnav-h, 64px) + env(safe-area-inset-bottom, 0px));
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        padding-left: env(safe-area-inset-left, 0px);
+        padding-right: env(safe-area-inset-right, 0px);
+        z-index: 2050;
+        background: var(--dash-surface, #fff);
+        border-top: 1px solid var(--dash-border, rgba(0,0,0,0.1));
+    }
+    body:not(.guest-panel) #mobileSectionNav button {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        border: 0;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        color: var(--dash-muted, rgba(0,0,0,0.5));
+        font-size: 0.64rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        /* The active tab's top accent line is drawn by an inset box-shadow;
+           keep it hugging the very top of the bar. */
+        box-shadow: inset 0 2px 0 transparent;
+        transition: color 0.12s ease;
+    }
+    body:not(.guest-panel) #mobileSectionNav .msnav-ico { line-height: 0; }
+    body:not(.guest-panel) #mobileSectionNav .msnav-ico svg { display: block; }
+    body:not(.guest-panel) #mobileSectionNav button.active {
+        color: var(--dash-ink, #000);
+        box-shadow: inset 0 2px 0 var(--dash-accent, #6c7bff);
+    }
+    body:not(.guest-panel) #mobileSectionNav button.active .msnav-ico { color: var(--dash-accent, #6c7bff); }
+
+    /* Landscape phones are short: trim the tab bar and icons so it doesn't eat
+       the scarce vertical space. One override of --msnav-h keeps the dependent
+       height/padding calcs in sync automatically. */
+    @media (orientation: landscape) {
+        body:not(.guest-panel) { --msnav-h: 46px; }
+        body:not(.guest-panel) #mobileSectionNav button { font-size: 0.6rem; gap: 1px; }
+        body:not(.guest-panel) #mobileSectionNav .msnav-ico svg { width: 18px; height: 18px; }
+    }
+
+    /* Hide desktop-only board affordances + the KPI strip (Monitor covers it). */
+    body:not(.guest-panel) .card-fold-btn,
+    body:not(.guest-panel) #foldDock,
+    body:not(.guest-panel) #railResizeHandle,
+    body:not(.guest-panel) #railFoldBtn,
+    body:not(.guest-panel) #dashOverview { display: none !important; }
+
+    /* Navbar breathing room on narrow phones: the volume SLIDER collapses
+       (full control lives in Settings → Audio); the mute button stays as the
+       instant-kill. The Host/Client switch already lives in the Connection
+       card — the first tab — so no navbar mode switch is needed. */
+    body:not(.guest-panel) #navVolSlider { display: none; }
+    /* Reset Layout is desktop-only: the mobile grid is static (no drag, no
+       saved arrangement), so there's nothing to reset. */
+    body:not(.guest-panel) #resetLayoutBtn { display: none; }
+
+    /* Tighten the bar on phones so brand + status + mute + Share + Guide fit.
+       Re-applies the safe-area insets (this padding shorthand would otherwise
+       wipe the base rule's), just off a 10px base instead of 20px — so the
+       navbar contents still clear the status bar / landscape notch. */
+    body:not(.guest-panel) .dash-nav {
+        padding: env(safe-area-inset-top, 0px) calc(10px + env(safe-area-inset-right, 0px)) 0 calc(10px + env(safe-area-inset-left, 0px));
+        gap: 8px;
+    }
+    body:not(.guest-panel) .dash-actions { gap: 6px; }
+    body:not(.guest-panel) .dash-toggle { padding: 6px 9px; }
+
+    /* Guide collapses to a book icon (the "Guide ↗" text was the widest
+       item); the label returns at desktop widths. */
+    body:not(.guest-panel) #navGuideLink .nav-full { display: none; }
+    body:not(.guest-panel) #navGuideLink .nav-mini { display: inline-flex; align-items: center; }
+}
+
+/* Guide icon is desktop-hidden by default (label shows instead). */
+#navGuideLink .nav-mini { display: none; }
+#navGuideLink .nav-mini svg { display: block; }
+
+/* ============================================================
+   STATUS POPOVER + NAVBAR GUIDE LINK
+   ============================================================ */
+/* The status chip is a real button now: quiet until hovered, caret hints
+   that it opens. Inherits the .dash-status text styling. */
+.dash-status-wrap { position: relative; }
+button.dash-status {
+    border: 0;
+    background: transparent;
+    padding: 6px 10px;
+    margin: 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+button.dash-status:hover { background: rgba(255, 255, 255, 0.08); }
+.dash-status-caret { font-size: 0.7em; opacity: 0.6; }
+
+#statusPopover {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 2100;
+    min-width: 240px;
+    padding: 12px 14px;
+    background: var(--dash-surface, #fff);
+    border: 1px solid var(--dash-border, rgba(0, 0, 0, 0.12));
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+    color: var(--dash-ink, #111);
+    font-size: 0.85rem;
+}
+#statusPopover .sp-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+}
+#statusPopover .sp-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--dash-muted, rgba(0, 0, 0, 0.5));
+}
+#statusPopover .sp-divider {
+    border: 0;
+    border-top: 1px solid var(--dash-border, rgba(0, 0, 0, 0.12));
+    margin: 8px 0;
+}
+#statusPopover .sp-mode-ctl { display: inline-flex; gap: 6px; }
+#statusPopover .sp-mode-ctl .dash-toggle { padding: 4px 10px; font-size: 0.78em; }
+#statusPopover .sp-mode-ctl .dash-toggle.active {
+    color: var(--dash-ink, #000);
+    border-color: var(--dash-accent, #6c7bff);
+}
+#statusPopover .connection-dot { margin: 0; }
+
+/* Guide is an <a> wearing the dash-toggle button chrome. */
+a.dash-toggle {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+/* ============================================================
+   SMALL-TEXT FONT PASS
+   Courier stays the display face; everything that renders SMALL swaps to
+   the hinted --font-ui stack (see :root) so labels stay crisp at 10-12px
+   on non-retina screens. Headers, brand, pads, and the big seq char keep
+   Courier — that's where the typewriter identity lives.
+   ============================================================ */
+.settings-hint,
+.settings-label,
+.settings-status,
+.form-label,
+.form-check-label,
+.form-control,
+.input-group-text,
+.stat-label,
+.stat-unit,
+.midi-subhead,
+.dash-col-head,
+.dash-status,
+.dash-toggle,
+.dock-pill,
+.dropdown-item,
+.ghost-hint,
+.sp-label,
+#statusPopover,
+#activityFeed,
+#mobileSectionNav button,
+#layoutSwitchBar {
+    font-family: var(--font-ui);
+}
+
+/* The tiniest uppercase labels also get a slight size bump — 9px Courier
+   was the worst offender; 10px+ hinted mono reads cleanly. */
+.stat-label { font-size: 0.72rem; }
+.sp-label { font-size: 0.72rem; }
+
+/* ============================================================
+   MIDI SUBHEADS + SETTINGS-CHECK SPACING
+   ============================================================ */
+@media (min-width: 1100px) {
+    /* INPUT (Client) / OUTPUT (Host) / Notes were easy to miss — brighten to
+       ink and give each a divider line so it reads as a real section break. */
+    body:not(.guest-panel) .midi-subhead {
+        color: var(--dash-ink);
+        font-size: 0.74rem;
+        padding: 10px 0 5px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid var(--dash-border);
+    }
+    /* (The earlier max-width cap here is obsolete — checkbox rows are now
+       grouped-left, so there's no spread to constrain.) */
+}
+
+/* Checkbox item inside the Share dropdown (keeps the menu open on click). */
+.share-opt-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+.share-opt-check input { margin: 0; }
+
+/* Alert modal: never let a long unbreakable string (share URLs) blow out the
+   card; and a readable, full-width, selectable field for copy-text alerts. */
+.custom-alert p { overflow-wrap: anywhere; word-break: break-word; }
+.custom-alert-copy {
+    width: 100%;
+    margin-top: 4px;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    background: rgba(0, 0, 0, 0.04);
+    color: inherit;
+}

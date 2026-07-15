@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon_180x180.png">
+
+    <!-- HTML Meta Tags -->
+    <title>MMOFX!</title>
+    <meta name="keywords" content="SFX, Sampler, Instrument, MIDI">
+
+    <script src="js/libs/jquery.min.js"></script>
+    <script src="js/libs/bootstrap.bundle.min.js"></script>
+    <script src="js/libs/gridstack-all.min.js"></script>
+    <script src="js/libs/firebase-app-compat.min.js"></script>
+    <script src="js/libs/firebase-database-compat.min.js"></script>
+    <script src="js/libs/firebase-auth-compat.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/gridstack.min.css">
+    <link rel="stylesheet" type="text/css" href="css/styles.css?v=105">
+    <link rel="stylesheet" type="text/css" href="css/pianoroll.css?v=105">
+</head>
+
+<body>
+    <!-- Connection status bar: hidden when connected, slides in on trouble.
+         Visible to guests too (lives outside the hidden topNav). -->
+    <div id="connectionBar" class="connection-bar" role="status" aria-live="polite"></div>
+
+    <!-- Wide-screen dashboard navbar. Hidden on mobile and for stripped guest
+         panels (body.guest-panel); shown only at the dashboard breakpoint. The
+         .connection-dot here is auto-updated by setConnectionStatus(). -->
+    <header id="dashNav" class="dash-nav">
+        <!-- <span class="dash-brand">MMOFX</span> -->
+        <img src="img/logo.png" alt="" height="30px" style="opacity: 85%; height: 30px;">
+        <span class="dash-status-wrap">
+            <button type="button" id="dashStatusBtn" class="dash-status" aria-expanded="false" title="Session status">
+                <span class="connection-dot"></span>
+                <span id="dashChannel"></span>
+                <span class="dash-status-caret">&#9662;</span>
+            </button>
+            <!-- Status popover: live session stats + Host/Client mirror (the
+                 canonical switch stays in the Connection card; this calls the
+                 same setHostClientMode()). Filled by updateOverview(). -->
+            <div id="statusPopover" hidden>
+                <div class="sp-row"><span class="connection-dot"></span><span id="spConnState">&mdash;</span></div>
+                <div class="sp-row"><span class="sp-label">Server</span><span id="spServer">&mdash;</span></div>
+                <div class="sp-row"><span class="sp-label">Channel</span><span id="spChannel">&mdash;</span></div>
+                <hr class="sp-divider">
+                <div class="sp-row"><span class="sp-label">Activity</span><span id="spActivity">0 /min</span></div>
+                <div class="sp-row"><span class="sp-label">Voices</span><span id="spVoices">0</span></div>
+                <div class="sp-row"><span class="sp-label">Samples</span><span id="spSamples">0</span></div>
+                <div class="sp-row"><span class="sp-label">MIDI</span><span id="spMidi">&mdash;</span></div>
+                <hr class="sp-divider">
+                <div class="sp-row">
+                    <span class="sp-label">Mode</span>
+                    <span class="sp-mode-ctl">
+                        <button type="button" id="spModeHost" class="dash-toggle">Host</button>
+                        <button type="button" id="spModeClient" class="dash-toggle">Client</button>
+                    </span>
+                </div>
+            </div>
+        </span>
+        <span class="dash-actions">
+            <span class="dash-volume">
+                <button type="button" id="navMuteBtn" class="dash-icon-btn" aria-label="Mute" title="Mute"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a9 9 0 0 1 0 12"/></svg></button>
+                <input type="range" id="navVolSlider" min="0" max="100" value="80" aria-label="Master volume">
+            </span>
+            <div class="dropdown">
+                <button class="dash-toggle dropdown-toggle" type="button" id="navShareBtn" data-bs-toggle="dropdown" aria-expanded="false">Share</button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><h6 class="dropdown-header">Quick share</h6></li>
+                    <li><button class="dropdown-item" type="button" id="navSharePads">Share Basic Pads Link</button></li>
+                    <li><button class="dropdown-item" type="button" id="navSharePiano">Share Basic Piano Link</button></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><h6 class="dropdown-header">Custom controller</h6></li>
+                    <li><button class="dropdown-item" type="button" id="navDesignClient">Design a Controller&hellip;</button></li>
+                    <li><button class="dropdown-item" type="button" id="navDownloadClient">Download Controller Template&hellip;</button></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <label class="dropdown-item share-opt-check" for="navShowChannel" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="navShowChannel"> Show channel name to guests
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            <button type="button" id="resetLayoutBtn" class="dash-toggle" title="Restore the default panel arrangement">Reset Layout</button>
+            <a id="navGuideLink" class="dash-toggle" href="https://xusione.com/pages/resources/articles/mmofx-guide.html" target="_blank" rel="noopener" title="Open the MMOFX guide"><span class="nav-full">Guide &#8599;</span><span class="nav-mini" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span></a>
+        </span>
+    </header>
+
+    <div style="background-color: rgb(255, 255, 255, 0)" id="topMenuSection">
+        <div class="d-flex align-items-center justify-content-center">
+            <!-- <img class="mb-4 mt-5" src="img/logo.png" alt="MMOFX!" width="280" height="65" id="topLogo" style="opacity: 70%; mix-blend-mode: multiply;"> -->
+             <img class="pb-3" src="img/logo.png?v=105" alt="MMOFX!" width="0" height="0" id="topLogo" style="opacity: 80%; display: none !important;">
+        </div>
+
+        <div id="guestInstruct" style="display: none;" class="pb-2">
+            <div class="text-center">
+                <h1 id="guestInfoText" class="d-flex justify-content-center ps-4 pe-4 pt-4 mb-3"
+                    style="color: rgba(0, 0, 0, 0.75) !important;"></h1>
+            </div>
+        </div>
+
+        <ul id="topNav" class="nav nav-tabs navbar-light pill-nav pb-2">
+            <li><a class="tab btn nav-link" data-bs-toggle="tab" href="#settings_tab">Config</a></li>
+            <li><a class="tab btn nav-link active" aria-current="page" data-bs-toggle="tab" href="#studio_tab">Studio</a></li>
+            <!-- <li><a class="tab btn nav-link" data-bs-toggle="tab" href="#help_tab">mDocs</a></li> -->
+            <li>
+                <a class="tab btn nav-link" href="https://xusione.com/pages/resources/articles/mmofx-guide.html" target="_blank" rel="noopener" style="display:flex; align-items:center; gap:5px;">
+                    Guide
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tab-content ml-auto">
+
+        <div id="settings_tab" class="tab-pane fade">
+
+            <div class="dash-col-head">Config</div>
+
+            <div class="settings-container" style="">
+
+                <div class="settings-card">
+                    <div class="settings-card-header">Audio</div>
+                    <div class="settings-card-body">
+                        <div class="slidecontainer macro-slider">
+                            <input id="masterAmp" type="range" min="0" max="100" value="80" class="slider">
+                            <label for="masterAmp" class="form-label">Volume</label>
+                        </div>
+
+                        <div class="form-check settings-check">
+                            <input type="checkbox" class="form-check-input" id="enablePreviewCheckbox">
+                            <label class="form-check-label" for="enablePreviewCheckbox">Device Keyboards</label>
+                        </div>
+
+                        <button id="stop_all_samples_btn" class="btn btn-light" onclick="stopAllSamples()">Reset</button>
+
+                        <hr class="midi-divider">
+                        <div class="midi-subhead">Notes</div>
+                        <p class="settings-hint">Applies to the Keys tab and MIDI input.</p>
+
+                        <div class="form-check settings-check">
+                            <input type="checkbox" class="form-check-input" id="holdPitchedCheckbox">
+                            <label class="form-check-label" for="holdPitchedCheckbox">Hold Notes</label>
+                        </div>
+
+                        <div class="slidecontainer">
+                            <input type="range" id="pianoReleaseSlider" min="0" max="8" step="0.1" value="2" class="slider" oninput="updateReleaseLabel()">
+                            <label for="pianoReleaseSlider" class="settings-label" style="margin-bottom: 0;">Fade Duration: <span id="pianoReleaseValue">2.0</span>s</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <div class="settings-card-header" id="connectionHeader">Connection <span class="connection-dot" title="Connection status"></span></div>
+                    <div class="settings-card-body">
+                        <div class="mode-seg" role="group" aria-label="Session mode">
+                            <span class="mode-seg-caption">Mode</span>
+                            <div class="mode-seg-btns">
+                                <button type="button" id="hostModeLabel" class="mode-seg-btn active" aria-pressed="true">Host</button>
+                                <button type="button" id="clientModeLabel" class="mode-seg-btn" aria-pressed="false">Client</button>
+                            </div>
+                        </div>
+                        <input type="checkbox" id="hostClientSwitch" style="display: none;">
+
+                        <input type="checkbox" id="receiveCommandsCheckbox" checked style="display: none;">
+                        <input type="checkbox" id="enableTransmissionCheckbox" style="display: none;">
+
+                        <p class="settings-status" id="firebaseBackendStatus"></p>
+                        <p id="currentChannelDisplay" class="settings-status">Disconnected</p>
+
+                        <input class="form-control" type="text" id="channelNameInputBox"
+                            placeholder="Channel name.." maxlength="40" />
+
+                        <div class="settings-btn-group">
+                            <button class="btn btn-light" type="button" id="setChannelNameButton">Connect</button>
+                        </div>
+
+                        <p class="settings-hint">If you're experiencing connection issues, try disabling your VPN and connecting manually.</p>
+
+                        <details class="server-config">
+                            <summary>Server Config</summary>
+                            <p class="settings-hint">Relay through your own Firebase backend for a reliable, dedicated server instead of the shared default.</p>
+                            <p class="settings-hint"><a href="https://xusione.com/pages/resources/articles/mmofx-guide.html#config-firebase" target="_blank" rel="noopener">Setup guide &rarr;</a></p>                            
+                            <textarea id="firebaseConfigInput" class="form-control" rows="6" placeholder="Paste your Firebase config object here" style="font-family: monospace; font-size: 0.78em;"></textarea>
+                            <p class="settings-hint">Switching server reloads the app, which clears loaded samples, save your sample map first.</p>
+                            <div class="settings-btn-group" style="margin-bottom: 10px; margin-top: 10px;">
+                                <button class="btn btn-light" type="button" id="firebaseConfigSave">Save &amp; Reload</button>
+                                <button class="btn btn-light" type="button" id="firebaseConfigReset">Use Default</button>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <div class="settings-card-header">MIDI</div>
+                    <div class="settings-card-body">
+                        <div class="midi-subhead">MIDI In</div>
+                        <p class="settings-hint">Always fans out to your active outputs. In Client mode it's also sent to the host.</p>
+                        <div class="form-check settings-check">
+                            <input type="checkbox" class="form-check-input" id="enableMidiInCheckbox">
+                            <label class="form-check-label" for="enableMidiInCheckbox">Enabled</label>
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="midiInputSelect" class="settings-label">Input Device:</label>
+                            <div id="midiInputSelect"></div>
+                        </div>
+
+                        <div class="slidecontainer">
+                            <input id="midiInChannel" type="range" min="0" max="15" value="0" class="slider">
+                            <label id="midiInChannelLabel" for="midiInChannel" class="form-label">Channel: 0</label>
+                        </div>
+
+                        <hr class="midi-divider">
+                        <div class="midi-subhead">MIDI Out</div>
+                        <p class="settings-hint">Receives from your active inputs in any mode. In Host mode it also plays what clients send.</p>
+                        <div class="form-check settings-check">
+                            <input type="checkbox" checked class="form-check-input" id="enableMidiOutCheckbox">
+                            <label class="form-check-label" for="enableMidiOutCheckbox">Enabled</label>
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="midiOutputSelect" class="settings-label">Output Devices:</label>
+                            <div id="midiOutputSelect"></div>
+                        </div>
+
+                        <div class="slidecontainer">
+                            <input id="midiOutChannel" type="range" min="0" max="15" value="0" class="slider">
+                            <label id="midiOutChannelLabel" for="midiOutChannel" class="form-label">Channel: 0</label>
+                        </div>
+
+                        <div class="slidecontainer">
+                            <input id="midiNotDuration" type="range" min="0" max="10000" value="200" class="slider">
+                            <label id="midiNotDurationLabel" for="midiNotDuration" class="form-label">Duration: 500</label>
+                        </div>
+
+                        <button id="scanButton" class="btn btn-light" style="margin-top: 12px;">Refresh Devices</button>
+                    </div>
+                </div>
+
+                <div class="settings-card" id="activityCard">
+                    <div class="settings-card-header">Activity</div>
+                    <div class="settings-card-body">
+                        <ul id="activityFeed"></ul>
+                    </div>
+                </div>
+
+                <div class="settings-card" id="sharingCard" style="margin-top: 50px;">
+                    <div class="settings-card-header">Sharing</div>
+                    <div class="settings-card-body">
+                        <p class="settings-hint">Share preconfigured control panels with guests. These links includes your current channel, so they'll join this session automatically.</p>
+
+                        <div class="form-check settings-check">
+                            <input type="checkbox" class="form-check-input" id="showChannelNameCheckbox">
+                            <label class="form-check-label" for="showChannelNameCheckbox">Show Channel Name</label>
+                        </div>
+
+                        <div class="settings-btn-group">
+                            <button class="btn btn-light" type="button" id="sharePadsChannelUrlButton">Share Pads</button>
+                            <button class="btn btn-light" type="button" id="sharePianoChannelUrlButton">Share Piano</button>
+                        </div>
+
+                        <!-- <p class="settings-hint">"Share Pads" sends a touch-pad layout, "Share Piano" sends a piano keyboard layout.</p> -->
+
+                        <p class="settings-hint" style="margin-top: 10px;">Build your own control panels, pre-set to this channel and backend. See the <a href="https://xusione.com/pages/resources/articles/mmofx-guide.html#config-custom-clients" target="_blank" rel="noopener">guide</a>.</p>
+                        <div class="settings-btn-group">
+                            <button class="btn btn-light" type="button" id="downloadClientButton">Download Client Template</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="row justify-content-center mt-5 mb-5" style="padding-top: 20px; padding-bottom: 20px;">
+                    <button class="btn btn-light" id="installBtn" style="width: 200px !important;">Add to Home Screen</button>
+                </div> -->
+            </div>
+        </div>
+
+        <div id="help_tab" class="tab-pane fade">
+
+            <div class="d-flex justify-content-center">
+                <div class="mb-5" style="max-width: 300px;">
+
+                    <div class="mt-5 d-flex justify-content-center ">
+                        <div class="text-center">
+                            <p style="font-weight: 800;">
+                                Welcome to MMOFX! Use the guides below to get started!
+                            </p>
+                            <div class="pt-3">
+                                <a href="#host-mode" class="scroll-link">Host Mode</a> |
+                                <a href="#client-mode" class="scroll-link">Client Mode</a>
+                            </div>
+
+                            <div class="pt-2">
+                                <a href="#midi-in" class="scroll-link">MIDI-In</a> |
+                                <a href="#midi-out" class="scroll-link">MIDI-Out</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5" id="host-mode">
+                        <h4 class="mt-3" style="font-weight: 800;"> Host Mode: </h4>
+                        <p style="font-size: 0.9em;">Use this mode to receive key commands and MIDI note values from all
+                            connected clients on the specified MMOFX channel.</p>
+                        <p style="font-size: 0.9em;"> 1. Tap/click config and navigate to the connection section. </p>
+                        <p style="font-size: 0.9em;"> 2. Select "Host"</p>
+                        <p style="font-size: 0.9em;"> 3. (Optional) Specify a channel and connect</p>
+                        <p style="font-size: 0.9em;"> 4. (Optional) Connect and configure a MIDI out device</p>
+                        <p style="font-size: 0.9em;"> 5. (Optional) Open Studio / Samples to configure samples and keys
+                        </p>
+                    </div>
+
+                    <div class="mt-5" id="midi-out" style="padding-top: 20px;">
+                        <h4 style="font-weight: 800;"> MIDI Out: </h4>
+                        <p style="font-size: 0.9em;">Enable MIDI out to forward MIDI input from connected clients to the
+                            selected MIDI output device. Use multiple instances of MMOFX for multiple MIDI output
+                            devices.</p>
+                        <p style="font-size: 0.9em;"> 1. Connect your device</p>
+                        <p style="font-size: 0.9em;"> 2. Tap/click config and navigate to the MIDI section </p>
+                        <p style="font-size: 0.9em;"> 3. Tap/click 'Refresh Devices' if you connected your device after
+                            launching the app</p>
+                        <p style="font-size: 0.9em;"> 4. Select the device in the Output Device Menu</p>
+                    </div>
+
+                    <div class="mt-5" id="client-mode" style="padding-top: 20px;">
+                        <h4 style="font-weight: 800;"> Client Mode: </h4>
+                        <p style="font-size: 0.9em;">Use this mode to send key commands and MIDI note values to all
+                            connected hosts on the specified MMOFX channel.</p>
+                        <p style="font-size: 0.9em;"> 1. Tap/click config and navigate to the connection section. </p>
+                        <p style="font-size: 0.9em;"> 2. Select "Client" </p>
+                        <p style="font-size: 0.9em;"> 3. (Optional) Specify a channel and connect </p>
+                        <p style="font-size: 0.9em;"> 4. (Optional) Connect and configure a MIDI In device</p>
+                        <p style="font-size: 0.9em;"> 5. Open Studio / Pads and tap/click pads or use MIDI device</p>
+                    </div>
+
+                    <div class="mt-5 mb-3" id="midi-in" style="padding-top: 20px;">
+                        <h4 style="font-weight: 800;"> MIDI In: </h4>
+                        <p style="font-size: 0.9em;">Enable MIDI In to send MIDI input from the selected device to all
+                            connected hosts on the specified channel. Use multiple instances of MMOFX for multiple input
+                            devices.</p>
+                        <p style="font-size: 0.9em;"> 1. Connect your device</p>
+                        <p style="font-size: 0.9em;"> 2. Tap/click config and navigate to the MIDI section </p>
+                        <p style="font-size: 0.9em;"> 3. Tap/click 'Refresh Devices' if you connected your device after
+                            launching the app</p>
+                        <p style="font-size: 0.9em;"> 4. Select the device in the Input Device Menu</p>
+                    </div>
+                </div>
+
+                <!-- <footer class="footer mb-5 mt-5">
+                       <div class="text-center">
+                           <a href="https://xusione.com/pages/support-xusione">
+                               <img src="suppo.gif"> &ndash;&gt;
+                               <p style="color:DarkSlateBlue !important;"><i>Love MMOFX? Support XUSIONE!</i></p>
+                           </a>
+                       </div>
+                   </footer> -->
+            </div>
+
+        </div>
+
+        <div id="studio_tab" class="tab-pane show active fade">
+
+            <div id="subNav">
+                <ul class="nav nav-tabs navbar-light pill-nav subtabs">
+                    <li><a class="tab nav-link" data-bs-toggle="tab" href="#seq_tab">Seq</a></li>
+                    <li><a id="padTabLink" class="tab nav-link active" data-bs-toggle="tab" href="#control_tab">Pads</a></li>
+                    <li><a id="pianoTabLink" class="tab nav-link" data-bs-toggle="tab" href="#piano_tab">Keys</a></li>
+                </ul>
+            </div>
+
+            <!-- Dashboard-only tab bar for the center Controls column: switches
+                 the top area between Pads and Seq (Keys sits below as a rail).
+                 Hidden on mobile, where #subNav handles navigation instead. -->
+            <div id="ctrlTabs">
+                <!-- <span class="dash-col-head dash-col-head--inline">Controls</span> -->
+                <button type="button" id="ctrlPadsBtn" class="dash-toggle active">Pads</button>
+                <button type="button" id="ctrlSeqBtn" class="dash-toggle">Seq</button>
+                <button type="button" id="ctrlKeysBtn" class="dash-toggle">Keys</button>
+                <!-- Compact fallback: replaces the tab row when the rail is
+                     dragged narrow (container query in styles.css). -->
+                <div class="dropdown" id="ctrlMenu">
+                    <button type="button" id="ctrlMenuBtn" class="dash-toggle dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">&#9776; Pads</button>
+                    <ul class="dropdown-menu">
+                        <li><button class="dropdown-item" type="button" data-ctrl="pads">Pads</button></li>
+                        <li><button class="dropdown-item" type="button" data-ctrl="seq">Seq</button></li>
+                        <li><button class="dropdown-item" type="button" data-ctrl="keys">Keys</button></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tab-content ml-auto">
+                <div id="sampler_tab" class="tab-pane settings-card">
+
+                    <!-- Dashboard overview: always-present live KPI cards so the
+                         center never opens empty. Hidden on mobile. -->
+                    <div id="dashOverview">
+                        <div class="stat-card">
+                            <span class="stat-label">Channel</span>
+                            <span class="stat-value"><span class="connection-dot"></span><span id="statChannel">&mdash;</span></span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Activity</span>
+                            <span class="stat-value"><span id="statActivity">0</span><span class="stat-unit">/min</span></span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Active voices</span>
+                            <span class="stat-value" id="statVoices">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Samples</span>
+                            <span class="stat-value" id="statSamples">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">MIDI</span>
+                            <span class="stat-value" id="statMidi">&mdash;</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-card-header">Samples</div>
+                    <div class="settings-card-body">
+                        <div class="form-check settings-check">
+                            <input type="checkbox" class="form-check-input" id="randomizePlaybackCheckbox">
+                            <label class="form-check-label" for="randomizePlaybackCheckbox">Randomize Samples</label>
+                        </div>
+                        <div class="form-check settings-check">
+                            <input type="checkbox" class="form-check-input" id="pitchPolyphonyCheckbox" checked>
+                            <label class="form-check-label" for="pitchPolyphonyCheckbox">Sample Polyphony</label>
+                        </div>
+                        <div class="d-flex justify-content-center flex-wrap gap-2">
+                            <button id="add_samples_btn" class="btn btn-light" onclick="addSamplesLsDisk()">+ Import</button>
+                            <div class="dropdown">
+                                <button id="sample_actions_btn" class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Actions</button>
+                                <ul class="dropdown-menu">
+                                    <li><button class="dropdown-item" type="button" onclick="initTrgKeys()">Init Keys</button></li>
+                                    <li><button class="dropdown-item" type="button" onclick="toggleAllPitch()">Toggle Pitch (All)</button></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><button class="dropdown-item" type="button" onclick="copySampleMapToKeyboard()">Copy Map</button></li>
+                                    <li><button class="dropdown-item" type="button" onclick="saveSampleMap()">Save Map</button></li>
+                                    <li><button class="dropdown-item" type="button" onclick="loadSampleMap()">Load Map</button></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><button class="dropdown-item text-danger" type="button" onclick="clearSamples()">Clear</button></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="container" id="sampleTableContainer" style="width:100% !important; margin-top: 20px !important;"></div>
+
+                        <!-- Dashboard empty-state: ghost cards shown only when no
+                             samples are loaded, so the column doesn't look bare. -->
+                        <div id="samplePlaceholder" aria-hidden="true">
+                            <div class="ghost-grid">
+                                <div class="ghost-card"></div>
+                                <div class="ghost-card"></div>
+                                <div class="ghost-card"></div>
+                                <div class="ghost-card"></div>
+                                <div class="ghost-card"></div>
+                                <div class="ghost-card"></div>
+                            </div>
+                            <p class="ghost-hint">Your kit is empty &mdash; hit <strong>+ Import</strong> to add samples.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="seq_tab" class="tab-pane">
+                    <div class="settings-container">
+                        <div class="settings-card">
+                            <div class="settings-card-header">Sequence</div>
+                            <div class="settings-card-body">
+                                <div class="seq-current">
+                                    <span class="seq-current-label">Current step</span>
+                                    <div class="seq-current-row">
+                                        <button class="btn btn-light seq-step-btn" type="button"
+                                            aria-label="Previous step" title="Step back"
+                                            onclick="stepSeq(-1)">&#8249;</button>
+                                        <h1 id="curSeqCharH" class="seq-current-char">?</h1>
+                                        <button class="btn btn-light seq-step-btn" type="button"
+                                            aria-label="Next step" title="Step forward"
+                                            onclick="stepSeq(1)">&#8250;</button>
+                                    </div>
+                                </div>
+                                <input class="form-control" type="text" value="?" id="maxlerZone"
+                                    placeholder="Sequence Keys" onchange="setOrigSeq()" />
+                                <div class="settings-btn-group" style="padding-bottom: 15px;">
+                                    <button class="btn btn-light" type="button" onclick="sampleTrigsToSeq()">Init</button>
+                                    <button class="btn btn-light" type="button" id="revSeq" onclick="reverseSeq()">Rev</button>
+                                    <button class="btn btn-light" type="button" id="randomizeSeq" onclick="randomizeSequencer()">?</button>
+                                    <button class="btn btn-light" type="button" id="resetSeq" onclick="resetOrigSeq()">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+      
+                        <div class="settings-card">
+                            <div class="settings-card-header">Playback</div>
+                            <div class="settings-card-body">
+                                <div class="settings-btn-group" style="padding-top: 15px;">
+                                    <button class="btn btn-light" type="button" id="playSeq" onclick="togglePlaySeq()">Start</button>
+                                    <button class="btn btn-light" type="button" id="stallSeqBtn" aria-pressed="false"
+                                        title="Press and hold to freeze the sequencer on the current step"
+                                        style="touch-action: none; user-select: none; -webkit-user-select: none;">Hold</button>
+                                </div>
+
+                                <!-- Hidden state read by iterateSeq(); driven momentarily by #stallSeqBtn -->
+                                <input type="checkbox" id="stallSeq" style="display: none;">
+
+                                <div class="field-row" style="padding-top: 10px;">
+                                    <label class="settings-label" for="seqRateTextField">Tempo (BPM):</label>
+                                    <input id="seqRateTextField" class="form-control" type="number" min="40"
+                                        max="300" onchange="setSeqRateText()" value="120" style="width:90px;" />
+                                </div>
+                                <input id="seqRateSlider" class="slider" type="range" step="1" min="1"
+                                    max="400" value="120" style="width:100%;"
+                                    oninput="setSeqRateSlider()">
+
+                                <div class="form-check settings-check" style="padding-bottom: 20px;"> 
+                                    <input type="checkbox" class="form-check-input" id="randomizeTrgs">
+                                    <label class="form-check-label" for="randomizeTrgs">Randomize</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="settings-card-header">Pattern</div>
+                            <div class="settings-card-body" style="padding-bottom: 25px;">
+                                <div class="form-check settings-check" style="padding-top: 15px;">
+                                    <input class="form-check-input" type="checkbox" id="fibonaSequ">
+                                    <label class="form-check-label" for="fibonaSequ">Enable</label>
+                                </div>
+
+                                <div class="settings-group">
+                                    <label class="settings-label" for="fiboPatterLength">Pattern Length</label>
+                                    <input id="fiboPatterLength" value="32" class="form-control" type="number"
+                                        onchange="setSeqRateText()" style="width:120px; margin:0 auto;" />
+                                </div>
+
+                                <div class="stepper-row">
+                                    <button type="button" class="btn btn-light stepper-btn" aria-label="Decrease" onclick="stepMulti(-1)">&minus;</button>
+                                    <input id="maxlerMulti" class="slider" type="range" min="1" max="100"
+                                        value="1" step="1" oninput="updateMultiLabel()">
+                                    <button type="button" class="btn btn-light stepper-btn" aria-label="Increase" onclick="stepMulti(1)">+</button>
+                                </div>
+                                <label class="settings-label" for="maxlerMulti">Variation: <span id="maxlerMultiValue">1.0</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="control_tab" class="tab-pane show active">
+                    <div class="mt-1 mb-4">
+                        <input type="text" id="" class="form-control phone-pad-input" placeholder="Keyboard Input"/>
+
+                        <div class="container">
+                            <div class="row" id="keyPadPanel"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="piano_tab" class="tab-pane" style="width: 100% !important;">
+                    <div id="controlCenter" style="display: flex; flex-direction: column; align-items: center; padding: 10px;">
+                        <div class="mt-3" id="pianoScaleSliderElement" style="width: 50%;">
+                            <div class="col-12">
+                                <div style="display: flex; flex-direction: column; align-items: center;" id="pianoScaleSlider" style="width: 100% !important;">
+                                    <input type="range" id="keyHeight" min="5" max="80" value="40" class="slider" style="width: 300px; max-width: 400px !important;">
+                                    <label for="keyHeight" style="margin-top: 0px;" class="no-select">Key Width</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check settings-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="pianoNoteOffCheckbox" checked>
+                            <label class="form-check-label" for="pianoNoteOffCheckbox" id="pianoNoteOffCheckboxClentLabel">Note Off on Release</label>
+                        </div>
+                    </div>
+                    
+                    <div class="container pb-5 pt-2">
+                        <div class="outerPianoContainer mx-auto">
+                            <div class="controls mx-auto"></div>                            
+                            <div class="mx-auto" id="pianoContainer"></div>                            
+                        </div>
+                    </div>
+                </div>
+
+                <div id="api_tab" class="tab-pane">
+                    <div class="text-center">
+                        <br>
+                        <button id="add_api_btn" class="btn btn-light" onclick="addApiListRow()">+ Add</button>
+                        <div class="container" id="apiConfContainer"></div>
+                        <br><br>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="composer_tab" class="tab-pane">
+            <div class="container">
+                <div class="text-center">
+                    <br><br>
+                    <button type="button" name="button">Play</button>
+                    <button type="button" name="button">Pause</button>
+                    <br><br>
+                    <div id="compPlot" class=""></div>
+                    <br><br>
+                    <button type="button" name="button">Load</button>
+                    <button type="button" name="button">Save</button>
+                    <button type="button" name="button">Clear</button>
+                    <br><br>
+                </div>
+            </div>
+        </div>
+
+        <div id="synth" class="tab-pane">
+            <div class="text-center">
+                <br><br><br>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <div class="text-center">
+                                <h5> Oscs </h5>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="osc_a_vol_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Sine</p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="osc_b_vol_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Square</p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="osc_c_vol_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Sawtooth</p>
+                            </div><br>
+                        </div>
+
+                        <div class="col-sm">
+                            <div class="text-center">
+                                <h5> Envelope </h5>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="attack_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Attack</p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="duration_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Decay</p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="release_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p>Release</p>
+                            </div><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mixer" class="tab-pane">
+            <div class="text-center">
+                <br><br>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <div class="text-center">
+                                <h5> Mix </h5>
+                            </div>
+                            <br>
+                            <div class="slidecontainer">
+                                <input id="samplerMasterAmp" type="range" min="0" max="100" value="50" class="slider">
+                                <p> Sampler </p>
+                            </div>
+
+                        </div>
+                        <br><br>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm">
+                            <div class="text-center">
+                                <h5> Delay A</h5>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delay_speed_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Time </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delay_feedback_knob" type="range" min="1" max="100" value="50"
+                                    class="slider">
+                                <p> Feedback </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delay_cutoff_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Cutoff </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delay_drywet_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Dry/Wet </p>
+                            </div><br>
+                        </div>
+
+                        <div class="col-sm">
+                            <div class="text-center">
+                                <h5> Delay B</h5>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delayB_speed_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Time </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delayB_feedback_knob" type="range" min="1" max="100" value="50"
+                                    class="slider">
+                                <p> Feedback </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delayB_cutoff_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Cutoff </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="delayB_drywet_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Dry/Wet </p>
+                            </div><br>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm">
+                            <div class="text-center">
+                                <h5> Reverb </h5>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="reverb_speed_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Room Size </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="reverb_feedback_knob" type="range" min="1" max="100" value="50"
+                                    class="slider">
+                                <p> Feedback </p>
+                            </div><br>
+
+                            <div class="slidecontainer">
+                                <input id="reverb_drywet_knob" type="range" min="1" max="100" value="50" class="slider">
+                                <p> Dry/Wet </p>
+                            </div><br>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <nav class="app-footer-links">
+            <a href="https://xusione.com/pages/resources/articles/mmofx-guide.html" target="_blank" rel="noopener">Guide</a>
+            <span class="app-footer-sep">·</span>
+            <!-- <a href="https://www.xusione.com/subpages/privacy.html" target="_blank" rel="noopener">Privacy</a>
+            <span class="app-footer-sep">·</span> -->
+            <a href="https://www.xusione.com/subpages/terms.html" target="_blank" rel="noopener">Terms</a>
+            <span class="app-footer-sep">·</span>
+            <a href="https://www.xusione.com" target="_blank" rel="noopener">© XUSIONE</a>
+        </nav>
+    </footer>
+
+    <script type="text/javascript" src="js/alerts.js?v=105"></script>
+    <script type="text/javascript" src="js/elements.js?v=105"></script>
+    <script type="text/javascript" src="js/params.js?v=105"></script>
+    <script type="text/javascript" src="js/firebase-config.js?v=105"></script>
+    <script type="text/javascript" src="js/network.js?v=105"></script>
+    <script type="text/javascript" src="js/ui.js?v=105"></script>
+    <script type="text/javascript" src="js/session.js?v=105"></script>
+    <script type="text/javascript" src="js/iosAudio.js?v=105"></script>
+    <script type="text/javascript" src="js/audio.js?v=105"></script>
+    <script type="text/javascript" src="js/sequ.js?v=105"></script>
+    <script type="text/javascript" src="js/pianoroll.js?v=105"></script>
+
+</body>
+
+</html>
