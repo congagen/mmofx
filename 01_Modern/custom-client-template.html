@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MMOFX Custom Client</title>
+
+    <!-- =================================================================
+         MMOFX — CUSTOM CLIENT TEMPLATE
+         A standalone control panel that drives an MMOFX host. Open this file
+         in a browser (or host it anywhere); tap a control and any host on the
+         same Channel + Backend plays it. Nothing here makes sound — the host
+         does. This is just a remote.
+
+         Edit the CONFIG block below; each field is commented inline.
+
+         Full guide (protocol, customising, self-hosting your own backend):
+         https://xusione.com/pages/resources/articles/mmofx-guide.html#config-custom-clients
+         ================================================================= -->
+
+    <style>
+        :root {
+            --bg: #0e0e16;
+            --card: #1a1a28;
+            --ink: #f4f4fb;
+            --muted: rgba(244, 244, 251, 0.55);
+            --accent: #6c7bff;
+            --ok: #46c98b;      /* connected dot */
+            --bad: #e2557a;     /* disconnected dot */
+            --edge: rgba(255, 255, 255, 0.1);  /* borders, dividers, scroll track */
+            --sharp: #2a2a3d;   /* sharp (black) keys */
+            --scroll: rgba(255, 255, 255, 0.28);  /* scrollbar handle */
+            --pad-h: 72px;      /* pad button height (CONFIG.PAD_HEIGHT) */
+            --key-h: 72px;      /* key button height (CONFIG.KEY_HEIGHT) */
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+            /* Fixed-height flex column: header/tabs stay put, <main> scrolls, so
+               it can own a real (grabbable) scrollbar track. */
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--edge);
+        }
+
+        .brand { font-weight: 600; letter-spacing: 0.02em; font-size: 1.05em; display: flex; align-items: center; min-width: 0; }
+        .brand img { max-height: 34px; width: auto; display: block; }
+
+        .status { display: flex; align-items: center; gap: 8px; font-size: 0.78em; color: var(--muted); }
+        .status .chan { font-weight: 600; color: var(--ink); }
+        .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--bad); transition: background 0.2s; }
+        .dot.connected { background: var(--ok); }
+
+        /* Content is centred with a sane max width so it doesn't stretch into
+           giant pads / keys on desktop — clients aren't always phones. */
+        nav, main, #chanBar { max-width: 720px; margin-left: auto; margin-right: auto; width: 100%; }
+
+        #chanBar { display: flex; gap: 8px; padding: 12px 16px 0; }
+        #chanBar[hidden] { display: none; }
+        #chanBar input { flex: 1; }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px 0;
+        }
+
+        nav button {
+            flex: 1;
+            padding: 10px;
+            border: 0;
+            border-radius: 10px 10px 0 0;
+            background: var(--card);
+            color: var(--muted);
+            font-size: 0.95em;
+            cursor: pointer;
+        }
+
+        nav button.active { color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); }
+
+        main {
+            padding: 16px;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            /* Reserve a scrollbar track (a strip that isn't a key/pad) so the
+               list can be scrolled without pressing a control — vital in Rows
+               mode where every button is full-width. */
+            scrollbar-gutter: stable;
+            scrollbar-width: auto;
+        }
+        main::-webkit-scrollbar { width: 14px; }
+        main::-webkit-scrollbar-track { background: var(--edge); border-radius: 8px; }
+        main::-webkit-scrollbar-thumb {
+            background: var(--scroll);
+            border-radius: 8px;
+            border: 3px solid var(--bg);
+        }
+        main::-webkit-scrollbar-thumb:hover { background: var(--ink); }
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* Pads and Keys share ONE layout + button style so the two surfaces
+           feel identical: a grid whose equal cells grow to fill the available
+           width (capped by the centred 720px content column). */
+        .pad-grid, .piano {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+            gap: 10px;
+        }
+        /* "rows" layout: one full-width button per line (long pad labels, or
+           big single-column keys). */
+        .pad-grid.rows, .piano.rows { grid-template-columns: 1fr; }
+
+        .pad, .pkey {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            /* Height comes from --pad-h / --key-h below; vertical padding is
+               kept small so it can't out-size those variables (a wrapped label
+               may still grow past them). Flex centring keeps labels centred. */
+            padding: 8px 14px;
+            border: 0;
+            border-radius: 12px;
+            background: var(--card);
+            color: var(--ink);
+            /* Pads: buildPads() shrinks this per-pad for longer labels. */
+            font-size: 1.05rem;
+            line-height: 1.15;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            hyphens: auto;
+            cursor: pointer;
+            transition: transform 0.05s, background 0.1s;
+        }
+
+        /* Each surface owns its own height. */
+        .pad { min-height: var(--pad-h); }
+        .pkey { min-height: var(--key-h); }
+
+        .pkey.sharp { background: var(--sharp); color: var(--muted); }
+        /* Active state last so it wins over .pkey.sharp (same specificity) —
+           otherwise sharp keys don't light up when pressed. */
+        .pad:active, .pkey:active { transform: scale(0.96); background: var(--accent); color: #fff; }
+        .pkey.sharp:active { background: var(--accent); color: #fff; }
+
+        /* Seq step indicator: one chip per step, the active one lights up. */
+        .seq-viz { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 2px; }
+        .seq-chip {
+            min-width: 30px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--muted);
+            font-size: 0.85em;
+            text-align: center;
+            transition: background 0.08s, color 0.08s, transform 0.08s;
+        }
+        .seq-chip.on { background: var(--accent); color: #fff; transform: scale(1.08); }
+
+        .row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .row label { font-size: 0.85em; color: var(--muted); }
+        input[type="text"], input[type="number"] {
+            background: var(--card);
+            border: 1px solid var(--edge);
+            border-radius: 8px;
+            color: var(--ink);
+            padding: 9px 11px;
+            font-size: 0.95em;
+        }
+        input[type="text"] { flex: 1; min-width: 140px; }
+
+        .btn {
+            border: 0;
+            border-radius: 9px;
+            padding: 11px 18px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.95em;
+            cursor: pointer;
+        }
+        .btn.ghost { background: var(--card); color: var(--ink); }
+
+        .hint { font-size: 0.8em; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+    </style>
+</head>
+
+<body>
+    <!-- === MMOFX CONFIG START === (the in-app generator overwrites backend + channel here) -->
+    <script>
+        /*__CONFIG_START__*/
+        const CONFIG = {
+            // --- Connection (must match the host) ---
+            // Client-side Firebase keys are not secrets; they only identify
+            // the backend. The in-app "Download Client" button fills these in.
+            backend: /*__BACKEND__*/{
+                apiKey: "AIzaSyDx3-4RSc8fpkQcL2O_DsDSZ29qJ_JoRx8",
+                projectId: "xtation-2",
+                databaseURL: "https://xtation-2.firebaseio.com",
+                authDomain: "xtation-2.firebaseapp.com"
+            }/*__END_BACKEND__*/,
+            channel: /*__CHANNEL__*/"Lobby"/*__END_CHANNEL__*/,
+
+            // --- Layout ---
+            // Surfaces to show, in order. Options: "pads", "keys", "seq".
+            // For a single surface use e.g. ["pads"].
+            PANELS: ["pads", "keys", "seq"],
+            // Hide the top nav (set false when you only use one panel).
+            SHOW_NAV: true,
+
+            // --- Pads ---
+            // Layout: "grid" (compact square-ish cells) or "rows" (one
+            // button per line, better for long labels).
+            PAD_LAYOUT: "grid",
+            // Pad button height in px (40-160), in either layout.
+            PAD_HEIGHT: 72,
+            // [label, key]; key is one character the host maps.
+            PAD_KEYS: [
+                ["1", "q"], ["2", "w"], ["3", "e"], ["4", "r"],
+                ["5", "a"], ["6", "s"], ["7", "d"], ["8", "f"],
+                ["9", "z"], ["10", "x"], ["11", "c"], ["12", "v"]
+            ],
+
+            // --- Keys ---
+            // Layout: "grid" (compact keys) or "rows" (one full-width key per line).
+            KEY_LAYOUT: "grid",
+            // Key button height in px (40-160), in either layout.
+            KEY_HEIGHT: 72,
+            // Inclusive note-index range (60 = root pitch).
+            PIANO_RANGE: [48, 72],
+
+            // --- Seq --- a CLIENT-SIDE step sequencer: it just fires the keys
+            // below at the given tempo. (The host has no "seq client" mode; the
+            // host's own sequencer is separate.) Steps are space-separated keys.
+            SEQ_STEPS: "q w e r",
+            SEQ_BPM: 120,
+
+            // --- Hints sent with every press ---
+            RANDOMIZE: false, // ask the host to randomise samples
+            HOLD: false       // ask the host to hold/sustain (piano)
+        };
+        /*__CONFIG_END__*/
+
+        // A shareable link can carry a config override in the URL hash
+        // (#cfg=<base64url JSON>), so this ONE file works both as a
+        // self-contained download AND as the live receiver for a link built by
+        // the Client Designer. Any key present in the override replaces the
+        // baked default above (backend included — client Firebase keys aren't
+        // secrets). Using the hash (not a query param) keeps the config out of
+        // server logs and referrers.
+        (function applyHashConfig() {
+            try {
+                var m = (location.hash || "").match(/(?:^#|&)cfg=([^&]+)/);
+                if (!m) return;
+                var b64 = m[1].replace(/-/g, "+").replace(/_/g, "/");
+                while (b64.length % 4) b64 += "=";
+                var over = JSON.parse(decodeURIComponent(escape(atob(b64))));
+                if (over && typeof over === "object") {
+                    Object.keys(over).forEach(function (k) { CONFIG[k] = over[k]; });
+                }
+            } catch (e) { console.warn("Ignoring malformed #cfg override:", e); }
+        })();
+
+        // Optional custom colour scheme: CONFIG.COLORS maps names to CSS values,
+        // applied as :root overrides. Any subset works; unset names keep the
+        // defaults above. Colours are plain strings, so they travel fine in a
+        // shareable link (unlike images).
+        (function applyColors() {
+            if (!CONFIG.COLORS || typeof CONFIG.COLORS !== "object") return;
+            var map = {
+                bg: "--bg", card: "--card", ink: "--ink", muted: "--muted",
+                accent: "--accent", ok: "--ok", bad: "--bad",
+                edge: "--edge", sharp: "--sharp", scroll: "--scroll"
+            };
+            Object.keys(CONFIG.COLORS).forEach(function (k) {
+                if (map[k] && CONFIG.COLORS[k]) {
+                    document.documentElement.style.setProperty(map[k], CONFIG.COLORS[k]);
+                }
+            });
+        })();
+
+        // Pad / key button heights, in px (each surface independent).
+        (function applyHeights() {
+            [["PAD_HEIGHT", "--pad-h"], ["KEY_HEIGHT", "--key-h"]].forEach(function (pair) {
+                var h = parseInt(CONFIG[pair[0]], 10);
+                if (!h || h < 40 || h > 160) return;
+                document.documentElement.style.setProperty(pair[1], h + "px");
+            });
+        })();
+    </script>
+    <!-- === MMOFX CONFIG END === -->
+
+    <!-- Firebase compat SDK (CDN; same wire protocol as the MMOFX app) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+    <header>
+        <div class="brand" id="brand">MMOFX Client</div>
+        <div class="status">
+            <span class="chan" id="chanLabel"></span>
+            <span class="dot" id="dot"></span>
+            <span id="statusText">connecting…</span>
+        </div>
+    </header>
+
+    <!-- Optional guest channel switcher (CONFIG.ALLOW_CHANNEL). -->
+    <div id="chanBar" hidden>
+        <input type="text" id="chanInput" placeholder="Channel" maxlength="40" autocomplete="off">
+        <button type="button" id="chanGo" class="btn">Connect</button>
+    </div>
+
+    <nav id="nav"></nav>
+    <main id="main"></main>
+
+    <script>
+        // ---- Networking: identical protocol to the MMOFX host ----
+        firebase.initializeApp(CONFIG.backend);
+        // The default backend's rules expect an authenticated user.
+        firebase.auth().signInAnonymously().catch(function (e) {
+            console.warn("Anonymous sign-in failed (the host's backend may not allow it):", e);
+        });
+
+        let nonce = 0;
+        const sessionId = "custom-" + Math.random().toString(36).slice(2);
+
+        // Send one command to the channel. Each press bumps the nonce so the
+        // host's child_changed fires even on repeats of the same key.
+        function send(key) {
+            nonce += 1;
+            firebase.database().ref(CONFIG.channel).set({
+                session_id: sessionId,
+                playedKey: {
+                    k: String(key),
+                    n: nonce,
+                    r: !!CONFIG.RANDOMIZE,
+                    h: !!CONFIG.HOLD
+                }
+            });
+        }
+
+        // ---- Connection indicator ----
+        firebase.database().ref(".info/connected").on("value", function (snap) {
+            const ok = snap.val() === true;
+            document.getElementById("dot").classList.toggle("connected", ok);
+            document.getElementById("statusText").textContent = ok ? "connected" : "connecting…";
+        });
+        // ---- Header brand: logo image if given, else text ----
+        (function () {
+            var brand = document.getElementById("brand");
+            if (CONFIG.TITLE_IMAGE) {
+                var img = document.createElement("img");
+                img.src = CONFIG.TITLE_IMAGE;
+                img.alt = CONFIG.TITLE || "Client";
+                brand.textContent = "";
+                brand.appendChild(img);
+            } else {
+                brand.textContent = CONFIG.TITLE || "MMOFX Client";
+            }
+        })();
+
+        function setChannelLabel() {
+            document.getElementById("chanLabel").textContent = CONFIG.channel;
+        }
+        setChannelLabel();
+
+        // ---- Optional guest channel switcher ----
+        // send() reads CONFIG.channel on every press, so re-pointing is just a
+        // matter of updating CONFIG.channel + the label (the Firebase connection
+        // itself is channel-independent — .info/connected doesn't change).
+        if (CONFIG.ALLOW_CHANNEL) {
+            var chanBar = document.getElementById("chanBar");
+            var chanInput = document.getElementById("chanInput");
+            chanBar.hidden = false;
+            chanInput.value = CONFIG.channel;
+            var connectChannel = function () {
+                var v = (chanInput.value || "").trim();
+                if (!v) return;
+                CONFIG.channel = v;
+                setChannelLabel();
+            };
+            document.getElementById("chanGo").addEventListener("click", connectChannel);
+            chanInput.addEventListener("keydown", function (e) { if (e.key === "Enter") connectChannel(); });
+        }
+
+        // ---- Panel builders ----
+        // Shrink the label as it gets longer so long names stay readable inside
+        // the pad instead of overflowing (with a low floor for extreme cases).
+        function padFontSize(label) {
+            var n = (label || "").length;
+            if (n <= 4) return "1.05rem";  // matches the Keys' base size
+            if (n <= 7) return "0.95rem";
+            if (n <= 11) return "0.82rem";
+            if (n <= 16) return "0.72rem";
+            return "0.62rem";
+        }
+
+        function buildPads() {
+            const wrap = document.createElement("div");
+            const rows = CONFIG.PAD_LAYOUT === "rows";
+            wrap.className = "pad-grid" + (rows ? " rows" : "");
+            CONFIG.PAD_KEYS.forEach(function (pair) {
+                const b = document.createElement("button");
+                b.className = "pad";
+                b.textContent = pair[0];
+                // Grid cells are narrow, so shrink long labels; full-width rows
+                // have room, so keep them at the base size.
+                if (!rows) b.style.fontSize = padFontSize(pair[0]);
+                b.addEventListener("pointerdown", function (e) { e.preventDefault(); send(pair[1]); });
+                wrap.appendChild(b);
+            });
+            return wrap;
+        }
+
+        function buildKeys() {
+            const wrap = document.createElement("div");
+            wrap.className = "piano" + (CONFIG.KEY_LAYOUT === "rows" ? " rows" : "");
+            const names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+            const sharps = { 1: 1, 3: 1, 6: 1, 8: 1, 10: 1 };
+            for (let i = CONFIG.PIANO_RANGE[0]; i <= CONFIG.PIANO_RANGE[1]; i++) {
+                const b = document.createElement("button");
+                const pc = ((i % 12) + 12) % 12;
+                // Octave label matches the app's pianoroll (MIDI 60 = C4), so a
+                // multi-octave range isn't a wall of identical letters.
+                const octave = Math.floor(i / 12) - 1;
+                b.className = "pkey" + (sharps[pc] ? " sharp" : "");
+                b.textContent = names[pc] + octave;
+                // Zero-pad so the key is 2+ chars and the host treats it as a
+                // pitched note (not a pad character).
+                const key = String(i).padStart(2, "0");
+                b.addEventListener("pointerdown", function (e) { e.preventDefault(); send(key); });
+                wrap.appendChild(b);
+            }
+            return wrap;
+        }
+
+        function buildSeq() {
+            const wrap = document.createElement("div");
+            wrap.innerHTML =
+                '<div class="row"><label>Steps</label>' +
+                '<input type="text" id="seqSteps"></div>' +
+                '<div class="row"><label>BPM</label>' +
+                '<input type="number" id="seqBpm" min="20" max="400" style="width:90px">' +
+                '<button class="btn" id="seqToggle">Start</button></div>' +
+                '<div class="seq-viz" id="seqViz"></div>' +
+                '<p class="hint">A client-side sequencer that fires the steps above at this tempo. ' +
+                'Like the app sequencer, each pad character is its own step, so "qwe" and "q w e" ' +
+                'are the same. A whole number is one pitched-note step (60 64 67); pad to 2+ digits ' +
+                '(e.g. 05) since a single character is sent as a pad key.</p>';
+            wrap.querySelector("#seqSteps").value = CONFIG.SEQ_STEPS;
+            wrap.querySelector("#seqBpm").value = CONFIG.SEQ_BPM;
+
+            // Expand the steps string into one entry per step. Whole numbers stay
+            // intact (a pitched note the host plays), everything else is split
+            // character by character — matching the app's sequencer, which steps
+            // through its string one character at a time. So "qwe", "q w e" and
+            // "60 q 64" all do the sensible thing.
+            const parseSteps = function (text) {
+                const out = [];
+                (text || "").trim().split(/\s+/).filter(Boolean).forEach(function (tok) {
+                    if (/^\d+$/.test(tok)) {
+                        out.push(tok);
+                    } else {
+                        for (let i = 0; i < tok.length; i++) out.push(tok[i]);
+                    }
+                });
+                return out;
+            };
+
+            // Step indicator: one chip per parsed step; keep it in sync as the
+            // guest edits the Steps field.
+            const stepsInput = wrap.querySelector("#seqSteps");
+            const viz = wrap.querySelector("#seqViz");
+            const renderChips = function () {
+                const steps = parseSteps(stepsInput.value);
+                viz.innerHTML = "";
+                steps.forEach(function (s) {
+                    const c = document.createElement("span");
+                    c.className = "seq-chip";
+                    c.textContent = s;
+                    viz.appendChild(c);
+                });
+            };
+            const highlight = function (active) {
+                Array.prototype.forEach.call(viz.children, function (c, i) {
+                    c.classList.toggle("on", i === active);
+                });
+            };
+            renderChips();
+            stepsInput.addEventListener("input", renderChips);
+
+            let timer = null, idx = 0;
+            const bpmInput = wrap.querySelector("#seqBpm");
+            const toggle = wrap.querySelector("#seqToggle");
+
+            // Each step is an 8th note, matching the app's sequencer
+            // (30000/BPM ms/step → 120 BPM = 250 ms/step), so the same BPM feels
+            // identical on the client and the host.
+            const stepMs = function () {
+                const bpm = Math.max(20, Math.min(400, parseInt(bpmInput.value, 10) || 120));
+                return 30000 / bpm;
+            };
+            const tick = function () {
+                const steps = parseSteps(stepsInput.value);
+                if (!steps.length) { highlight(-1); return; }
+                const active = idx % steps.length;
+                send(steps[active]);
+                highlight(active);
+                idx++;
+            };
+            const restartTimer = function () {
+                clearInterval(timer);
+                timer = setInterval(tick, stepMs());
+            };
+
+            toggle.addEventListener("click", function () {
+                if (timer) {
+                    clearInterval(timer); timer = null; toggle.textContent = "Start"; highlight(-1); return;
+                }
+                idx = 0;
+                restartTimer();
+                toggle.textContent = "Stop";
+                tick();
+            });
+            // Live tempo: re-time a running sequence the moment the BPM changes.
+            bpmInput.addEventListener("input", function () { if (timer) restartTimer(); });
+            return wrap;
+        }
+
+        // ---- Assemble nav + panels from CONFIG ----
+        const builders = { pads: buildPads, keys: buildKeys, seq: buildSeq };
+        const labels = { pads: "Pads", keys: "Keys", seq: "Seq" };
+        const nav = document.getElementById("nav");
+        const main = document.getElementById("main");
+        const panels = [];
+
+        CONFIG.PANELS.forEach(function (name, i) {
+            if (!builders[name]) return;
+            const panel = document.createElement("div");
+            panel.className = "panel" + (i === 0 ? " active" : "");
+            panel.appendChild(builders[name]());
+            main.appendChild(panel);
+            panels.push(panel);
+
+            if (CONFIG.SHOW_NAV && CONFIG.PANELS.length > 1) {
+                const tab = document.createElement("button");
+                tab.textContent = labels[name] || name;
+                tab.className = i === 0 ? "active" : "";
+                tab.addEventListener("click", function () {
+                    panels.forEach(function (p) { p.classList.remove("active"); });
+                    [].forEach.call(nav.children, function (c) { c.classList.remove("active"); });
+                    panel.classList.add("active");
+                    tab.classList.add("active");
+                });
+                nav.appendChild(tab);
+            }
+        });
+        if (!nav.children.length) nav.style.display = "none";
+    </script>
+</body>
+
+</html>

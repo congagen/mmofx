@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>MMOFX Controller Designer</title>
+
+    <!-- =================================================================
+         MMOFX — CLIENT DESIGNER
+         A GUI alternative to hand-editing custom-client-template.html. Configure
+         a guest control panel here, then either COPY A LINK (config packed into
+         the URL hash, read by custom-client-template.html) or DOWNLOAD a
+         self-contained HTML file (config baked in — the only option that can
+         embed custom images). Nothing here makes sound; the host does.
+
+         Reuses custom-client-template.html as the single runtime: this page only
+         produces a CONFIG. Opened from the app's Share menu with ?channel= & ?fb=.
+         ================================================================= -->
+
+    <style>
+        :root {
+            --bg: #0e0e16;
+            --panel: #14141f;
+            --card: #1a1a28;
+            --edge: rgba(255, 255, 255, 0.09);
+            --ink: #f4f4fb;
+            --muted: rgba(244, 244, 251, 0.55);
+            --accent: #6c7bff;
+            --ok: #46c98b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--edge);
+        }
+        header h1 { font-size: 1.05rem; font-weight: 600; margin: 0; letter-spacing: 0.02em; }
+        header p { margin: 0; font-size: 0.8rem; color: var(--muted); }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+            gap: 0;
+            align-items: stretch;
+            min-height: calc(100vh - 58px);
+        }
+        @media (max-width: 860px) {
+            .layout { grid-template-columns: 1fr; }
+            .preview-col { border-left: 0 !important; border-top: 1px solid var(--edge); }
+        }
+
+        .form-col { padding: 18px 20px 60px; overflow-y: auto; }
+        .preview-col {
+            border-left: 1px solid var(--edge);
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            align-self: start;
+            height: calc(100vh - 58px);
+        }
+
+        .group {
+            background: var(--panel);
+            border: 1px solid var(--edge);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+        }
+        .group > summary {
+            list-style: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: var(--muted);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .group > summary::-webkit-details-marker { display: none; }
+        .group > summary::after {
+            content: "\25B8"; /* ▸ */
+            font-size: 0.95rem;
+            line-height: 1;
+            transition: transform 0.15s ease;
+        }
+        .group > summary:hover { color: var(--ink); }
+        .group[open] > summary { margin-bottom: 12px; }
+        .group[open] > summary::after { transform: rotate(90deg); }
+
+        label.field { display: block; margin-bottom: 12px; }
+        label.field > span { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 5px; }
+
+        input[type="text"], input[type="number"], input[type="url"], select {
+            width: 100%;
+            background: var(--card);
+            border: 1px solid var(--edge);
+            border-radius: 8px;
+            color: var(--ink);
+            padding: 9px 11px;
+            font-size: 0.92rem;
+        }
+        select { cursor: pointer; }
+        input:focus { outline: none; border-color: var(--accent); }
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            padding: 3px;
+            background: var(--card);
+            border: 1px solid var(--edge);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .checks { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+        .check { display: inline-flex; align-items: center; gap: 7px; font-size: 0.9rem; }
+        .check input { width: 17px; height: 17px; accent-color: var(--accent); }
+
+        .row2 { display: flex; gap: 10px; }
+        .row2 > * { flex: 1; }
+
+        input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+
+        /* Surfaces: enable + reorder */
+        .surface-rows { display: flex; flex-direction: column; gap: 8px; }
+        .surface-row { display: grid; grid-template-columns: 1fr 38px 38px; gap: 8px; align-items: center; }
+        .icon-btn:disabled { opacity: 0.28; cursor: default; }
+
+        /* Pad editor */
+        .pad-rows { display: flex; flex-direction: column; gap: 8px; }
+        .pad-row { display: grid; grid-template-columns: 1fr 84px 36px; gap: 8px; align-items: center; }
+        .pad-row .lbl-hd, .pad-head { font-size: 0.72rem; color: var(--muted); }
+        .pad-head { display: grid; grid-template-columns: 1fr 84px 36px; gap: 8px; margin-bottom: 6px; }
+        .icon-btn {
+            border: 1px solid var(--edge);
+            background: var(--card);
+            color: var(--muted);
+            border-radius: 8px;
+            height: 38px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+        .icon-btn:hover { color: var(--ink); }
+        .btn {
+            border: 1px solid var(--edge);
+            background: var(--card);
+            color: var(--ink);
+            border-radius: 9px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .btn:hover { border-color: var(--accent); }
+        .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .btn.add { width: 100%; margin-top: 8px; }
+
+        .hint { font-size: 0.78rem; color: var(--muted); line-height: 1.5; margin: 6px 0 0; }
+
+
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .actions .btn { flex: 1; min-width: 130px; }
+
+        .preview-frame {
+            flex: 1;
+            width: 100%;
+            border: 1px solid var(--edge);
+            border-radius: 12px;
+            background: #000;
+        }
+        .preview-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .preview-head h2 { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 0; }
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-size: 0.88rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+            z-index: 50;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        #linkLen.warn { color: #e2a24a; }
+        #linkLen.warn2 { color: #e2557a; }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>MMOFX Controller Designer</h1>
+        <p>Build a guest controller &rarr; copy a link or download the file.</p>
+    </header>
+
+    <div class="layout">
+        <div class="form-col">
+            <details class="group" open>
+                <summary>Session</summary>
+                <label class="field">
+                    <span>Channel (must match the host)</span>
+                    <input type="text" id="channel" placeholder="Lobby" maxlength="40">
+                </label>
+                <label class="check"><input type="checkbox" id="allowChannel"> Let guests change the channel</label>
+            </details>
+
+                        <details class="group">
+                <summary>Header</summary>
+                <label class="field">
+                    <span>Title text</span>
+                    <input type="text" id="title" placeholder="MMOFX Client" maxlength="60">
+                </label>
+                <label class="field">
+                    <span>Logo image URL (overrides title text)</span>
+                    <input type="url" id="titleImage" placeholder="https://&hellip;/logo.png">
+                </label>
+                <p class="hint">A logo must be a hosted URL to travel in a shared link. The channel name and connection dot always sit on the right.</p>
+            </details>
+
+            <details class="group" open>
+                <summary>Surfaces</summary>
+                <div class="surface-rows" id="surfaceRows"></div>
+                <p class="hint">Guests land on the first <em>enabled</em> surface; use the arrows to reorder. The tab bar appears automatically when more than one is enabled.</p>
+            </details>
+
+            <details class="group" open>
+                <summary>Pads</summary>
+                <label class="field">
+                    <span>Layout</span>
+                    <select id="padLayout">
+                        <option value="grid">Grid &mdash; compact cells</option>
+                        <option value="rows">Rows &mdash; one per line (long labels)</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>Pad height &mdash; <span id="padHeightVal">72</span>px</span>
+                    <input type="range" id="padHeight" min="40" max="160" step="4" value="72">
+                </label>
+                <div class="pad-head"><span class="lbl-hd">Label (shown)</span><span class="lbl-hd">Key</span><span></span></div>
+                <div class="pad-rows" id="padRows"></div>
+                <button type="button" class="btn add" id="addPad">+ Add pad</button>
+                <p class="hint">Each pad sends one <em>key</em> the host maps to a sample (a single character, e.g. <code>q</code>). The label is just what the guest sees.</p>
+            </details>
+
+            <details class="group" open>
+                <summary>Keys (piano)</summary>
+                <label class="field">
+                    <span>Layout</span>
+                    <select id="keyLayout">
+                        <option value="grid">Grid &mdash; compact keys</option>
+                        <option value="rows">Rows &mdash; full width</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>Key height &mdash; <span id="keyHeightVal">72</span>px</span>
+                    <input type="range" id="keyHeight" min="40" max="160" step="4" value="72">
+                </label>
+                <div class="row2">
+                    <label class="field"><span>Lowest note</span><input type="number" id="pianoLow" min="0" max="127" value="48"></label>
+                    <label class="field"><span>Highest note</span><input type="number" id="pianoHigh" min="0" max="127" value="72"></label>
+                </div>
+                <p class="hint">Note numbers, 0&ndash;127 (60 = middle C / the host&rsquo;s root pitch).</p>
+            </details>
+
+            <details class="group" open>
+                <summary>Seq</summary>
+                <label class="field"><span>Steps (space-separated keys)</span><input type="text" id="seqSteps" value="1 2 3 4 5"></label>
+                <label class="field"><span>BPM</span><input type="number" id="seqBpm" min="20" max="400" value="120"></label>
+                <p class="hint">A client-side sequencer that fires these keys at the tempo. A whole number is one pitched note (60 64 67); a single character is a pad key.</p>
+            </details>
+
+            <details class="group">
+                <summary>Send hints</summary>
+                <div class="checks">
+                    <label class="check"><input type="checkbox" id="h_random"> Randomize samples</label>
+                    <label class="check"><input type="checkbox" id="h_hold"> Hold / sustain</label>
+                </div>
+                <p class="hint">Flags sent with every press, asking the host to randomize samples or hold pitched notes.</p>
+            </details>
+
+            <details class="group">
+                <summary>Colors</summary>
+                <label class="check"><input type="checkbox" id="customColors"> Use a custom color scheme</label>
+                <div class="row2" style="margin-top:12px">
+                    <label class="field"><span>Background</span><input type="color" id="cBg" value="#0e0e16"></label>
+                    <label class="field"><span>Surface</span><input type="color" id="cCard" value="#1a1a28"></label>
+                </div>
+                <div class="row2">
+                    <label class="field"><span>Text</span><input type="color" id="cInk" value="#f4f4fb"></label>
+                    <label class="field"><span>Muted text</span><input type="color" id="cMuted" value="#8a8aa0"></label>
+                </div>
+                <div class="row2">
+                    <label class="field"><span>Accent</span><input type="color" id="cAccent" value="#6c7bff"></label>
+                    <label class="field"><span>Borders &amp; dividers</span><input type="color" id="cEdge" value="#2b2b3a"></label>
+                </div>
+                <div class="row2">
+                    <label class="field"><span>Connected dot</span><input type="color" id="cOk" value="#46c98b"></label>
+                    <label class="field"><span>Disconnected dot</span><input type="color" id="cBad" value="#e2557a"></label>
+                </div>
+                <div class="row2">
+                    <label class="field"><span>Sharp keys</span><input type="color" id="cSharp" value="#2a2a3d"></label>
+                    <label class="field"><span>Scrollbar</span><input type="color" id="cScroll" value="#4a4a5e"></label>
+                </div>
+                <p class="hint">Covers the whole controller, header included: title/channel use <em>Text</em>, the status text uses <em>Muted</em>, and the header rule uses <em>Borders</em>. Colors travel fine in a shared link. Off by default (uses the built-in dark theme).</p>
+            </details>
+
+            <details class="group">
+                <summary>Advanced &middot; Backend</summary>
+                <p class="hint" style="margin-top:0">Client Firebase keys aren&rsquo;t secrets &mdash; they only identify which backend to reach. Prefilled from the host when you open this from the app. Leave as-is for the default backend.</p>
+                <label class="field"><span>API key</span><input type="text" id="fbApiKey"></label>
+                <label class="field"><span>Project ID</span><input type="text" id="fbProjectId"></label>
+                <label class="field"><span>Database URL</span><input type="url" id="fbDatabaseURL"></label>
+            </details>
+        </div>
+
+        <div class="preview-col">
+            <div class="preview-head">
+                <h2>Live preview</h2>
+                <button type="button" class="btn" id="refreshPreview">Refresh</button>
+            </div>
+            <iframe class="preview-frame" id="preview" title="Client preview"></iframe>
+            <div class="actions">
+                <button type="button" class="btn primary" id="copyLink">Copy link</button>
+                <button type="button" class="btn" id="downloadHtml">Download HTML</button>
+            </div>
+            <p class="hint" id="linkNote">The link packs your config into the URL hash. A logo <em>URL</em> rides along fine; only embedded images need Download.</p>
+            <p class="hint" id="linkLen"></p>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        var TEMPLATE_URL = "custom-client-template.html";
+
+        // Default backend — kept in sync with custom-client-template.html. Used
+        // when the designer wasn't opened with an ?fb= (custom backend) param.
+        var DEFAULT_BACKEND = {
+            apiKey: "AIzaSyDx3-4RSc8fpkQcL2O_DsDSZ29qJ_JoRx8",
+            projectId: "xtation-2",
+            databaseURL: "https://xtation-2.firebaseio.com",
+            authDomain: "xtation-2.firebaseapp.com"
+        };
+
+        // ---- URL-safe base64 (UTF-8 aware) --------------------------------
+        function b64urlEncode(str) {
+            return btoa(unescape(encodeURIComponent(str)))
+                .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        }
+
+        // ---- Read prefills from our own URL (?channel=, ?fb=) --------------
+        var qs = new URLSearchParams(location.search);
+
+        function decodeFb(fb) {
+            try {
+                var b64 = fb.replace(/-/g, "+").replace(/_/g, "/");
+                while (b64.length % 4) b64 += "=";
+                var parts = atob(b64).split("|"); // apiKey|projectId|databaseURL
+                if (!parts[0] || !parts[1]) return null;
+                return {
+                    apiKey: parts[0],
+                    projectId: parts[1],
+                    databaseURL: parts[2] || ("https://" + parts[1] + ".firebaseio.com"),
+                    authDomain: parts[1] + ".firebaseapp.com"
+                };
+            } catch (e) { return null; }
+        }
+
+        var initialBackend = (qs.get("fb") && decodeFb(qs.get("fb"))) || DEFAULT_BACKEND;
+
+        // ---- Element refs -------------------------------------------------
+        var el = function (id) { return document.getElementById(id); };
+
+        // ---- Surfaces: enable + custom order ------------------------------
+        // PANELS order is user-controlled, so "guests land on the first enabled
+        // surface" is something you can actually steer.
+        var SURFACE_LABELS = { pads: "Pads", keys: "Keys", seq: "Seq" };
+        var surfaceOrder = ["pads", "keys", "seq"];
+        var surfaceOn = { pads: true, keys: true, seq: true };
+
+        function renderSurfaces() {
+            var wrap = el("surfaceRows");
+            wrap.innerHTML = "";
+            surfaceOrder.forEach(function (id, i) {
+                var row = document.createElement("div");
+                row.className = "surface-row";
+
+                var lab = document.createElement("label");
+                lab.className = "check";
+                var cb = document.createElement("input");
+                cb.type = "checkbox";
+                cb.checked = !!surfaceOn[id];
+                cb.addEventListener("change", function () {
+                    surfaceOn[id] = cb.checked;
+                    schedulePreview();
+                });
+                lab.appendChild(cb);
+                lab.appendChild(document.createTextNode(" " + SURFACE_LABELS[id]));
+
+                var up = document.createElement("button");
+                up.type = "button"; up.className = "icon-btn"; up.textContent = "↑";
+                up.title = "Move up"; up.disabled = i === 0;
+                up.addEventListener("click", function () { moveSurface(i, -1); });
+
+                var down = document.createElement("button");
+                down.type = "button"; down.className = "icon-btn"; down.textContent = "↓";
+                down.title = "Move down"; down.disabled = i === surfaceOrder.length - 1;
+                down.addEventListener("click", function () { moveSurface(i, 1); });
+
+                row.appendChild(lab); row.appendChild(up); row.appendChild(down);
+                wrap.appendChild(row);
+            });
+        }
+        function moveSurface(i, dir) {
+            var j = i + dir;
+            if (j < 0 || j >= surfaceOrder.length) return;
+            var t = surfaceOrder[i]; surfaceOrder[i] = surfaceOrder[j]; surfaceOrder[j] = t;
+            renderSurfaces();
+            schedulePreview();
+        }
+
+        // ---- Pad editor ---------------------------------------------------
+        var DEFAULT_PADS = [
+            ["1", "q"], ["2", "w"], ["3", "e"], ["4", "r"],
+            ["5", "a"], ["6", "s"], ["7", "d"], ["8", "f"]
+        ];
+        var padRows = el("padRows");
+
+        function addPadRow(label, key) {
+            var row = document.createElement("div");
+            row.className = "pad-row";
+            var lbl = document.createElement("input");
+            lbl.type = "text"; lbl.value = label != null ? label : ""; lbl.placeholder = "Label"; lbl.maxLength = 24;
+            var k = document.createElement("input");
+            k.type = "text"; k.value = key != null ? key : ""; k.placeholder = "key"; k.maxLength = 4;
+            var del = document.createElement("button");
+            del.type = "button"; del.className = "icon-btn"; del.textContent = "✕"; del.title = "Remove";
+            del.addEventListener("click", function () { row.remove(); schedulePreview(); });
+            lbl.addEventListener("input", schedulePreview);
+            k.addEventListener("input", schedulePreview);
+            row.appendChild(lbl); row.appendChild(k); row.appendChild(del);
+            padRows.appendChild(row);
+        }
+        function setPads(list) {
+            padRows.innerHTML = "";
+            (list && list.length ? list : DEFAULT_PADS).forEach(function (p) { addPadRow(p[0], p[1]); });
+        }
+        el("addPad").addEventListener("click", function () { addPadRow("", ""); schedulePreview(); });
+
+        function syncHeightLabels() {
+            el("padHeightVal").textContent = el("padHeight").value;
+            el("keyHeightVal").textContent = el("keyHeight").value;
+        }
+        el("padHeight").addEventListener("input", syncHeightLabels);
+        el("keyHeight").addEventListener("input", syncHeightLabels);
+
+        // ---- Build CONFIG from the form -----------------------------------
+        function currentBackend() {
+            return {
+                apiKey: el("fbApiKey").value.trim(),
+                projectId: el("fbProjectId").value.trim(),
+                databaseURL: el("fbDatabaseURL").value.trim(),
+                authDomain: el("fbProjectId").value.trim() + ".firebaseapp.com"
+            };
+        }
+        function backendIsDefault(b) {
+            return b.apiKey === DEFAULT_BACKEND.apiKey
+                && b.projectId === DEFAULT_BACKEND.projectId
+                && b.databaseURL === DEFAULT_BACKEND.databaseURL;
+        }
+
+        function collectPads() {
+            var out = [];
+            Array.prototype.forEach.call(padRows.children, function (row) {
+                var ins = row.querySelectorAll("input");
+                var label = ins[0].value.trim();
+                var key = ins[1].value.trim();
+                if (key) out.push([label || key, key]);
+            });
+            return out;
+        }
+
+        function buildConfig() {
+            var panels = surfaceOrder.filter(function (id) { return surfaceOn[id]; });
+
+            var low = clampNote(el("pianoLow").value, 48);
+            var high = clampNote(el("pianoHigh").value, 72);
+            if (high < low) { var t = low; low = high; high = t; }
+
+            var cfg = {
+                channel: el("channel").value.trim() || "Lobby",
+                TITLE: el("title").value.trim() || "MMOFX Client",
+                PANELS: panels.length ? panels : ["pads"],
+                SHOW_NAV: true,
+                PAD_KEYS: collectPads(),
+                PIANO_RANGE: [low, high],
+                SEQ_STEPS: el("seqSteps").value,
+                SEQ_BPM: clampInt(el("seqBpm").value, 120, 20, 400),
+                RANDOMIZE: el("h_random").checked,
+                HOLD: el("h_hold").checked,
+                ALLOW_CHANNEL: el("allowChannel").checked
+            };
+            // Only include when non-default, so default-config links stay short.
+            if (el("padLayout").value === "rows") cfg.PAD_LAYOUT = "rows";
+            if (el("keyLayout").value === "rows") cfg.KEY_LAYOUT = "rows";
+            var ph = clampInt(el("padHeight").value, 72, 40, 160);
+            if (ph !== 72) cfg.PAD_HEIGHT = ph;
+            var kh = clampInt(el("keyHeight").value, 72, 40, 160);
+            if (kh !== 72) cfg.KEY_HEIGHT = kh;
+            var img = el("titleImage").value.trim();
+            if (img) cfg.TITLE_IMAGE = img;
+            if (el("customColors").checked) {
+                cfg.COLORS = {
+                    bg: el("cBg").value,
+                    card: el("cCard").value,
+                    ink: el("cInk").value,
+                    muted: el("cMuted").value,
+                    accent: el("cAccent").value,
+                    edge: el("cEdge").value,
+                    ok: el("cOk").value,
+                    bad: el("cBad").value,
+                    sharp: el("cSharp").value,
+                    scroll: el("cScroll").value
+                };
+            }
+            return cfg;
+        }
+        function clampNote(v, dflt) { return clampInt(v, dflt, 0, 127); }
+        function clampInt(v, dflt, lo, hi) {
+            var n = parseInt(v, 10);
+            if (isNaN(n)) n = dflt;
+            return Math.max(lo, Math.min(hi, n));
+        }
+
+        // The link only needs to carry the backend when it's a CUSTOM one; the
+        // default is already baked into the receiver, so default links stay short.
+        function configForLink() {
+            var cfg = buildConfig();
+            // Drop values equal to the receiver's baked defaults so the link
+            // carries only what actually differs — shorter URL, denser-free QR.
+            if (cfg.TITLE === "MMOFX Client") delete cfg.TITLE;
+            if (cfg.SHOW_NAV === true) delete cfg.SHOW_NAV;
+            if (cfg.ALLOW_CHANNEL === false) delete cfg.ALLOW_CHANNEL;
+            if (cfg.RANDOMIZE === false) delete cfg.RANDOMIZE;
+            if (cfg.HOLD === false) delete cfg.HOLD;
+            var b = currentBackend();
+            if (!backendIsDefault(b)) cfg.backend = b;
+            return cfg;
+        }
+
+        function buildLink() {
+            var encoded = b64urlEncode(JSON.stringify(configForLink()));
+            return location.origin + location.pathname.replace(/[^/]*$/, "") + TEMPLATE_URL + "#cfg=" + encoded;
+        }
+
+        // ---- Live preview (debounced) -------------------------------------
+        var previewTimer = null;
+        function schedulePreview() {
+            clearTimeout(previewTimer);
+            previewTimer = setTimeout(function () { updatePreview(); saveState(); }, 500);
+        }
+        function updatePreview() {
+            // A fragment-only src change is same-document navigation — the iframe
+            // wouldn't reload and re-read #cfg. A throwaway query param (pv) that
+            // changes each time forces a real reload; it's NOT in the copied
+            // link (buildLink), only in the preview.
+            var link = buildLink();
+            el("preview").src = link.replace("#cfg=", "?pv=" + Date.now() + "#cfg=");
+            updateLinkLen(link.length);
+        }
+
+        // The config rides in the URL hash, which browsers handle at huge sizes,
+        // so the link itself never "doesn't fit" for copy/paste. The only real
+        // ceiling is a QR code: dense/hard to scan past ~1200 chars, and
+        // physically impossible past ~2900 (QR byte-mode capacity). Frame the
+        // readout around that, not link validity.
+        function updateLinkLen(n) {
+            var elp = el("linkLen");
+            var note = n > 2900 ? " — won't fit a QR code (copy/paste still works; or use Download)."
+                : n > 1200 ? " — copy/paste is fine; too dense to scan as a QR code."
+                : " — fine for both copy/paste and QR codes.";
+            elp.textContent = "Link length: " + n + " / ~2900 characters (QR code limit)" + note;
+            elp.classList.toggle("warn", n > 1200 && n <= 2900);
+            elp.classList.toggle("warn2", n > 2900);
+        }
+        el("refreshPreview").addEventListener("click", updatePreview);
+
+        // Any input change reschedules the preview.
+        document.querySelector(".form-col").addEventListener("input", schedulePreview);
+        document.querySelector(".form-col").addEventListener("change", schedulePreview);
+
+        // ---- Toast --------------------------------------------------------
+        var toastTimer = null;
+        function toast(msg) {
+            var t = el("toast");
+            t.textContent = msg;
+            t.classList.add("show");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2200);
+        }
+
+        // ---- Copy link ----------------------------------------------------
+        el("copyLink").addEventListener("click", function () {
+            var url = buildLink();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(
+                    function () { toast("Link copied to clipboard"); },
+                    function () { prompt("Copy this link:", url); }
+                );
+            } else {
+                prompt("Copy this link:", url);
+            }
+        });
+
+        // ---- Download self-contained HTML ---------------------------------
+        // Fetch the template and replace the whole CONFIG block with a baked
+        // config (backend + channel included). This path can carry embedded
+        // images (data URIs) a link can't.
+        el("downloadHtml").addEventListener("click", function () {
+            var cfg = buildConfig();
+            cfg.backend = currentBackend();
+            fetch(TEMPLATE_URL).then(function (r) {
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                return r.text();
+            }).then(function (html) {
+                var baked = "/*__CONFIG_START__*/\n        const CONFIG = "
+                    + JSON.stringify(cfg, null, 8) + ";\n        /*__CONFIG_END__*/";
+                var out = html.replace(
+                    /\/\*__CONFIG_START__\*\/[\s\S]*?\/\*__CONFIG_END__\*\//,
+                    function () { return baked; }
+                );
+                var blob = new Blob([out], { type: "text/html" });
+                var a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "mmofx-client-" + (cfg.channel || "panel") + ".html";
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+                toast("Downloaded " + a.download);
+            }).catch(function () {
+                toast("Couldn't load the template to build the file");
+            });
+        });
+
+        // ---- Persistence ---------------------------------------------------
+        // Autosave to localStorage so a reload doesn't lose the design. Chosen
+        // over explicit Save/Load: no extra UI, and it fixes the actual pain.
+        var LS_KEY = "mmofx_designer_v1";
+        var TEXT_FIELDS = ["channel", "title", "titleImage", "padLayout", "keyLayout",
+            "padHeight", "keyHeight", "pianoLow", "pianoHigh", "seqSteps", "seqBpm",
+            "fbApiKey", "fbProjectId", "fbDatabaseURL",
+            "cBg", "cCard", "cInk", "cMuted", "cAccent", "cEdge", "cOk", "cBad", "cSharp", "cScroll"];
+        var CHECK_FIELDS = ["allowChannel", "customColors", "h_random", "h_hold"];
+
+        function saveState() {
+            try {
+                var s = { fields: {}, checks: {}, order: surfaceOrder, on: surfaceOn, pads: collectPads() };
+                TEXT_FIELDS.forEach(function (id) { var e = el(id); if (e) s.fields[id] = e.value; });
+                CHECK_FIELDS.forEach(function (id) { var e = el(id); if (e) s.checks[id] = e.checked; });
+                localStorage.setItem(LS_KEY, JSON.stringify(s));
+            } catch (e) { /* private mode / quota — non-fatal */ }
+        }
+        function loadState() {
+            try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch (e) { return null; }
+        }
+
+        // ---- Init ------------------------------------------------------------
+        (function init() {
+            var saved = loadState();
+            if (saved) {
+                TEXT_FIELDS.forEach(function (id) {
+                    if (saved.fields && saved.fields[id] != null) { var e = el(id); if (e) e.value = saved.fields[id]; }
+                });
+                CHECK_FIELDS.forEach(function (id) {
+                    if (saved.checks && saved.checks[id] != null) { var e = el(id); if (e) e.checked = saved.checks[id]; }
+                });
+                if (saved.order && saved.order.length === 3) surfaceOrder = saved.order;
+                if (saved.on) surfaceOn = saved.on;
+                setPads(saved.pads);
+            } else {
+                setPads(null);
+            }
+
+            // The host's live context always wins over a saved design.
+            if (qs.get("channel")) el("channel").value = qs.get("channel");
+            var fb = qs.get("fb") && decodeFb(qs.get("fb"));
+            if (fb) {
+                el("fbApiKey").value = fb.apiKey;
+                el("fbProjectId").value = fb.projectId;
+                el("fbDatabaseURL").value = fb.databaseURL;
+            }
+            // Backfill anything still empty (first run, no URL params).
+            if (!el("channel").value) el("channel").value = "Lobby";
+            if (!el("fbApiKey").value) {
+                el("fbApiKey").value = initialBackend.apiKey;
+                el("fbProjectId").value = initialBackend.projectId;
+                el("fbDatabaseURL").value = initialBackend.databaseURL;
+            }
+
+            renderSurfaces();
+            syncHeightLabels();
+            updatePreview();
+        })();
+    </script>
+</body>
+
+</html>
